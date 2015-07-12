@@ -1,4 +1,8 @@
 from django.shortcuts import render
+from django.utils import timezone
+from .models import Post
 
 def post_list(request):
-    return render(request, 'blog/post_list.html', {})  #To serve as a template, 'blog/post_list.html' has to be put in blog\template\blog\
+    posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
+    return render(request, 'blog/post_list.html', {'posts': posts})  #To serve as a template, 'blog/post_list.html' has to be put in blog\template\blog\
+	#The last parameter, which looks like this: {} is a place to integrate objects in models.py (posts) with html ('posts') in template folder.
