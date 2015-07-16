@@ -10,7 +10,7 @@
         {% for post in posts %}
             <div>
                 <p>published: {{ post.published_date }}</p>  <!--see models.py for 'post' object and the fields it contain-->
-                <h1><a href="">{{ post.title }}</a></h1>
+                <h1><a href="/">{{ post.title }}</a></h1>
             <p>{{ post.text|linebreaks }}</p>
         </div>
         {% endfor %}
