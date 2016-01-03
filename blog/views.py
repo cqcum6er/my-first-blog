@@ -1,14 +1,14 @@
 from django.shortcuts import render
 #from django.utils import timezone
 from .models import Post  #'Post' table object is retrieved from 'models.py' within the same folder.
-import re
-import urllib  #Needed for information retrieval from the web.
-import httplib  #Needed for efficient information retrieval from the web by maintaining stable server connection.
-from django.http import HttpResponse  #TO print string directly to html.
+#import re
+#import urllib  #Needed for information retrieval from the web.
+#import httplib  #Needed for efficient information retrieval from the web by maintaining stable server connection.
+import requests
 
 def KeyFet(sep,num):  #KeyFet() function fetches components of key statistics page; att=attribute, sep=separator, num=Nth separator
 	att = ""
-	for ch in html.split(sep)[num]:
+	for ch in html.text.split(sep)[num]:
 		if ch != "<":
 			att += ch
 		else:
@@ -22,14 +22,16 @@ def post_list(request):  #"post_list" must be requested from urls.py
     #YfLink.request('GET','/q/cp?s=%5EDJI+Components')  #.request('GET',url) is similar to .urlopen(url) in urllib or urllib2
     #page = YfLink.getresponse()
 	global html  #Make html in KeyFet function accessible.
-	YFconn = httplib.HTTPConnection('finance.yahoo.com')
-	YFconn.request('GET','/q/cp?s=%5EDJI+Components')
-	page = YFconn.getresponse()
-	html = page.read()
+	#YFconn = httplib.HTTPConnection('finance.yahoo.com')
+	#YFconn.request('GET','/q/cp?s=%5EDJI+Components')
+	html = requests.get('http://finance.yahoo.com/q/cp?s=%5EDJI+Components')
+	#page = YFconn.getresponse()
+	#html = page.read()
+	#print html.text
 	DJlist = []
 	for iter in xrange(5,35):
 		DJsym = ""
-		for ch in html.split('/q?s=')[iter]:
+		for ch in html.text.split('/q?s=')[iter]:
 			if ch != "\"":
 				DJsym += ch
 			else:
@@ -45,13 +47,14 @@ def post_list(request):  #"post_list" must be requested from urls.py
 	else:
 		pass
 	for tick in DJlist:
-		YFconn.request('GET','/q/ks?s='+tick+'+Key+Statistics')
-		page = YFconn.getresponse()
-		html = page.read()
-		if 'tabledata1\">' in html:
+		#YFconn.request('GET','/q/ks?s='+tick+'+Key+Statistics')
+		html = requests.get('http://finance.yahoo.com/q/ks?s='+tick+'+Key+Statistics')
+		#page = YFconn.getresponse()
+		#html = page.read()
+		if 'tabledata1\">' in html.text:
 			LastPrice = ""
-			if 'yfs_l84_' in html:
-				for ch in html.split('yfs_l84_')[1]:
+			if 'yfs_l84_' in html.text:
+				for ch in html.text.split('yfs_l84_')[1]:
 					if ch != '<':
 						LastPrice += ch
 					else:
@@ -60,7 +63,7 @@ def post_list(request):  #"post_list" must be requested from urls.py
 				LP = LP_Split[1].replace(',','')
 				print LP
 			_52WkChg = ""
-			for ch in html.split('tabledata1\">')[33]:
+			for ch in html.text.split('tabledata1\">')[33]:
 				if ch != "<":
 					_52WkChg += ch
 				else:
@@ -74,8 +77,8 @@ def post_list(request):  #"post_list" must be requested from urls.py
 			PpS = KeyFet('tabledata1\">',6)
 			PpB = KeyFet('tabledata1\">',7)
 			MktCap = ""
-			if 'yfs_j10_' in html:
-				for ch in html.split('yfs_j10_')[1]:
+			if 'yfs_j10_' in html.text:
+				for ch in html.text.split('yfs_j10_')[1]:
 					if ch != '<':
 						MktCap += ch
 					else:
@@ -108,7 +111,7 @@ def post_list(request):  #"post_list" must be requested from urls.py
 				MpC = "N/A"
 			EpE = KeyFet('tabledata1\">',9)
 			Name = ""
-			for ch in html.split('<h2>')[2]:
+			for ch in html.text.split('<h2>')[2]:
 				if ch != "<":
 					Name += ch
 				else:
