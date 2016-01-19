@@ -1,12 +1,86 @@
 <html>
 	<head>
-		<title>Fundamental Compare</title>
+		<title>Peer Fundamental-DJ Index</title>
+		<style type="text/css">
+		body {  <!--Viewable area format-->
+			font: 12pt Verdana, Arial, Gerogia, sans-serif;
+			background-color: #EADCAE;
+			margin: 0;
+		}
+	
+		#nav {  <!--Left vertical navigation menu format-->
+			width: 150px;
+			float: left;
+			margin-top: 40px;
+			margin-right: 18px;
+			margin-bottom: -2000px;
+			padding-left: 0;
+			padding-bottom: 2000px;
+		}
+	
+		#content {  <!--Content area format-->
+			display: inline;  <!--Display content area next to left verti nav menu-->
+			position: relative;
+			float: left;
+			width: 75%;
+			background-color: #fff;
+			padding: 12px;
+		}
+	
+		#nav ul {
+			background-color: #ffcc66;
+			list-style: none;  <!--Remove list indicator (bullet)-->
+			margin: 12px 0 0 12px;  <!--Reserve margin for the entire list-->
+			padding-left: 0;  <!--Remove space reserved for list indicator-->
+			clear: left;
+		}
+	
+		#nav li {
+			border-bottom: 1px solid #fff;
+			padding: 4px;
+			text-align: center;
+		}
+
+		#nav a {
+			text-decoration: none;  <!--Remove hyperlink formating-->
+			padding: 4px;
+			display: block;  <!--Expand clickable boundary to the entire cell-->
+		}
+
+		#nav a:hover, a:active {
+			display: block;
+			background-color: #66991c;
+			color: white;
+		}
+		</style>	
 	</head>
 	<body>
+		<table style="margin-bottom: -25px; padding-bottom: 0;">  <!--Topbar begins-->
+			<tr style="text-align:center; background-color: #fff;">
+			<th><h1 style="color:#00A100">Peer Fundamental<br><h2 style="font-family:verdana; font-size:12pt;">The Free Fundamental Analysis Database</h2></h1></th>
+			</tr>
+		</table>  <!--Topbar ends-->
+
+		<div id="nav">  <!--left verti nav menu begins-->
+			<ul>
+				<li><a class="hover" href="Home.html">Home</a></li>
+				<li><a class="hover" href="OurStrategy.html">Database</a></li>
+				<li><a class="hover" href="WhatYouGet.html">Education Center</a></li>
+				<li><a class="hover" href="Testpage.html">FAQ</a></li>
+				<li><a class="hover" href="Testpage.html">Links</a></li>
+				<li><a class="hover" href="Testpage.html">Contact</a></li>
+			</ul>
+		</div>  <!--left verti nav menu ends-->
+
 		<div>
-			<h1><a href="http://finance.yahoo.com/">Fundamental Compare</a></h1>
+			<h2 style="text-align: center; background-color: #3a7795; color: #fff;">Dow Jones Index</h2>
 		</div>
-		<table>
+		
+		<div>
+			<h3><a href="http://finance.yahoo.com/">Today</a></h3>
+		</div>
+		
+		<table id="content">
 			<tr>
 				<th>Symbol</th>
 				<th>Price</th>
