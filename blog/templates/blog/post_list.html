@@ -5,14 +5,14 @@
 		body {  <!--Viewable area format-->
 			font: 12pt Verdana, Arial, Gerogia, sans-serif;
 			background-color: #EADCAE;
-			margin: 0;	<!--Margin defines the space outside the element border; set to 0 to occupy the whole browser window-->
+			margin: 0;	<!--Margin defines the space outside the element border; set to 0 to occupy the whole browser window.-->
 		}
 	
 		h1,h2 {
 			font-family: arial;
 		}
 	
-		#nav {	<!--Left vertical navigation menu format-->
+		#nav {	<!--Left vertical navigation menu format; define a different style for a different element identified by id="nav".-->
 			width: 150px;
 			float: left;
 			margin-top: 40px;
@@ -29,7 +29,7 @@
 			width: 75%;
 			background-color: #fff;
 			padding: 12px;
-			margin-left:175px;
+			margin-left:175px;	<!--Margin added to keep element to the right of nav bar-->
 		}
 	
 		#nav ul {
@@ -41,7 +41,7 @@
 		}
 	
 		#nav li {
-			border-bottom: 1px solid #fff;
+			border: 5px solid #fff;
 			padding: 4px;
 			text-align: center;
 		}
@@ -81,12 +81,12 @@
 			<h2 style="text-align: center; background-color: #3a7795; color: #fff;">Dow Jones Index</h2>
 		</div>
 		
-		<div style="margin-left:175px;">
+		<div style="margin-left:175px;">	<!--Margin added to keep element to the right of nav bar-->
 			<h3><a href="http://finance.yahoo.com/">Today</a></h3>
 		</div>
 		
 		<table id="content">
-			<tr>
+			<tr style="color:white;background:black;">
 				<th>Symbol</th>
 				<th>Price</th>
 				<th>52-week Change</th>
