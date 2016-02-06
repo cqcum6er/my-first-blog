@@ -1,0 +1,71 @@
+{% extends "post_list.html" %}
+
+{% block title %}Fundamental Overview-DJ Index-Today{% endblock %}
+
+{% block content %}
+<div id="aside">
+	<ul>
+		<li><a href="http://finance.yahoo.com/q?s=^dji">Dow Jones Index</a></li>
+		<li><a href="http://finance.yahoo.com/q?s=^gspc">S&amp;P500 Index</a></li>
+	</ul>
+</div>
+
+<div id="section" style="margin-left:175px; background-color:#fff;">	<!--Margin added to keep element to the right of aside bar-->
+	<ul style=" list-style:none; display:inline; text-decoration:none;">
+		<li style="display:inline; text-decoration:none;"><a style="text-decoration:none;" href="http://finance.yahoo.com/">Today</a></li>
+		<li style="display:inline; text-decoration:none;"><a href="http://finance.yahoo.com/">Last Week</a></li>
+		<li style="display:inline; text-decoration:none;"><a href="http://finance.yahoo.com/">Last Month</a></li>
+		<li style="display:inline; text-decoration:none;"><a href="http://finance.yahoo.com/">Last Quarter</a></li>
+		<li style="display:inline; text-decoration:none;"><a href="http://finance.yahoo.com/">Last Year</a></li>
+	</ul>
+</div>
+
+<table id="article" border="8" style="border-collapse: collapse; width:1000px;">
+	<caption>Dow Jones Index - Today</caption>
+	<thead>
+	<tr style="color:white;background:black;">
+		<th>Symbol</th>
+		<th>Price</th>
+		<th>52-week Change</th>
+		<th>52-week Low</th>
+		<th>52-week High</th>
+		<th>5 Year Average Dividend Yield</th>
+		<th>Trailing P/E</th>
+		<th>Forward P/E</th>
+		<th>PEG Ratio</th>
+		<th>Price/Sales</th>
+		<th>Price/Book</th>
+		<th>Market Cap</th>
+		<th>Levered Free Cash Flow</th>
+		<th>Market Per Cash Flow</th>
+		<th>Enterprise Value/EBITDA</th>
+		<th>Name</th>
+	</tr>
+	</thead>
+	<tbody>
+	{% for post in posts %}  <!--see views.py for 'posts' list-->
+		<!--<p>published: {{ post.published_date }}</p>
+		<h1><a href="/">{{ post.title }}</a></h1>
+		<p>{{ post.text|linebreaks }}</p>-->
+	<tr align="center">
+		<td>{{post.Symbol}}</td>
+		<td>{{post.LastPrice}}</td>
+		<td>{{post.FiftyTwoWkChg}}</td>
+		<td>{{post.FiftyTwoWkLo}}</td>
+		<td>{{post.FiftyTwoWkHi}}</td>
+		<td>{{post.DivYild}}</td>
+		<td>{{post.TrailPE}}</td>
+		<td>{{post.ForwardPE}}</td>
+		<td>{{post.PEG_Ratio}}</td>
+		<td>{{post.PpS}}</td>
+		<td>{{post.PpB}}</td>
+		<td>{{post.Market_Cap}}</td>
+		<td>{{post.Free_Cash_Flow}}</td>
+		<td>{{post.Market_per_CashFlow}}</td>
+		<td>{{post.Enterprise_per_EBITDA}}</td>
+		<td>{{post.Name}}</td>
+	</tr>
+	{% endfor %}
+	</tbody>
+</table>
+{% endblock %}

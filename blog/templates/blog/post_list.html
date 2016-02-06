@@ -1,9 +1,81 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 	<head>
-		<title>Peer Fundamental-DJ Index</title>
+		<title>{% block title %}Fundamental Overview-Home{% endblock %}</title>
 		<style type="text/css">
+		#header {<!--refer to http://www.w3schools.com/html/html_layout.asp for layout referrence-->}
+				
+		ul#nav {
+			padding: 0;
+		}
+		ul#nav li {
+			display: inline;  <!--Displays an element as an inline element (like <span>); applies to <li>.-->
+		}
+		ul#nav li a {
+			background-color: black;
+			color: white;
+			padding: 10px 20px;
+			text-decoration: none;
+			border-radius: 8px 8px 0 0;
+		}
+		ul#nav li a:hover {
+			background-color: orange;
+			color: black;
+		}
+
+		#aside {	<!--Left vertical navigation bar format; define a different style for a different element identified by id="aside".-->
+			width: 125px;
+			float: left;
+			margin-top: 20px;
+			margin-right: 18px;
+			margin-bottom: -2000px;
+			margin-left: 0;
+			padding-left: 0;	<!--padding defines the space between element and element border-->
+			padding-bottom: 2000px;
+		}
+		#aside ul {
+			background-color: #ffcc66;
+			list-style: none;  <!--Remove list indicator (bullet)-->
+			margin: 0 0 0 12px;  <!--Reserve margin for the entire list-->
+			padding-left: 5px;  <!--Remove space reserved for list indicator-->
+			clear: left;
+		}
+		#aside li {
+			border-bottom: 1px solid #fff;
+			padding: 4px;
+			text-align: center;
+		}
+		#aside a {	<!--Format hyperlink in all stats(i.e.link, visited, etc.)-->
+			padding: 8px;
+			display: block;  <!--Expand clickable boundary to the entire cell-->
+			text-decoration: none;  <!--Remove hyperlink formating (i.e.underline); applies to <a>.-->
+		}
+		#aside a:hover, a:active {	<!--Change link color when cursor hovers over and when clicked.-->
+			display: block;
+			background-color: #66991c;
+			color: white;
+		}
+		
+		#article {  <!--Content area format-->
+			<!--display: inline;  Display content area next to left verti aside bar-->
+			position: relative;
+			float: left;
+			width: 75%;
+			background-color: #fff;
+			padding: 6px;
+			margin-left:165px;	<!--Margin added to keep element to the right of aside bar-->
+		}
+
+		#article tr:nth-child(even) {
+		background-color: #eee;
+		}
+		
+		#article tr:nth-child(odd) {
+		background-color: #fff;
+		}
+						
 		body {  <!--Viewable area format-->
-			font: 12pt Verdana, Arial, Gerogia, sans-serif;
+			font: 12pt Verdana, "Times New Roman", Gerogia, sans-serif;
 			background-color: #EADCAE;
 			margin: 0;	<!--Margin defines the space outside the element border; set to 0 to occupy the whole browser window.-->
 		}
@@ -11,122 +83,43 @@
 		h1,h2 {
 			font-family: arial;
 		}
-	
-		#nav {	<!--Left vertical navigation menu format; define a different style for a different element identified by id="nav".-->
-			width: 150px;
-			float: left;
-			margin-top: 40px;
-			margin-right: 18px;
-			margin-bottom: -2000px;
-			padding-left: 0;	<!--padding defines the space between element and element border-->
-			padding-bottom: 2000px;
-		}
-	
-		#content {  <!--Content area format-->
-			display: inline;  <!--Display content area next to left verti nav menu-->
-			position: relative;
-			float: left;
-			width: 75%;
-			background-color: #fff;
-			padding: 12px;
-			margin-left:175px;	<!--Margin added to keep element to the right of nav bar-->
-		}
-	
-		#nav ul {
-			background-color: #ffcc66;
-			list-style: none;  <!--Remove list indicator (bullet)-->
-			margin: 12px 0 0 12px;  <!--Reserve margin for the entire list-->
-			padding-left: 0;  <!--Remove space reserved for list indicator-->
-			clear: left;
-		}
-	
-		#nav li {
-			border: 5px solid #fff;
-			padding: 4px;
-			text-align: center;
-		}
-
-		#nav a {
-			text-decoration: none;  <!--Remove hyperlink formating-->
-			padding: 4px;
-			display: block;  <!--Expand clickable boundary to the entire cell-->
-		}
-
-		#nav a:hover, a:active {
-			display: block;
-			background-color: #66991c;
-			color: white;
-		}
 		</style>	
 	</head>
 	<body>
-		<table style="margin-bottom: -25px; padding-bottom: 0;">  <!--Topbar begins-->
-			<tr style="text-align:center; background-color: #fff;">
-			<th><h1 style="color:#00A100">Peer Fundamental<br><h2 style="font-family:verdana; font-size:12pt;">The Free Fundamental Analysis Database</h2></h1></th>
-			</tr>
-		</table>  <!--Topbar ends-->
+		<!--Topbar begins-->
+		<div style="text-align:center; background-color:#fff;">
+			<h1 style="color:#00A100">Fundamental Overview</h1>
+			<h2 style="font-size:12pt;">The Comprehensive Fundamental Analysis Database</h2>
+		</div>  <!--Topbar ends-->
 
-		<div id="nav">  <!--left verti nav menu begins-->
-			<ul>
+		<div>  <!--a container for navigation links below header-->
+			<ul id="nav">	<!--Unordered list-->
 				<li><a class="hover" href="Home.html">Home</a></li>
-				<li><a class="hover" href="OurStrategy.html">Database</a></li>
-				<li><a class="hover" href="WhatYouGet.html">Education Center</a></li>
-				<li><a class="hover" href="Testpage.html">FAQ</a></li>
-				<li><a class="hover" href="Testpage.html">Links</a></li>
-				<li><a class="hover" href="Testpage.html">Contact</a></li>
+				<li><a class="hover" href="Education_Center.html">Education Center</a></li>
+				<li><a class="hover" href="Database.html">Database</a></li>
+				<li><a class="hover" href="Resources.html">Resources</a></li>
+				<li><a class="hover" href="FAQ.html">FAQ</a></li>
+				<li><a class="hover" href="Contact.html">Contact</a></li>
 			</ul>
-		</div>  <!--left verti nav menu ends-->
-
-		<div>
-			<h2 style="text-align: center; background-color: #3a7795; color: #fff;">Dow Jones Index</h2>
-		</div>
-		
-		<div style="margin-left:175px;">	<!--Margin added to keep element to the right of nav bar-->
-			<h3><a href="http://finance.yahoo.com/">Today</a></h3>
-		</div>
-		
-		<table id="content">
-			<tr style="color:white;background:black;">
-				<th>Symbol</th>
-				<th>Price</th>
-				<th>52-week Change</th>
-				<th>52-week Low</th>
-				<th>52-week High</th>
-				<th>5 Year Average Dividend Yield</th>
-				<th>Trailing P/E</th>
-				<th>Forward P/E</th>
-				<th>PEG Ratio</th>
-				<th>Price/Sales</th>
-				<th>Price/Book</th>
-				<th>Market Cap</th>
-				<th>Levered Free Cash Flow</th>
-				<th>Market Per Cash Flow</th>
-				<th>Enterprise Value/EBITDA</th>
-				<th>Name</th>
-			</tr>
-			{% for post in posts %}  <!--see views.py for 'posts' list-->
-				<!--<p>published: {{ post.published_date }}</p>
-				<h1><a href="/">{{ post.title }}</a></h1>
-				<p>{{ post.text|linebreaks }}</p>-->
-			<tr align="center">
-				<td>{{post.Symbol}}</td>
-				<td>{{post.LastPrice}}</td>
-				<td>{{post.FiftyTwoWkChg}}</td>
-				<td>{{post.FiftyTwoWkLo}}</td>
-				<td>{{post.FiftyTwoWkHi}}</td>
-				<td>{{post.DivYild}}</td>
-				<td>{{post.TrailPE}}</td>
-				<td>{{post.ForwardPE}}</td>
-				<td>{{post.PEG_Ratio}}</td>
-				<td>{{post.PpS}}</td>
-				<td>{{post.PpB}}</td>
-				<td>{{post.Market_Cap}}</td>
-				<td>{{post.Free_Cash_Flow}}</td>
-				<td>{{post.Market_per_CashFlow}}</td>
-				<td>{{post.Enterprise_per_EBITDA}}</td>
-				<td>{{post.Name}}</td>
-			</tr>
-			{% endfor %}
-		</table>
+		</div>  <!--top nav bar ends-->
+		{% block content %}
+		  <p>Why do you want your money in stock?</p>
+		  <ol>
+			<li>Stock performs better than bond or bank CD in fighting inflation.</li>
+			<li>Unlike real estate, which can take months and years to appreciate in value, you can trade stocks much easier and in a shorter period.</li>
+			<li>With shorter turnover time in stock, you can take your earning and reinvest that money in more undervalued stocks and watch your money grow!</li>
+		  </ol>
+		  <p>Even though you have your money in stocks, what can you do to help yourself minimize the risks associated with stocks?  After all, many people invest in stock outside their normal career so they have little time to dedicate to evaluate the value of a stock.  If you decided to invest in a stock, it is preferably to hold it for long term.</p>
+		  <p>Why invest in stock for long term?  Below are some of the benefits of investing for long term:</p>
+		  <ol>
+			<li>Most investors lack the time and resources to trade like a day trader.  We know your time is precious so with our method you pick a few stock to invest in and check back in a few weeks or months.</li>
+			<li>Invest for longer term (i.e. more than a year) reduces your taxable portion so you get to keep more of your earnings!</li>
+			<li>It has been demonstrated that long term (more than a year) investment has higher yield than short term.  Many stocks also pay dividend, which guarantees yield in the long term even when stock price depreciates.</li>
+			<li>Take the panic out of trading stocks.  Stocks can rise and fall greatly in a short period of time, but it is the behavior of a stock over the long run that behaves more predictably.  The stocks I picked will very likely follow an upward trend over the long run.</li>
+			<li>Take the hassle out of moving your money from one stock to the next.</li>
+		  </ol>
+		  <p>How much money do I need to start investing in stocks?  Is there a high cost of entry?</p>
+		  <p>One benefit associated with stocks is that there are many stocks offered at different price ranges.  With that said, if you only just started to invest, it is suggested that you invest only with amount that you are comfortable with.  However, it is important that you start early to take advantage of compound interest.</p>
+		{% endblock %}
 	</body>
 </html>
