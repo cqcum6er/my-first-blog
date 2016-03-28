@@ -94,9 +94,9 @@
 
 		<div>  <!--a container for navigation links below header-->
 			<ul id="nav">	<!--Unordered list-->
-				<li><a class="hover" href="Home.html">Home</a></li>
+				<li><a class="hover" href="{% url 'blog:home_link' %}">Home</a></li>
 				<li><a class="hover" href="Education_Center.html">Education Center</a></li>
-				<li><a class="hover" href="Database.html">Database</a></li>
+				<li><a class="hover" href="{% url 'blog:DJ_link' %}">Database</a></li>
 				<li><a class="hover" href="Resources.html">Resources</a></li>
 				<li><a class="hover" href="FAQ.html">FAQ</a></li>
 				<li><a class="hover" href="Contact.html">Contact</a></li>

@@ -6,6 +6,9 @@ from .models import Post  #'Post' table object is retrieved from 'models.py' wit
 #import httplib  #Needed for efficient information retrieval from the web by maintaining stable server connection.
 import requests
 
+def post_list(request):  #Home url
+	return render(request, 'blog/home.html')
+
 def KeyFet(sep,num):  #KeyFet() function fetches components of key statistics page; att=attribute, sep=separator, num=Nth separator
 	att = ""
 	for ch in html.text.split(sep)[num]:
@@ -15,7 +18,7 @@ def KeyFet(sep,num):  #KeyFet() function fetches components of key statistics pa
 			break #terminates the nearest enclosing loop when '<' is ran into (the loop control target, ch, keeps its current value).
 	return att
 
-def post_list(request):  #"post_list" must be requested from urls.py
+def DJ_list(request):  #"post_list" must be requested from urls.py
     #posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
     #posts = Post.objects.values()
     #YfLink = httplib.HTTPConnection('finance.yahoo.com')
@@ -136,5 +139,5 @@ def post_list(request):  #"post_list" must be requested from urls.py
 			)
 		post.save()  #Save each entry of database.
 	posts = Post.objects.values()  #values() returns content of database as dictionary, thus making the database iterable.
-	return render(request, 'blog/post_list.html', {'posts': posts})  #To serve as a template, 'blog/post_list.html' has to be put in blog\template\blog\
+	return render(request, 'blog/DJ.html', {'posts': posts})  #To serve as a template, 'blog/post_list.html' has to be put in blog\template\blog\
 	#The last parameter, which looks like this: {} is a place to integrate objects in models.py (posts) with html ('posts') in template folder.
