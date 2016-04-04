@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>{% block title %}Fundamental Overview-Home{% endblock %}</title>
+		<title>{% block title %}Fundamental Trader-Home{% endblock %}</title>
 		<style type="text/css">
 		#header {<!--refer to http://www.w3schools.com/html/html_layout.asp for layout referrence-->}
 				
@@ -88,18 +88,18 @@
 	<body>
 		<!--Topbar begins-->
 		<div style="text-align:center; background-color:#fff;">
-			<h1 style="color:#00A100">Fundamental Overview</h1>
+			<h1 style="color:#00A100">Fundamental Trader</h1>
 			<h2 style="font-size:12pt;">The Comprehensive Fundamental Analysis Database</h2>
 		</div>  <!--Topbar ends-->
 
 		<div>  <!--a container for navigation links below header-->
 			<ul id="nav">	<!--Unordered list-->
 				<li><a class="hover" href="{% url 'blog:home_link' %}">Home</a></li>
-				<li><a class="hover" href="Education_Center.html">Education Center</a></li>
+				<li><a class="hover" href="{% url 'blog:inProgress_link' %}">Education Center</a></li>
 				<li><a class="hover" href="{% url 'blog:DJ_link' %}">Database</a></li>
-				<li><a class="hover" href="Resources.html">Resources</a></li>
-				<li><a class="hover" href="FAQ.html">FAQ</a></li>
-				<li><a class="hover" href="Contact.html">Contact</a></li>
+				<li><a class="hover" href="{% url 'blog:inProgress_link' %}">Resources</a></li>
+				<li><a class="hover" href="{% url 'blog:inProgress_link' %}">FAQ</a></li>
+				<li><a class="hover" href="{% url 'blog:inProgress_link' %}">Contact</a></li>
 			</ul>
 		</div>  <!--top nav bar ends-->
 		{% block content %}

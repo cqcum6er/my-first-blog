@@ -9,6 +9,9 @@ import requests
 def post_list(request):  #Home url
 	return render(request, 'blog/home.html')
 
+def inProgrss(request):  #Home url
+	return render(request, 'blog/InProgress.html')
+
 def KeyFet(sep,num):  #KeyFet() function fetches components of key statistics page; att=attribute, sep=separator, num=Nth separator
 	att = ""
 	for ch in html.text.split(sep)[num]:
