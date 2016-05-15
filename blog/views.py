@@ -1,15 +1,12 @@
 from django.shortcuts import render
-#from django.utils import timezone
 from .models import Post  #'Post' table object is retrieved from 'models.py' within the same folder.
-#import re
-#import urllib  #Needed for information retrieval from the web.
-#import httplib  #Needed for efficient information retrieval from the web by maintaining stable server connection.
 import requests
+import csv
 
 def post_list(request):  #Home url
 	return render(request, 'blog/home.html')
 
-def inProgrss(request):  #Home url
+def inProgrss(request):  #In-Progress url
 	return render(request, 'blog/InProgress.html')
 
 def KeyFet(sep,num):  #KeyFet() function fetches components of key statistics page; att=attribute, sep=separator, num=Nth separator
@@ -22,14 +19,37 @@ def KeyFet(sep,num):  #KeyFet() function fetches components of key statistics pa
 	return att
 
 def DJ_list(request):  #"post_list" must be requested from urls.py
-    #posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
-    #posts = Post.objects.values()
-    #YfLink = httplib.HTTPConnection('finance.yahoo.com')
-    #YfLink.request('GET','/q/cp?s=%5EDJI+Components')  #.request('GET',url) is similar to .urlopen(url) in urllib or urllib2
-    #page = YfLink.getresponse()
+	with open('./DJ_list.csv', 'rb') as file:
+		infile = csv.reader(file, delimiter=",", quotechar='"')
+		next(infile, None)  # skip the headers
+		for row in infile:
+			#if row.line_num == 1:
+				#continue  #Skip column header.
+			_, created = Post.objects.get_or_create(
+			Symbol=row[0],
+			LastPrice=row[1],
+			FiftyTwoWkChg=row[2],
+			FiftyTwoWkLo=row[3],
+			FiftyTwoWkHi=row[4],
+			DivYild=row[5],
+			TrailPE=row[6],
+			ForwardPE=row[7],
+			PEG_Ratio=row[8],
+			PpS=row[9],
+			PpB=row[10],
+			Market_Cap=row[11],
+			Free_Cash_Flow=row[12],
+			Market_per_CashFlow=row[13],
+			Enterprise_per_EBITDA=row[14],
+			Name=row[15],
+			)
+			post.save()  #Save each entry of database.
+		posts = Post.objects.values()  #values() returns content of database as dictionary, thus making the database iterable.
+		return render(request, 'blog/DJ.html', {'posts': posts})  #To serve as a template, 'blog/post_list.html' has to be put in blog\template\blog\
+		#The last parameter, which looks like this: {} is a place to integrate objects in models.py (posts) with html ('posts') in template folder.
+	'''
+	#posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
 	global html  #Make 'html' accessible to KeyFet function.
-	#YFconn = httplib.HTTPConnection('finance.yahoo.com')
-	#YFconn.request('GET','/q/cp?s=%5EDJI+Components')
 	response = requests.get('http://finance.yahoo.com/q/cp?s=%5EDJI+Components')
 	html = response.text  #Convert requests object to string.
 	DJlist = []
@@ -40,8 +60,6 @@ def DJ_list(request):  #"post_list" must be requested from urls.py
 				DJsym += ch
 			else:
 				break #Continue next iteration in outer 'for' loop when '"' is ran into.
-		#response.write(DJsym)
-		#return HttpResponse(DJsym)
 		DJlist.append(DJsym.encode('ascii'))
 	#for tick in DJlist:
 		#YFconn.request('GET','/q/ks?s='+tick+'+Key+Statistics')
@@ -140,3 +158,4 @@ def DJ_list(request):  #"post_list" must be requested from urls.py
 	posts = Post.objects.values()  #values() returns content of database as dictionary, thus making the database iterable.
 	return render(request, 'blog/DJ.html', {'posts': posts})  #To serve as a template, 'blog/post_list.html' has to be put in blog\template\blog\
 	#The last parameter, which looks like this: {} is a place to integrate objects in models.py (posts) with html ('posts') in template folder.
+	'''

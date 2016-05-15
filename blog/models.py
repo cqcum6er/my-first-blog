@@ -1,5 +1,5 @@
 from django.db import models
-from django.utils import timezone
+#from django.utils import timezone
 
 class Post(models.Model):  #Defines our model ('models' is a python class; 'Post' is an object; 'models.Model' corresponds to a table in a database, a subclass of django.db.)
 #author, title, text, created_date, & published_date all correspond to column in the 'Post' table.
@@ -8,8 +8,8 @@ class Post(models.Model):  #Defines our model ('models' is a python class; 'Post
     #text = models.TextField()
     #created_date = models.DateTimeField(default=timezone.now)
     #published_date = models.DateTimeField(blank=True, null=True)
-	Symbol = models.CharField(max_length=20, default='N/A')  #Add default value so the initiated table will have prepopulated value.
-	LastPrice = models.CharField(max_length=30, default='N/A')
+	Symbol = models.CharField(max_length=20, default='N/A')  #Add default value so the initiated table will have prepopulated value.
+	LastPrice = models.CharField(max_length=30, default='N/A')
 	FiftyTwoWkChg = models.CharField(max_length=30, default='N/A')
 	FiftyTwoWkLo = models.CharField(max_length=30, default='N/A')
 	FiftyTwoWkHi = models.CharField(max_length=30, default='N/A')
