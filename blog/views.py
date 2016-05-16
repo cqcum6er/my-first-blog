@@ -23,7 +23,7 @@ def DJ_list(request):  #"post_list" must be requested from urls.py
 		Post.objects.all().delete()
 	else:
 		pass
-	with open('./DJ_list.csv', 'rb') as file:
+	with open('DJ_list.csv', 'rb') as file:
 		infile = csv.reader(file, delimiter=",", quotechar='"')
 		next(infile, None)  # skip the headers
 		for row in infile:
