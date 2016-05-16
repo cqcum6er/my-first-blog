@@ -19,13 +19,18 @@ def KeyFet(sep,num):  #KeyFet() function fetches components of key statistics pa
 	return att
 
 def DJ_list(request):  #"post_list" must be requested from urls.py
+	if Post:  #Check to see if there is existing entry.  If there is, delete existing entry to prepare for updated entry.
+		Post.objects.all().delete()
+	else:
+		pass
 	with open('./DJ_list.csv', 'rb') as file:
 		infile = csv.reader(file, delimiter=",", quotechar='"')
 		next(infile, None)  # skip the headers
 		for row in infile:
 			#if row.line_num == 1:
 				#continue  #Skip column header.
-			_, created = Post.objects.get_or_create(
+			#post, created = Post.objects.get_or_create(
+			post = Post(
 			Symbol=row[0],
 			LastPrice=row[1],
 			FiftyTwoWkChg=row[2],
@@ -43,7 +48,7 @@ def DJ_list(request):  #"post_list" must be requested from urls.py
 			Enterprise_per_EBITDA=row[14],
 			Name=row[15],
 			)
-			post.save()  #Save each entry of database.
+			post.save()  #Save each entry ('post') of database.
 		posts = Post.objects.values()  #values() returns content of database as dictionary, thus making the database iterable.
 		return render(request, 'blog/DJ.html', {'posts': posts})  #To serve as a template, 'blog/post_list.html' has to be put in blog\template\blog\
 		#The last parameter, which looks like this: {} is a place to integrate objects in models.py (posts) with html ('posts') in template folder.
