@@ -29,7 +29,6 @@ def DJ_list(request):  #"post_list" must be requested from urls.py
 		for row in infile:
 			#if row.line_num == 1:
 				#continue  #Skip column header.
-			#post, created = Post.objects.get_or_create(
 			post = Post(
 			Symbol=row[0],
 			LastPrice=row[1],
