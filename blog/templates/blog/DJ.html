@@ -1,6 +1,6 @@
 {% extends "blog/home.html" %}  <!--Must include 'blog/' before html name for Django to look up-->
 
-{% block title %}Fundamental Trader-DJ Index-Today{% endblock %}
+{% block title %}Fundamental Trader-DJ Index-Last Day{% endblock %}
 
 {% block content %}
 <div id="aside">
@@ -12,7 +12,7 @@
 
 <div id="section" style="margin-left:175px; background-color:#fff;">	<!--Margin added to keep element to the right of aside bar-->
 	<ul style=" list-style:none; display:inline; text-decoration:none;">
-		<li style="display:inline; text-decoration:none;"><a style="text-decoration:none;" href="http://finance.yahoo.com/">Today</a></li>
+		<li style="display:inline; text-decoration:none;"><a style="text-decoration:none;" href="http://finance.yahoo.com/">Last Day</a></li>
 		<li style="display:inline; text-decoration:none;"><a href="http://finance.yahoo.com/">Last Week</a></li>
 		<li style="display:inline; text-decoration:none;"><a href="http://finance.yahoo.com/">Last Month</a></li>
 		<li style="display:inline; text-decoration:none;"><a href="http://finance.yahoo.com/">Last Quarter</a></li>
@@ -21,7 +21,7 @@
 </div>
 
 <table id="article" border="8" style="border-collapse: collapse; width:1000px;">
-	<caption>Dow Jones Index - Today</caption>
+	<caption>Dow Jones Index - Last Day</caption>
 	<thead>
 	<tr style="color:white;background:black;">
 		<th>Symbol</th>
@@ -29,14 +29,14 @@
 		<th>52-week Change</th>
 		<th>52-week Low</th>
 		<th>52-week High</th>
-		<th>5 Year Average Dividend Yield</th>
+		<th>Trailing Annual Dividend Yield</th>
 		<th>Trailing P/E</th>
 		<th>Forward P/E</th>
 		<th>PEG Ratio</th>
 		<th>Price/Sales</th>
 		<th>Price/Book</th>
 		<th>Market Cap</th>
-		<th>Levered Free Cash Flow</th>
+		<th>Operating Cash Flow</th>
 		<th>Market Per Cash Flow</th>
 		<th>Enterprise Value/EBITDA</th>
 		<th>Name</th>
