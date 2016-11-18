@@ -1,5 +1,6 @@
 from django.db import models
-#from django.utils import timezone
+from django.contrib import admin
+import datetime
 
 class Post(models.Model):  #Defines our model ('models' is a python class; 'Post' is an object; 'models.Model' corresponds to a table in a database, a subclass of django.db.)
 #author, title, text, created_date, & published_date all correspond to column in the 'Post' table.
@@ -8,6 +9,7 @@ class Post(models.Model):  #Defines our model ('models' is a python class; 'Post
     #text = models.TextField()
     #created_date = models.DateTimeField(default=timezone.now)
     #published_date = models.DateTimeField(blank=True, null=True)
+	Day = models.DateField(blank=False, default=datetime.date.today().strftime('%Y-%m-%d'))
 	Symbol = models.CharField(max_length=20, default='N/A')  #Add default value so the initiated table will have prepopulated value.
 	LastPrice = models.CharField(max_length=30, default='N/A')
 	FiftyTwoWkChg = models.CharField(max_length=30, default='N/A')
@@ -28,6 +30,9 @@ class Post(models.Model):  #Defines our model ('models' is a python class; 'Post
         #self.published_date = timezone.now()
         #self.save()
 
-	def __str__(self):  #Note: The _str_ method returns a string and will return the title of the book as the string representation displayed on the admin page; can be replaced with __unicode__(self).
+	#class Meta:  #To be used with .latest() in views.py.
+		#get_latest_by = 'Day'
+
+	def __str__(self):  #Note: The _str_ method returns a string of each model instance on the admin page; can be replaced with __unicode__(self).
 		return self.Symbol
 		#return self.title #Get a text (string) with a Post title
