@@ -33,8 +33,8 @@ def DJ_LastDay(request):  #"DJ_LastDay" must be requested from urls.py
 		posts = Post.objects.filter(Day__lte=datetime.date.today()).order_by('-Day')[:30]  #Retrieve the last 30 entry (as ordered by '-Day', which starts with the latest day) in db as QuerySet object (iterable).
 		#posts = Post.objects.values()  #values() returns content of database as dictionary rather than model instances, thus making the database iterable.
 		'''posts = Post.objects.values().latest('Day')  #If latest() is empty, it works with attributes defined by 'class Meta' in models.py. Note latest () only retrieve ONE instance.'''
-		print type(posts)
-		print posts
+		#print type(posts)
+		#print posts
 		return render(request, 'blog/DJ_LastDay.html', {'posts': posts})
 '''
 	with open('DJ_list.csv', 'rb') as file:  # Need to use absolute path when on Pythonanywhere server (i.e. use '/home/cqcum6er/my-first-blog/DJ_list.csv' as file path.)
