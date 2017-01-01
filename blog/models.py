@@ -13,8 +13,8 @@ class Post(models.Model):  #Defines our model ('models' is a python class; 'Post
 	Symbol = models.CharField(max_length=20, default='N/A')  #Add default value so the initiated table will have prepopulated value.
 	LastPrice = models.CharField(max_length=30, default='N/A')
 	FiftyTwoWkChg = models.CharField(max_length=30, default='N/A')
-	FiftyTwoWkLo = models.CharField(max_length=30, default='N/A')
 	FiftyTwoWkHi = models.CharField(max_length=30, default='N/A')
+	FiftyTwoWkLo = models.CharField(max_length=30, default='N/A')
 	DivYild = models.CharField(max_length=30, default='N/A')
 	TrailPE = models.CharField(max_length=30, default='N/A')
 	ForwardPE = models.CharField(max_length=30, default='N/A')
