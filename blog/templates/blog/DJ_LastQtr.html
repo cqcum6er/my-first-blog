@@ -1,6 +1,6 @@
 {% extends "blog/home.html" %}  <!--Must include 'blog/' before html name for Django to look up-->
 
-{% block title %}Fundamental Trader-DJ Index-Last Day{% endblock %}
+{% block title %}Fundamental Trader-DJ Index-Last Quarter{% endblock %}
 
 {% block content %}
 <div id="aside">
@@ -12,17 +12,16 @@
 
 <div id="section" style="margin-left:175px; background-color:#fff;">	<!--Margin added to keep element to the right of aside bar-->
 	<ul style=" list-style:none; display:inline; text-decoration:none;">
-		<li style="display:inline; text-decoration:none;"><a style="text-decoration:none;" href="{% url 'blog:DJ_LastDay' %}">Last Trading Day</a></li>
+		<li style="display:inline; text-decoration:none;"><a href="{% url 'blog:DJ_LastDay' %}">Last Trading Day</a></li>
 		<li style="display:inline; text-decoration:none;"><a href="{% url 'blog:DJ_LastWk' %}">Last Week</a></li>
 		<li style="display:inline; text-decoration:none;"><a href="{% url 'blog:DJ_LastMnth' %}">Last Month</a></li>
-		<li style="display:inline; text-decoration:none;"><a href="{% url 'blog:DJ_LastQtr' %}">Last Quarter</a></li>
+		<li style="display:inline; text-decoration:none;"><a style="text-decoration:none;" href="{% url 'blog:DJ_LastQtr' %}">Last Quarter</a></li>
 		<li style="display:inline; text-decoration:none;"><a href="{% url 'blog:DJ_LastYr' %}">Last Year</a></li>
 	</ul>
 </div>
 
 <table id="article" border="8" style="border-collapse: collapse; width:1000px;">
-	<caption>Dow Jones Index ({{posts|length}} items returned) - Last Trading Day ({% with posts.0 as last %} {{last.Day}} {% endwith %}) <!--Get "Day" field value from first item in QuerySet "posts."-->
-	</caption>
+	<caption>Dow Jones Index ({{posts|length}} items returned) - Last Quarter ({% with posts.0 as last %} {{last.Day}} {% endwith %})</caption>
 	<thead>
 	<tr style="color:white;background:black;">
 		<th>Symbol</th>

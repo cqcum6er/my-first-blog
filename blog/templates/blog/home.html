@@ -97,12 +97,18 @@
 				<li><a class="hover" href="{% url 'blog:home_link' %}">Home</a></li>
 				<li><a class="hover" href="{% url 'blog:inProgress_link' %}">Education Center</a></li>
 				<li><a class="hover" href="{% url 'blog:DJ_LastDay' %}">Database</a></li>
-				<li><a class="hover" href="{% url 'blog:inProgress_link' %}">Resources</a></li>
-				<li><a class="hover" href="{% url 'blog:inProgress_link' %}">FAQ</a></li>
+				<li><a class="hover" href="{% url 'blog:inProgress_link' %}">Links</a></li>
+				<li><a class="hover" href="{% url 'blog:inProgress_link' %}">Disclaimer</a></li>
 				<li><a class="hover" href="{% url 'blog:inProgress_link' %}">Contact</a></li>
 			</ul>
 		</div>  <!--top nav bar ends-->
 		{% block content %}
+		  <h2 style="font-size:12pt;">Dow Jones Industrial Average</h2>
+		  <img width="564" height="269" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=WN6SR"/>
+		  <h2 style="font-size:12pt;">S&P 500 Index</h2>
+		  <img width="564" height="269" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=L5M39"/>
+		  <h2 style="font-size:12pt;">NASDAQ Composite</h2>
+		  <img width="564" height="269" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=T8J69"/>
 		  <p>Why do you want your money in stock?</p>
 		  <ol>
 			<li>Stock performs better than bond or bank CD in fighting inflation.</li>

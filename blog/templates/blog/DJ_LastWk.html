@@ -1,6 +1,6 @@
 {% extends "blog/home.html" %}  <!--Must include 'blog/' before html name for Django to look up-->
 
-{% block title %}Fundamental Trader-DJ Index-Last Day{% endblock %}
+{% block title %}Fundamental Trader-DJ Index-Last Week{% endblock %}
 
 {% block content %}
 <div id="aside">
@@ -12,16 +12,16 @@
 
 <div id="section" style="margin-left:175px; background-color:#fff;">	<!--Margin added to keep element to the right of aside bar-->
 	<ul style=" list-style:none; display:inline; text-decoration:none;">
-		<li style="display:inline; text-decoration:none;"><a style="text-decoration:none;" href="{% url 'blog:DJ_LastDay' %}">Last Trading Day</a></li>
-		<li style="display:inline; text-decoration:none;"><a href="{% url 'blog:DJ_LastWk' %}">Last Week</a></li>
-		<li style="display:inline; text-decoration:none;"><a href="http://finance.yahoo.com/">Last Month</a></li>
-		<li style="display:inline; text-decoration:none;"><a href="http://finance.yahoo.com/">Last Quarter</a></li>
-		<li style="display:inline; text-decoration:none;"><a href="http://finance.yahoo.com/">Last Year</a></li>
+		<li style="display:inline; text-decoration:none;"><a href="{% url 'blog:DJ_LastDay' %}">Last Trading Day</a></li>
+		<li style="display:inline; text-decoration:none;"><a style="text-decoration:none;" href="{% url 'blog:DJ_LastWk' %}">Last Week</a></li>
+		<li style="display:inline; text-decoration:none;"><a href="{% url 'blog:DJ_LastMnth' %}">Last Month</a></li>
+		<li style="display:inline; text-decoration:none;"><a href="{% url 'blog:DJ_LastQtr' %}">Last Quarter</a></li>
+		<li style="display:inline; text-decoration:none;"><a href="{% url 'blog:DJ_LastYr' %}">Last Year</a></li>
 	</ul>
 </div>
 
 <table id="article" border="8" style="border-collapse: collapse; width:1000px;">
-	<caption>Dow Jones Index - Last Week{{post.Day}}</caption>
+	<caption>Dow Jones Index ({{posts|length}} items returned) - Last Week ({% with posts.0 as last %} {{last.Day}} {% endwith %})</caption>
 	<thead>
 	<tr style="color:white;background:black;">
 		<th>Symbol</th>
@@ -43,7 +43,7 @@
 	</tr>
 	</thead>
 	<tbody>
-	{% for post in posts %}  <!--see views.py for 'posts' list-->
+	{% for post in posts reversed %}  <!--see views.py for 'posts' list-->
 		<!--<p>published: {{ post.published_date }}</p>
 		<h1><a href="/">{{ post.title }}</a></h1>
 		<p>{{ post.text|linebreaks }}</p>-->
