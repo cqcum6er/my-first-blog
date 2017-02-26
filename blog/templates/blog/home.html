@@ -3,22 +3,24 @@
 	<head>
 		<title>{% block title %}Fundamental Trader-Home{% endblock %}</title>
 		<style type="text/css">
-		#header {<!--refer to http://www.w3schools.com/html/html_layout.asp for layout referrence-->}
+		#header {/*Refer to http://www.w3schools.com/html/html_layout.asp for layout referrence*/}
 				
 		ul#nav {
+			/*Don't use <!--comment--> format to comment out modifier under css if file is saved as html (the modifier will still be read!)*/
+			/*position: fixed; Set the navbar to fixed position*/
 			padding: 0;
 		}
 		ul#nav li {
-			display: inline;  <!--Displays an element as an inline element (like <span>); applies to <li>.-->
+			display: inline;  <!--Display an element as an inline element (like <span>); applies to <li>.-->
 		}
-		ul#nav li a {
+		ul#nav li a {  /*Display default link appearance.*/
 			background-color: black;
 			color: white;
 			padding: 10px 20px;
 			text-decoration: none;
 			border-radius: 8px 8px 0 0;
 		}
-		ul#nav li a:hover {
+		ul#nav li a:hover, a:active {
 			background-color: orange;
 			color: black;
 		}
@@ -56,7 +58,13 @@
 			color: white;
 		}
 		
-		#article {  <!--Content area format-->
+		#section a:hover, a:active {	<!--Change link color when cursor hovers over and when clicked.-->
+			display: block;
+			background-color: #66991c;
+			color: white;
+		}
+		
+		#myTable {  <!--Content area format-->
 			<!--display: inline;  Display content area next to left verti aside bar-->
 			position: relative;
 			float: left;
@@ -66,12 +74,21 @@
 			margin-left:165px;	<!--Margin added to keep element to the right of aside bar-->
 		}
 
-		#article tr:nth-child(even) {
-		background-color: #eee;
+		#myTable th {
+			cursor: pointer;  <!--Indicate clickable table header-->
 		}
 		
-		#article tr:nth-child(odd) {
-		background-color: #fff;
+		#myTable th:hover {
+			background-color: #66991c;
+			color: white;
+		}
+		
+		#myTable tr:nth-child(even) {
+			background-color: #eee;
+		}
+		
+		#myTable tr:nth-child(odd) {
+			background-color: #fff;
 		}
 						
 		body {  <!--Viewable area format-->
@@ -79,14 +96,22 @@
 			background-color: #EADCAE;
 			margin: 0;	<!--Margin defines the space outside the element border; set to 0 to occupy the whole browser window.-->
 		}
-	
+		
 		h1,h2 {
 			font-family: arial;
 		}
+		
+		/*.main {
+			padding: 16px;
+			margin-top: 0px;
+			height: 50px; /* Used to enable scrolling */
+		}*/
 		</style>	
 	</head>
 	<body>
 		<!--Topbar begins-->
+		<!--<div style="position: fixed; top: 0;">-->
+		
 		<div style="text-align:center; background-color:#fff;">
 			<h1 style="color:#00A100">Fundamental Trader</h1>
 			<h2 style="font-size:12pt;">The Comprehensive Fundamental Analysis Database</h2>
@@ -94,15 +119,24 @@
 
 		<div>  <!--a container for navigation links below header-->
 			<ul id="nav">	<!--Unordered list-->
-				<li><a class="hover" href="{% url 'blog:home_link' %}">Home</a></li>
-				<li><a class="hover" href="{% url 'blog:inProgress_link' %}">Education Center</a></li>
-				<li><a class="hover" href="{% url 'blog:DJ_LastDay' %}">Database</a></li>
-				<li><a class="hover" href="{% url 'blog:inProgress_link' %}">Links</a></li>
-				<li><a class="hover" href="{% url 'blog:inProgress_link' %}">Disclaimer</a></li>
-				<li><a class="hover" href="{% url 'blog:inProgress_link' %}">Contact</a></li>
+				<!--{% load active_nav %}  load the custom template tags to mark active link
+				{% url 'blog:home_link' as home %}-->
+				<!--<li>{{request.path}}</li>
+				<li><a {% if request.path == 'blog:home_link' %}class="active"{% endif %} href="{% url 'blog:home_link' %}">Home</a></li>-->
+				<!--<li><a class="{% active request 'blog:home_link' %}" href="{{home}}">Home</a></li>-->
+				<li><a href="{% url 'blog:home_link' %}">Home</a></li>
+				<li><a href="{% url 'blog:inProgress_link' %}">Education Center</a></li>
+				<li><a href="{% url 'blog:DJ_LastDay' %}">Database</a></li>
+				<li><a href="{% url 'blog:inProgress_link' %}">Links</a></li>
+				<li><a href="{% url 'blog:inProgress_link' %}">Disclaimer</a></li>
+				<li><a href="{% url 'blog:inProgress_link' %}">Contact</a></li>
 			</ul>
-		</div>  <!--top nav bar ends-->
+		</div>
+		<!--</div>  top nav bar ends-->
+		<div class="main">
 		{% block content %}
+		  <button type="button" onclick="document.getElementById('demo').innerHTML = Date()">Click me to display Date and Time.</button>
+		  <p id="demo"></p>
 		  <h2 style="font-size:12pt;">Dow Jones Industrial Average</h2>
 		  <img width="564" height="269" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=WN6SR"/>
 		  <h2 style="font-size:12pt;">S&P 500 Index</h2>
@@ -127,5 +161,6 @@
 		  <p>How much money do I need to start investing in stocks?  Is there a high cost of entry?</p>
 		  <p>One benefit associated with stocks is that there are many stocks offered at different price ranges.  With that said, if you only just started to invest, it is suggested that you invest only with amount that you are comfortable with.  However, it is important that you start early to take advantage of compound interest.</p>
 		{% endblock %}
+		</div>
 	</body>
 </html>

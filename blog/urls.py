@@ -8,5 +8,6 @@ urlpatterns = [
 	url(r'^DJ_LastMonth/', views.DJ_LastMnth, name='DJ_LastMnth'),
 	url(r'^DJ_LastQuarter/', views.DJ_LastQtr, name='DJ_LastQtr'),
 	url(r'^DJ_LastYear/', views.DJ_LastYr, name='DJ_LastYr'),
+	#url(r'^NoData/', views.DJ_LastYr, name ='DJ_LastYr'),  #For pages under construction.
 	url(r'^inProgress/', views.inProgrss, name ='inProgress_link'),  #For pages under construction.
 ]

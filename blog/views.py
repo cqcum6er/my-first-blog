@@ -1,5 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils import timezone
+from django.core.exceptions import ObjectDoesNotExist  #Display in-app message when an instance isn't found.
+from django.http import HttpResponse
 from .models import Post  #'Post' table object is retrieved from 'models.py' within the same folder.
 import requests
 import csv
@@ -43,7 +45,7 @@ def DJ_LastDay(request):  #"DJ_LastDay" must be requested from urls.py
 	print TestDay
 	print iso_to_gregorian(TestDay.isocalendar()[0], TestDay.isocalendar()[1]-1, 3)'''
 	#print (aniso8601)
-	return render(request, 'blog/DJ_LastDay.html', {'posts': posts})#, {'LastDay': p.Day})  #To serve as a template, 'blog/DJ.html' has to be put in blog\template\blog\
+	return render(request, 'blog/DJ_LastDay.html', {'LastDay_posts': posts})#, {'LastDay': p.Day})  #To serve as a template, 'blog/DJ.html' has to be put in blog\template\blog\
 	#The last parameter, which looks like this: {} is a place to integrate objects in models.py (posts) with html ('posts') in template folder.
 
 def DJ_LastWk(request):  #Display value from Wednesday of last week.
@@ -52,7 +54,7 @@ def DJ_LastWk(request):  #Display value from Wednesday of last week.
 	print LastDay
 	print iso_to_gregorian(LastDay.isocalendar()[0], LastDay.isocalendar()[1]-1, 3)  #Show date from last week's Wednesday.'''
 	posts = Post.objects.filter(Day=iso_to_gregorian(LastDay.isocalendar()[0], LastDay.isocalendar()[1]-1, 3))  #Retrieve all instances from Wednesday of last week.
-	return render(request, 'blog/DJ_LastWk.html', {'posts': posts})
+	return render(request, 'blog/DJ_LastWk.html', {'LastWk_posts': posts})
 
 def DJ_LastMnth(request):  #Display value from the 1st (trading) day of last month.
 	p = Post.objects.latest('Day')
@@ -69,7 +71,7 @@ def DJ_LastMnth(request):  #Display value from the 1st (trading) day of last mon
 		p = Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+11)).earliest('Day')
 		print p.Day
 		posts = Post.objects.filter(Day=p.Day)
-	return render(request, 'blog/DJ_LastMnth.html', {'posts': posts})
+	return render(request, 'blog/DJ_LastMnth.html', {'LastMnth_posts': posts})
 
 def DJ_LastQtr(request):  #Display value from the 1st (trading) day of last quarter.
 	p = Post.objects.latest('Day')
@@ -86,7 +88,7 @@ def DJ_LastQtr(request):  #Display value from the 1st (trading) day of last quar
 		p = Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+9)).earliest('Day')
 		print p.Day
 		posts = Post.objects.filter(Day=p.Day)
-	return render(request, 'blog/DJ_LastQtr.html', {'posts': posts})
+	return render(request, 'blog/DJ_LastQtr.html', {'LastQtr_posts': posts})
 
 def DJ_LastYr(request):  #Display value from the 1st (trading) day of last year.
 	p = Post.objects.latest('Day')
@@ -95,7 +97,11 @@ def DJ_LastYr(request):  #Display value from the 1st (trading) day of last year.
 	#print type(LastDay.strftime('%m'))
 	CurrYr = LastDay.strftime('%Y')
 	CurrMnth = LastDay.strftime('%m')
-	p = Post.objects.filter(Day__year=str(int(CurrYr)-1)).earliest('Day')  #Retrieve earliest date available from last year, doesn't matter the month.
-	print p.Day
-	posts = Post.objects.filter(Day=p.Day)
-	return render(request, 'blog/DJ_LastYr.html', {'posts': posts})
+	try:
+		p = Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=CurrMnth).earliest('Day')  #Retrieve earliest date available from last year, doesn't matter the month.
+		print p.Day
+		posts = Post.objects.filter(Day=p.Day)
+		return render(request, 'blog/DJ_LastYr.html', {'LastYr_posts': posts})
+	except ObjectDoesNotExist:
+		print "No entry exists for this month from last year, please try an earlier date."
+		#return redirect('/NoData/') 
