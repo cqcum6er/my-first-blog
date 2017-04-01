@@ -28,8 +28,8 @@
 		<th onclick="sortTable(0)">Symbol</th>
 		<th onclick="sortTable(1)">Price</th>
 		<th onclick="sortTable(2)">52-week Change</th>
-		<th onclick="sortTable(3)">52-week Low</th>
-		<th onclick="sortTable(4)">52-week High</th>
+		<th onclick="sortTable(3)">52-week High</th>
+		<th onclick="sortTable(4)">52-week Low</th>
 		<th onclick="sortTable(5)">Trailing Annual Dividend Yield</th>
 		<th onclick="sortTable(6)">Trailing P/E</th>
 		<th onclick="sortTable(7)">Forward P/E</th>
@@ -52,8 +52,8 @@
 		<td>{{post.Symbol}}</td>
 		<td>{{post.LastPrice}}</td>
 		<td>{{post.FiftyTwoWkChg}}</td>
-		<td>{{post.FiftyTwoWkLo}}</td>
 		<td>{{post.FiftyTwoWkHi}}</td>
+		<td>{{post.FiftyTwoWkLo}}</td>
 		<td>{{post.DivYild}}</td>
 		<td>{{post.TrailPE}}</td>
 		<td>{{post.ForwardPE}}</td>
@@ -84,7 +84,11 @@ function sortTable(n) {  //See <https://www.w3schools.com/howto/howto_js_sort_ta
     //start by saying: no switching is done:
     switching = false;
     rows = table.getElementsByTagName("TR");
-    /*Loop through all table rows (except the
+    for (i = 1; i < (rows.length - 1); i++) {
+		if (rows[i].getElementsByTagName("TD")[n] != '"Infinity"') { continue; }
+			rows[i].getElementsByTagName("TD")[n] = 0;
+	}
+	/*Loop through all table rows (except the
     first, which contains table headers):*/
 	for (i = 1; i < (rows.length - 1); i++) {
       //start by saying there should be no switching:
