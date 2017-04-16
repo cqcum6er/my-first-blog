@@ -4,27 +4,48 @@
 		<title>{% block title %}Fundamental Trader-Home{% endblock %}</title>
 		<style type="text/css">
 		#header {/*Refer to http://www.w3schools.com/html/html_layout.asp for layout referrence*/}
-				
-		ul#nav {
-			/*Don't use <!--comment--> format to comment out modifier under css if file is saved as html (the modifier will still be read!)*/
+								
+		body {  /*Viewable area format*/
+			font: 10pt Verdana, "Times New Roman", Gerogia, sans-serif;
+			background-color: #EADCAE;
+			margin: 0;	/*Margin defines the space outside the element border; set to 0 to occupy the whole browser window.*/
+		}
+		
+		h1,h2 {
+			font-family: arial;
+		}
+
+		/*.main {  /*.class*/
+			padding: 16px;
+			margin-top: 0px;
+			height: 50px; /* Used to enable scrolling */
+		}*/
+		
+		ul#nav {  /*HTML element#id selector*/
+			/*Don't use html comment format to comment out modifier under css if file is saved as html (the modifier will still be read!)*/
 			/*position: fixed; Set the navbar to fixed position*/
 			padding: 0;
 		}
-		ul#nav li {
-			display: inline;  <!--Display an element as an inline element (like <span>); applies to <li>.-->
+		ul#nav li {  /*matches all list item (li) in selector ul#nav*/
+			display: inline;  /*Display an element as an inline element (like <span>); applies to <li>.*/
 		}
+
 		ul#nav li a {  /*Display default link appearance.*/
 			background-color: black;
 			color: white;
 			padding: 10px 20px;
 			text-decoration: none;
-			border-radius: 8px 8px 0 0;
+			border-radius: 8px 8px 0 0;  /*upper L; upper R; lower R; lower L*/
+		}
+		ul#nav li a.actlink { /*Active link modifier must be placed before LVHA modifier to work.*/
+			background-color: orange;
+			color: black;
 		}
 		ul#nav li a:hover, a:active {
 			background-color: orange;
 			color: black;
-		}
-
+		}  /*LVHA-order= :link, :visited, :hover, :active.*/
+		
 		#aside {	<!--Left vertical navigation bar format; define a different style for a different element identified by id="aside".-->
 			width: 125px;
 			float: left;
@@ -50,7 +71,7 @@
 		#aside a {	<!--Format hyperlink in all stats(i.e.link, visited, etc.)-->
 			padding: 8px;
 			display: block;  <!--Expand clickable boundary to the entire cell-->
-			text-decoration: none;  <!--Remove hyperlink formating (i.e.underline); applies to <a>.-->
+			text-decoration: none;  <!--Remove hyperlink formating (i.e.underline); from links.-->
 		}
 		#aside a:hover, a:active {	<!--Change link color when cursor hovers over and when clicked.-->
 			display: block;
@@ -85,27 +106,12 @@
 		
 		#myTable tr:nth-child(even) {
 			background-color: #eee;
-		}
+		}  <!--Set alternating table row background color (even row).-->
 		
 		#myTable tr:nth-child(odd) {
 			background-color: #fff;
-		}
-						
-		body {  <!--Viewable area format-->
-			font: 12pt Verdana, "Times New Roman", Gerogia, sans-serif;
-			background-color: #EADCAE;
-			margin: 0;	<!--Margin defines the space outside the element border; set to 0 to occupy the whole browser window.-->
-		}
-		
-		h1,h2 {
-			font-family: arial;
-		}
-		
-		/*.main {
-			padding: 16px;
-			margin-top: 0px;
-			height: 50px; /* Used to enable scrolling */
-		}*/
+		}  <!--Set alternating table row background color (odd row).-->
+
 		</style>	
 	</head>
 	<body>
@@ -119,17 +125,18 @@
 
 		<div>  <!--a container for navigation links below header-->
 			<ul id="nav">	<!--Unordered list-->
-				<!--{% load active_nav %}  load the custom template tags to mark active link
-				{% url 'blog:home_link' as home %}-->
-				<!--<li>{{request.path}}</li>
-				<li><a {% if request.path == 'blog:home_link' %}class="active"{% endif %} href="{% url 'blog:home_link' %}">Home</a></li>-->
-				<!--<li><a class="{% active request 'blog:home_link' %}" href="{{home}}">Home</a></li>-->
-				<li><a href="{% url 'blog:home_link' %}">Home</a></li>
-				<li><a href="{% url 'blog:inProgress_link' %}">Education Center</a></li>
-				<li><a href="{% url 'blog:DJ_LastDay' %}">Database</a></li>
-				<li><a href="{% url 'blog:inProgress_link' %}">Links</a></li>
-				<li><a href="{% url 'blog:inProgress_link' %}">Disclaimer</a></li>
-				<li><a href="{% url 'blog:inProgress_link' %}">Contact</a></li>
+				{% load active_nav %}  <!--Load the custom template tags to mark active link.-->
+				{% url 'blog:home_link' as home %}  <!--Must use a replacement name for a link when the link is placed inside a block tag.-->
+				{% url 'blog:inProgress_link' as inPro %}
+				{% url 'blog:DJ_LastDay' as DJLD %}
+				<!--{% if request.path == home %}<li>active</li>{% endif %}-->
+				<!--<li>{{request.path}}</li>  Check for active path; must be activated with Django simple tag.-->
+				<li><a {% if request.path == home %}class="actlink"{% endif %} href="{% url 'blog:home_link' %}">Home</a></li>
+				<li><a {% if request.path == inPro %}class="actlink"{% endif %} href="{% url 'blog:inProgress_link' %}">Education Center</a></li>
+				<li><a {% if request.path == DJLD %}class="actlink"{% endif %} href="{% url 'blog:DJ_LastDay' %}">Database</a></li>
+				<li><a {% if request.path == inPro %}class="actlink"{% endif %} href="{% url 'blog:inProgress_link' %}">Links</a></li>
+				<li><a {% if request.path == inPro %}class="actlink"{% endif %} href="{% url 'blog:inProgress_link' %}">Disclaimer</a></li>
+				<li><a {% if request.path == inPro %}class="actlink"{% endif %} href="{% url 'blog:inProgress_link' %}">Contact</a></li>
 			</ul>
 		</div>
 		<!--</div>  top nav bar ends-->

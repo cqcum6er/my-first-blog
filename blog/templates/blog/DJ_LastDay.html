@@ -5,7 +5,7 @@
 {% block content %}
 <div id="aside">
 	<ul>
-		<li><a href="http://finance.yahoo.com/q?s=^dji">Dow Jones Index</a></li>
+		<li><a href="{% url 'blog:DJ_LastDay' %}">Dow Jones Index</a></li>
 		<li><a href="http://finance.yahoo.com/q?s=^gspc">S&amp;P500 Index</a></li>
 	</ul>
 </div>
@@ -50,21 +50,21 @@
 		<p>{{ post.text|linebreaks }}</p>-->
 	<tr align="center">
 		<td>{{post.Symbol}}</td>
-		<td>{{post.LastPrice}}</td>
-		<td>{{post.FiftyTwoWkChg}}</td>
-		<td>{{post.FiftyTwoWkHi}}</td>
-		<td>{{post.FiftyTwoWkLo}}</td>
-		<td>{{post.DivYild}}</td>
-		<td>{{post.TrailPE}}</td>
-		<td>{{post.ForwardPE}}</td>
-		<td>{{post.PEG_Ratio}}</td>
-		<td>{{post.PpS}}</td>
-		<td>{{post.PpB}}</td>
-		<td>{{post.Market_Cap}}</td>
-		<td>{{post.Free_Cash_Flow}}</td>
-		<td>{{post.Market_per_CashFlow}}</td>
-		<td>{{post.Enterprise_per_EBITDA}}</td>
-		<td>{{post.Name}}</td>
+		<td>{% firstof post.LastPrice "N/A" %}</td>  <!--Print out value OR "N/A" in case value doesn't exist.-->
+		<td>{% firstof post.FiftyTwoWkChg|floatformat:2 "N/A" %}</td>  <!--Parse to 2 decimal places OR print out "N/A" if type isn't float.-->
+		<td>{% firstof post.FiftyTwoWkHi "N/A" %}</td>
+		<td>{% firstof post.FiftyTwoWkLo "N/A" %}</td>
+		<td>{% firstof post.DivYild|floatformat:2 "N/A" %}</td>
+		<td>{% firstof post.TrailPE|floatformat:2 "N/A" %}</td>
+		<td>{% firstof post.ForwardPE|floatformat:2 "N/A" %}</td>
+		<td>{% firstof post.PEG_Ratio "N/A" %}</td>
+		<td>{% firstof post.PpS|floatformat:2 "N/A" %}</td>
+		<td>{% firstof post.PpB|floatformat:2 "N/A" %}</td>
+		<td>{% widthratio post.Market_Cap 1000000000 1 %}B</td>  <!--equals to post.Market_Cap divided by one billion and multiply by one.-->
+		<td>{% widthratio post.Free_Cash_Flow 1000000000 1 %}B</td>
+		<td>{% firstof post.Market_per_CashFlow|floatformat:2 "N/A" %}</td>
+		<td>{% firstof post.Enterprise_per_EBITDA|floatformat:2 "N/A" %}</td>
+		<td>{% firstof post.Name "N/A" %}</td>
 	</tr>
 	{% endfor %}
 	</tbody>
