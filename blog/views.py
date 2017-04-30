@@ -1,8 +1,12 @@
+'''
+views.py retrieves model instances from the database or instantiate a form (see feedback_form).
+'''
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist  #Display in-app message when an instance isn't found.
 from django.http import HttpResponse
 from .models import Post  #'Post' table object is retrieved from 'models.py' within the same folder.
+from .forms import FeedbackForm
 import requests
 import csv
 import datetime
@@ -105,3 +109,16 @@ def DJ_LastYr(request):  #Display value from the 1st (trading) day of last year.
 	except ObjectDoesNotExist:
 		print "No entry exists for this month from last year, please try an earlier date."
 		#return redirect('/NoData/') 
+
+def thanks(request):  #In-Progress url
+	return render(request, 'blog/thanks.html')
+	
+def feedback_form(request):
+	if request.method == 'POST':
+		form = FeedbackForm(request.POST)  #Accept user input as 'request.POST'. 
+		if form.is_valid():  #runs validation checks for all fields and returns Boolean.
+			form.save()
+			return render(request, 'blog/thanks.html')
+	else:  #If a GET (such as first time the form is displayed), a blank form is created.
+		form = FeedbackForm()
+	return render(request, 'blog/feedback.html', {'form': form})

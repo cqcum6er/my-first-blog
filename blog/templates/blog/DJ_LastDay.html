@@ -1,27 +1,27 @@
 {% extends "blog/home.html" %}  <!--Must include 'blog/' before html name for Django to look up-->
 
-{% block title %}Fundamental Trader-DJ Index-Last Day{% endblock %}
+{% block title %} Fundamental Trader-DJ Index-Last Day {% endblock %}
 
 {% block content %}
 <div id="aside">
 	<ul>
 		<li><a href="{% url 'blog:DJ_LastDay' %}">Dow Jones Index</a></li>
-		<li><a href="http://finance.yahoo.com/q?s=^gspc">S&amp;P500 Index</a></li>
+		<li><a style="text-decoration:none;" href="http://finance.yahoo.com/q?s=^gspc">S&amp;P500 Index</a></li>
 	</ul>
 </div>
 
-<div id="section" style="margin-left:175px; background-color:#fff;">	<!--Margin added to keep element to the right of aside bar-->
+<div id="section" style="margin-left:175px; background-color:#fff;">  <!--Margin added to keep element to the right of aside bar-->
 	<ul style=" list-style:none; display:inline; text-decoration:none;">
-		<li style="display:inline; text-decoration:none;"><a style="text-decoration:none;" href="{% url 'blog:DJ_LastDay' %}">Last Trading Day</a></li>
-		<li style="display:inline; text-decoration:none;"><a href="{% url 'blog:DJ_LastWk' %}">Last Week</a></li>
-		<li style="display:inline; text-decoration:none;"><a href="{% url 'blog:DJ_LastMnth' %}">Last Month</a></li>
-		<li style="display:inline; text-decoration:none;"><a href="{% url 'blog:DJ_LastQtr' %}">Last Quarter</a></li>
-		<li style="display:inline; text-decoration:none;"><a href="{% url 'blog:DJ_LastYr' %}">Last Year</a></li>
+		<li style="display:inline; text-decoration:none;"><a href="{% url 'blog:DJ_LastDay' %}">Last Trading Day</a></li>
+		<li style="display:inline; text-decoration:none;"><a style="text-decoration:none;" href="{% url 'blog:DJ_LastWk' %}">Last Week</a></li>
+		<li style="display:inline; text-decoration:none;"><a style="text-decoration:none;" href="{% url 'blog:DJ_LastMnth' %}">Last Month</a></li>
+		<li style="display:inline; text-decoration:none;"><a style="text-decoration:none;" href="{% url 'blog:DJ_LastQtr' %}">Last Quarter</a></li>
+		<li style="display:inline; text-decoration:none;"><a style="text-decoration:none;" href="{% url 'blog:DJ_LastYr' %}">Last Year</a></li>
 	</ul>
 </div>
 
 <table id="myTable" border="8" style="border-collapse: collapse; width:1000px;">
-	<caption>Dow Jones Index ({{LastDay_posts|length}} items returned) - Last Trading Day ({% with LastDay_posts.0 as 1st %} {{1st.Day}} {% endwith %}) <!--Get "Day" field value from first item in QuerySet "posts."-->
+	<caption>Dow Jones Index ({{ LastDay_posts|length }} items returned) - Last Trading Day ({% with LastDay_posts.0 as 1st %} {{ 1st.Day }} {% endwith %})  <!--Get "Day" field value from first item in QuerySet "posts."-->
 	</caption>
 	<thead>
 	<tr style="color:white;background:black;">
@@ -49,19 +49,42 @@
 		<h1><a href="/">{{ post.title }}</a></h1>
 		<p>{{ post.text|linebreaks }}</p>-->
 	<tr align="center">
-		<td>{{post.Symbol}}</td>
+		<td>{{ post.Symbol }}</td>
 		<td>{% firstof post.LastPrice "N/A" %}</td>  <!--Print out value OR "N/A" in case value doesn't exist.-->
-		<td>{% firstof post.FiftyTwoWkChg|floatformat:2 "N/A" %}</td>  <!--Parse to 2 decimal places OR print out "N/A" if type isn't float.-->
+		<!--{% if post.FiftyTwoWkChg|floatformat %}
+			<!--{% widthratio post.FiftyTwoWkChg 1 100 as x %}  Divide by 1 and multiply by 100.-->
+			<!--<td>{{ x }}%</td>  Parse to 2 decimal places OR print out "N/A" if type isn't float.-->
+		<!--{% else %}
+			<td>N/A</td>
+		{% endif %}-->
+		{% load math_op %}
+		{% if post.FiftyTwoWkChg|floatformat %}  <!--Check if conversion to float type is possible.-->
+			<td>{{ post.FiftyTwoWkChg|mult:100|floatformat:2 }}%</td>
+		{% else %}
+			<td>N/A</td>
+		{% endif %}
 		<td>{% firstof post.FiftyTwoWkHi "N/A" %}</td>
 		<td>{% firstof post.FiftyTwoWkLo "N/A" %}</td>
-		<td>{% firstof post.DivYild|floatformat:2 "N/A" %}</td>
+		{% if post.DivYild|floatformat %}
+			<td>{{ post.DivYild|mult:100|floatformat:2 }}%</td>
+		{% else %}
+			<td>N/A</td>
+		{% endif %}
 		<td>{% firstof post.TrailPE|floatformat:2 "N/A" %}</td>
 		<td>{% firstof post.ForwardPE|floatformat:2 "N/A" %}</td>
 		<td>{% firstof post.PEG_Ratio "N/A" %}</td>
 		<td>{% firstof post.PpS|floatformat:2 "N/A" %}</td>
 		<td>{% firstof post.PpB|floatformat:2 "N/A" %}</td>
-		<td>{% widthratio post.Market_Cap 1000000000 1 %}B</td>  <!--equals to post.Market_Cap divided by one billion and multiply by one.-->
-		<td>{% widthratio post.Free_Cash_Flow 1000000000 1 %}B</td>
+		{% if post.Market_Cap|floatformat %}
+			<td>{{ post.Market_Cap|div:1000000000|floatformat:2 }}B</td>
+		{% else %}
+			<td>N/A</td>
+		{% endif %}
+		{% if post.Free_Cash_Flow|floatformat %}
+			<td>{{ post.Free_Cash_Flow|div:1000000000|floatformat:2 }}B</td>
+		{% else %}
+			<td>N/A</td>
+		{% endif %}
 		<td>{% firstof post.Market_per_CashFlow|floatformat:2 "N/A" %}</td>
 		<td>{% firstof post.Enterprise_per_EBITDA|floatformat:2 "N/A" %}</td>
 		<td>{% firstof post.Name "N/A" %}</td>

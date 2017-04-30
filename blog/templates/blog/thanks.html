@@ -1,0 +1,8 @@
+{% extends "blog/home.html" %}  <!--Must include 'blog/' before html name for Django to look up-->
+
+{% block title %} Fundamental Trader-Thanks {% endblock %}
+
+{% block content %}
+<h1>Thanks for your response:)</h1>
+<p><a href="{% url 'blog:feedback' %}">More comments?</a></p>
+{% endblock %}

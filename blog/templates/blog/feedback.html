@@ -1,0 +1,13 @@
+{% extends "blog/home.html" %}  <!--Must include 'blog/' before html name for Django to look up-->
+
+{% block title %} Fundamental Trader-Feedback {% endblock %}
+
+{% block content %}
+<h1>Questions? Comments?</h1>
+<p>You may also contact me for the historical data. Also let me know if you are interested in collaboration, thank you!</p>
+<form action="{% url 'blog:feedback' %}" method="POST">  <!--Action attribute specifies the form data should be sent to the URL specified; 'POST' method offers more control over access than 'GET'.-->
+	{% csrf_token %}  <!--This tag protects the site from Cross Site Request Forgeries.-->
+	{{ form.as_p }}   <!--'.as_p' renders the form wrapped in <p> tags.-->
+	<input type="submit" value="Submit" />
+</form>
+{% endblock %}
