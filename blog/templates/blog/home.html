@@ -134,12 +134,13 @@
 				{% url 'blog:DJ_LastQtr' as DJLQ %}
 				{% url 'blog:DJ_LastYr' as DJLY %}
 				{% url 'blog:feedback' as fdbk %}
+				{% url 'blog:EduCenter' as edu %}
 				{% load make_list %}  <!--Load the custom template tags to prepare an url list.-->
 				{% collect DJLD DJLW DJLM DJLQ DJLY as all_db_link %}
 				<!--{% if request.path == home %}<li>active</li>{% endif %}-->
 				<!--<li>{{request.path}}</li>  Check for active path; must be activated with Django simple tag.-->
 				<li><a {% if request.path == home %}class="actlink"{% endif %} href="{% url 'blog:home_link' %}">Home</a></li>
-				<li><a {% if request.path == inPro %}class="actlink"{% endif %} href="{% url 'blog:inProgress_link' %}">Education Center</a></li>
+				<li><a {% if request.path == edu %}class="actlink"{% endif %} href="{% url 'blog:EduCenter' %}">Education Center</a></li>
 				<li><a {% if request.path in all_db_link %}class="actlink"{% endif %} href="{% url 'blog:DJ_LastDay' %}">Database</a></li>
 				<!--<li><a {% if request.path == DJLD or request.path == DJLW or request.path == DJLM or request.path == DJLQ or request.path == DJLY %}class="actlink"{% endif %} href="{% url 'blog:DJ_LastDay' %}">Database</a></li>-->
 				<li><a {% if request.path == inPro %}class="actlink"{% endif %} href="{% url 'blog:inProgress_link' %}">Links</a></li>

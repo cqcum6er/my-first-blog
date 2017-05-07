@@ -15,5 +15,5 @@ class FeedbackForm(forms.ModelForm):
 #Use the following form if feedback isn't linked to model instances.
 class FeedbackForm(forms.Form):
 	contact_name = forms.CharField(required=True)
-	#contact_email = forms.EmailField(required=True)
+	contact_email = forms.EmailField(required=True)
 	content = forms.CharField(required=True, widget=forms.Textarea)  #Makes the "content" field a larger Textarea.

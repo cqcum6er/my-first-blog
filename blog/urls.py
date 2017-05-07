@@ -12,4 +12,5 @@ urlpatterns = [
 	url(r'^inProgress/', views.inProgrss, name ='inProgress_link'),  #For pages under construction.
 	url(r'^feedback/', views.feedback_form, name='feedback'),
 	url(r'^thanks/', views.thanks, name='thanks'),
+	url(r'^EduCenter/', views.Edu_Center, name='EduCenter'),
 ]

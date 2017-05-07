@@ -5,12 +5,16 @@ from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist  #Display in-app message when an instance isn't found.
 from django.http import HttpResponse
+from django.core.mail import EmailMessage, send_mail  #For email.
+from django.template import Context  #For email.
+from django.template.loader import get_template  #For email.
 from .models import Post  #'Post' table object is retrieved from 'models.py' within the same folder.
 from .forms import FeedbackForm
 import requests
 import csv
 import datetime
 import aniso8601
+
 '''
 #To update database with the current date, save scheduled csv record from Pythonanywhere, then run local server ONCE to populate local database before commenting out this block; comment out this block before saving views.py to Pythonanywhere to use scheduled csv instead...
 #if not Post:  #Check to see if database is empty.  If it's not, do nothing, else empty existing entry to prepare for update. (Remove the 'if' statement if run as a scheduler command on Pythonanywhere.)
@@ -114,11 +118,27 @@ def thanks(request):  #In-Progress url
 	return render(request, 'blog/thanks.html')
 	
 def feedback_form(request):
+	form_class = FeedbackForm
 	if request.method == 'POST':
-		form = FeedbackForm(request.POST)  #Accept user input as 'request.POST'. 
+		form = form_class(request.POST)  #Accept user input as 'request.POST'. 
 		if form.is_valid():  #runs validation checks for all fields and returns Boolean.
-			form.save()
+			'''form.save() Only useable for forms.ModelForm in forms.py.
 			return render(request, 'blog/thanks.html')
 	else:  #If a GET (such as first time the form is displayed), a blank form is created.
 		form = FeedbackForm()
 	return render(request, 'blog/feedback.html', {'form': form})
+	'''
+			contact_name = request.POST.get('contact_name', '')
+			contact_email = request.POST.get('contact_email', '')
+			form_content = request.POST.get('content', '')
+			template = get_template('blog/contact_template.txt')
+			context = Context({'contact_name': contact_name, 'contact_email': contact_email, 'form_content': form_content,})
+			content = template.render(context)
+			email = EmailMessage("New contact form submission", content, "Fundamental Trader"+'', ['ericsun1221@gmail.com'], headers = {'Reply-To': contact_email })  #Must specify email inbox to send to.
+			email.send()
+			#return redirect('thanks.html')
+			return render(request, 'blog/thanks.html')
+	return render(request, 'blog/feedback.html', {'form': form_class,})
+
+def Edu_Center(request):  #In-Progress url
+	return render(request, 'blog/EduCenter.html')

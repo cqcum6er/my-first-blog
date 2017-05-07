@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '2)z6gao=dn=csifbos_a&8sr5h6#%%imru@l=y*elf)e+c*3ta'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []  #Set to ['127.0.0.1', 'cqcum6er.pythonanywhere.com'] when DEBUG is set to False, otherwise leave empty.
+ALLOWED_HOSTS = ['127.0.0.1', 'cqcum6er.pythonanywhere.com']  #Set to ['127.0.0.1', 'cqcum6er.pythonanywhere.com'] when DEBUG is set to False, otherwise leave empty.
 
 
 # Application definition
@@ -101,3 +101,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+#Enable email capability below.
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  #Use 'django.core.mail.backends.console.EmailBackend' for local test.
+EMAIL_HOST = 'smtp.gmail.com'  #"pop.mail.yahoo.com" use "smtp.mail.yahoo.com" when receiving in yahoo; use "localhost" when doing local test.
+EMAIL_PORT = 465 #587 995  #use 1025 when doing local test.
+DEFAULT_FROM_EMAIL = 'ericsun1221@gmail.com'
+EMAIL_HOST_USER = 'ericsun1221@gmail.com'
+EMAIL_HOST_PASSWORD = '75786810'
+#EMAIL_USE_TLS = True
+EMAIL_USE_SSL = True
