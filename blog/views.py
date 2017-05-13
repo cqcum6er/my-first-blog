@@ -8,13 +8,12 @@ from django.http import HttpResponse
 from django.core.mail import EmailMessage, send_mail  #For email.
 from django.template import Context  #For email.
 from django.template.loader import get_template  #For email.
-from .models import Post  #'Post' table object is retrieved from 'models.py' within the same folder.
+from .models import Post, UserComment  #Retrieve model objects from 'models.py' within the same folder.
 from .forms import FeedbackForm
 import requests
 import csv
 import datetime
 import aniso8601
-
 '''
 #To update database with the current date, save scheduled csv record from Pythonanywhere, then run local server ONCE to populate local database before commenting out this block; comment out this block before saving views.py to Pythonanywhere to use scheduled csv instead...
 #if not Post:  #Check to see if database is empty.  If it's not, do nothing, else empty existing entry to prepare for update. (Remove the 'if' statement if run as a scheduler command on Pythonanywhere.)
@@ -114,15 +113,21 @@ def DJ_LastYr(request):  #Display value from the 1st (trading) day of last year.
 		print "No entry exists for this month from last year, please try an earlier date."
 		#return redirect('/NoData/') 
 
-def thanks(request):  #In-Progress url
+def thanks(request):
 	return render(request, 'blog/thanks.html')
 	
 def feedback_form(request):
-	form_class = FeedbackForm
+	'''
+	form_class = FeedbackForm  #use for email submission.
+	'''
 	if request.method == 'POST':
-		form = form_class(request.POST)  #Accept user input as 'request.POST'. 
+		form = FeedbackForm(request.POST)  #Accept user input as 'request.POST'; use form_class(request.POST) with email submission.
 		if form.is_valid():  #runs validation checks for all fields and returns Boolean.
-			'''form.save() Only useable for forms.ModelForm in forms.py.
+			obj = UserComment()  #Generate new UserComment object (see models.py).
+			obj.contact_name = form.cleaned_data['contact_name']
+			obj.contact_email = form.cleaned_data['contact_email']
+			obj.content = form.cleaned_data['content']
+			obj.save()  #Save the object to db.
 			return render(request, 'blog/thanks.html')
 	else:  #If a GET (such as first time the form is displayed), a blank form is created.
 		form = FeedbackForm()
@@ -139,6 +144,7 @@ def feedback_form(request):
 			#return redirect('thanks.html')
 			return render(request, 'blog/thanks.html')
 	return render(request, 'blog/feedback.html', {'form': form_class,})
+	'''
 
-def Edu_Center(request):  #In-Progress url
+def Edu_Center(request):
 	return render(request, 'blog/EduCenter.html')

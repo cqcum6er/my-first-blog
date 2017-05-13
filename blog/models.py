@@ -36,3 +36,11 @@ class Post(models.Model):  #Defines our model ('models' is a python class; 'Post
 	def __str__(self):  #Note: The _str_ method returns a string of each model instance on the admin page; can be replaced with __unicode__(self).
 		return self.Symbol
 		#return self.title #Get a text (string) with a Post title
+
+class UserComment(models.Model):
+	contact_name = models.CharField(max_length=80)
+	contact_email = models.EmailField()
+	content = models.CharField(max_length=1000)
+	
+	def __str__(self):
+		return self.contact_name
