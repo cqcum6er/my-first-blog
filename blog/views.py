@@ -1,7 +1,7 @@
 '''
 views.py retrieves model instances from the database or instantiate a form (see feedback_form).
 '''
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect #get_object_or_404
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist  #Display in-app message when an instance isn't found.
 from django.http import HttpResponse
@@ -124,9 +124,9 @@ def feedback_form(request):
 		form = FeedbackForm(request.POST)  #Accept user input as 'request.POST'; use form_class(request.POST) with email submission.
 		if form.is_valid():  #runs validation checks for all fields and returns Boolean.
 			obj = UserComment()  #Generate new UserComment object (see models.py).
-			obj.contact_name = form.cleaned_data['contact_name']
-			obj.contact_email = form.cleaned_data['contact_email']
-			obj.content = form.cleaned_data['content']
+			obj.name = form.cleaned_data['name']
+			obj.email = form.cleaned_data['email']
+			obj.message = form.cleaned_data['message']
 			obj.save()  #Save the object to db.
 			return render(request, 'blog/thanks.html')
 	else:  #If a GET (such as first time the form is displayed), a blank form is created.
@@ -146,5 +146,12 @@ def feedback_form(request):
 	return render(request, 'blog/feedback.html', {'form': form_class,})
 	'''
 
-def Edu_Center(request):
+def edu_center(request):
 	return render(request, 'blog/EduCenter.html')
+	
+def query_search(request):
+	queryset_list = Post.objects.all()
+	query = request.GET.get("q")  #"q" is the name of query object (under input text) in the html.
+	if query:
+		queryset_list = queryset_list.filter(Symbol__icontains=query)  #Use 'icontains' lookuptype to specify case-insensitive filter.
+	return render(request, 'blog/results.html', {'query': queryset_list})

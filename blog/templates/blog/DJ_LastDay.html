@@ -4,6 +4,10 @@
 
 {% block content %}
 <div id="aside">
+	<form method="GET" action="">
+		<input type="text" name="q" placeholder="Search symbols" value="{{ request.GET.q }}" /><br/>  <!--include 'name' for search to show up in url; include 'value' to display query while typing.-->
+		<input type="submit" value="Search" />
+	</form>
 	<ul>
 		<li><a href="{% url 'blog:DJ_LastDay' %}">Dow Jones Index</a></li>
 		<li><a style="text-decoration:none;" href="http://finance.yahoo.com/q?s=^gspc">S&amp;P500 Index</a></li>
