@@ -49,7 +49,7 @@
 		#aside {	<!--Left vertical navigation bar format; define a different style for a different element identified by id="aside".-->
 			width: 125px;
 			float: left;
-			margin-top: 20px;
+			margin-top: 0;
 			margin-right: 18px;
 			margin-bottom: -2000px;
 			margin-left: 0;
@@ -149,7 +149,6 @@
 				<li><a {% if request.path in all_db_link %}class="actlink"{% endif %} href="{% url 'blog:DJ_LastDay' %}">Database</a></li>
 				<!--<li><a {% if request.path == DJLD or request.path == DJLW or request.path == DJLM or request.path == DJLQ or request.path == DJLY %}class="actlink"{% endif %} href="{% url 'blog:DJ_LastDay' %}">Database</a></li>-->
 				<li><a {% if request.path == inPro %}class="actlink"{% endif %} href="{% url 'blog:inProgress_link' %}">Links</a></li>
-				<li><a {% if request.path == inPro %}class="actlink"{% endif %} href="{% url 'blog:inProgress_link' %}">Disclaimer</a></li>
 				<li><a {% if request.path == fdbk %}class="actlink"{% endif %} href="{% url 'blog:feedback' %}">Contact</a></li>
 			</ul>
 		</div>
@@ -182,6 +181,17 @@
 		  <p>How much money do I need to start investing in stocks?  Is there a high cost of entry?</p>
 		  <p>One benefit associated with stocks is that there are many stocks offered at different price ranges.  With that said, if you only just started to invest, it is suggested that you invest only with amount that you are comfortable with.  However, it is important that you start early to take advantage of compound interest.</p>
 		{% endblock %}
+		</div>
+		<div style="color:grey; margin-bottom:-2000px;">
+		<p>The information and data on this website are provided for informational purposes only. We cannot guarantee the accuracy or completeness of information and data presented on our website. Any information presented should not be taken as recommendation for any investment vehicle or advice.
+		</p>
+		<p>&copy;Copyright
+		<script>  //Insert current year.
+		var today = new Date()
+		var year = today.getFullYear()
+		document.write(year)
+		</script>
+		fundamentaltrader.com. All Rights Reserved.</p>
 		</div>
 	</body>
 </html>

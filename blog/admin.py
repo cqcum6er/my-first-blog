@@ -4,10 +4,10 @@ from .models import Post, UserComment
 #from .forms import FeedbackForm  #Use if feedback form is linked to model instances.
 
 class PostAdmin(admin.ModelAdmin):  #Create an admin class for customized admin interface.
-	list_display = ['Day', 'Symbol', 'LastPrice']  #Choose attributes to display.
+	list_display = ['Day', 'Symbol', 'LastPrice', 'FiftyTwoWkChg', 'DivYild', 'PEG_Ratio', 'PpS', 'PpB', 'Market_Cap', 'Free_Cash_Flow', 'Market_per_CashFlow', 'Enterprise_per_EBITDA']  #Choose attributes to display.
 	list_display_links = ['Symbol']  #Specify linkable attribute under display.
 	list_filter = ['Day', 'Symbol']  #Add filter function for admin page.
-	search_fields = ['Day', 'Symbol', 'LastPrice']  #Implment search function.
+	search_fields = ['Day', 'Symbol', 'LastPrice']  #Implment search function for specific fields.
 '''
 	class Meta:  #Use if feedback form is linked to model instances.
 		model = Post

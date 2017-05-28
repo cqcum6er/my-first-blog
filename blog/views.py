@@ -1,13 +1,14 @@
-'''
-views.py retrieves model instances from the database or instantiate a form (see feedback_form).
-'''
+#views.py retrieves model instances from the database or instantiate a form (see feedback_form).
 from django.shortcuts import render, redirect #get_object_or_404
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist  #Display in-app message when an instance isn't found.
 from django.http import HttpResponse
-from django.core.mail import EmailMessage, send_mail  #For email.
-from django.template import Context  #For email.
-from django.template.loader import get_template  #For email.
+'''
+#For email.
+from django.core.mail import EmailMessage, send_mail
+from django.template import Context
+from django.template.loader import get_template
+'''
 from .models import Post, UserComment  #Retrieve model objects from 'models.py' within the same folder.
 from .forms import FeedbackForm
 import requests
@@ -149,9 +150,13 @@ def feedback_form(request):
 def edu_center(request):
 	return render(request, 'blog/EduCenter.html')
 	
-def query_search(request):
+def get_query(request):  #Implement logic for query search.
 	queryset_list = Post.objects.all()
 	query = request.GET.get("q")  #"q" is the name of query object (under input text) in the html.
-	if query:
-		queryset_list = queryset_list.filter(Symbol__icontains=query)  #Use 'icontains' lookuptype to specify case-insensitive filter.
-	return render(request, 'blog/results.html', {'query': queryset_list})
+	if query:  #Check if user entered a query string.
+		queryset_list = queryset_list.filter(Symbol__iexact=query)  #Apply 'iexact' lookuptype to find case-insensitive filter with exact match in a given field, "Symbol".
+		if len(queryset_list) == 0:  #If no symbol is found, display error message.
+			return HttpResponse('No symbol found.')
+		return render(request, 'blog/results.html', {'query': queryset_list})
+	else:	
+		return HttpResponse('Please submit a search term.')  #If no user input is received, display error message.

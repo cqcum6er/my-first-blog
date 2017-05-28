@@ -37,10 +37,10 @@ class Post(models.Model):  #Defines our model ('models' is a python class; 'Post
 	def __str__(self):  #Note: The _str_ method returns a string of each model instance on the admin page; can be replaced with __unicode__(self).
 		return self.Symbol
 		#return self.title #Get a text (string) with a Post title
-		
+	'''
 	def get_absolute_url(self):
-		return reverse("blog:results", kwargs={"pk":self.pk})  #"<namespace>:<html>"
-
+		return reverse("blog:results", kwargs={"Symbol":self.Symbol})  #"<namespace>:<html>"
+	'''
 class UserComment(models.Model):
 	name = models.CharField(max_length=80)
 	email = models.EmailField()
