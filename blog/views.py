@@ -3,6 +3,8 @@ from django.shortcuts import render, redirect #get_object_or_404
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist  #Display in-app message when an instance isn't found.
 from django.http import HttpResponse
+from django.db.models import Q  #Allow simultaneous search in different fields.
+from difflib import get_close_matches  #Allow 'approximate' search.
 '''
 #For email.
 from django.core.mail import EmailMessage, send_mail
@@ -28,6 +30,12 @@ with open('DJ_list.csv', 'rb') as file:  # Need to use absolute path when on Pyt
 		Post.objects.create(**dict(zip(fields, row)))
 #...end of block.
 '''
+p = Post.objects.latest('Day')  #Returns an object instance (not iterable); if latest() is empty, it works with attributes defined by 'class Meta' in models.py. Note latest () only retrieve ONE instance; .values() needs to be inserted in front of latest() to make it iterable as dictionary; cache queryset object for quick retrieval in html request.
+LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')  #Convert str to datetime object from datetime module.
+print LastDay
+CurrYr = LastDay.strftime('%Y')  #Retrieve current year as string from datetime object, LastDay.
+CurrMnth = LastDay.strftime('%m')  #Retrieve current month as string from datetime object, LastDay.
+
 def iso_to_gregorian(iso_year, iso_week, iso_day):  #Converts ISO week date format to Gregorian calendar date format.
 	jan4 = datetime.date(iso_year, 1, 4)  #1st week ('Week 01') of new year always contains Jan 4th.
 	start = jan4 - datetime.timedelta(days=jan4.isoweekday()-1)  #Get the year for ISO week date.
@@ -45,7 +53,6 @@ def DJ_LastDay(request):  #"DJ_LastDay" must be requested from urls.py
 	last_date = datetime.date(2016, 9, 17)
 	posts = Post.objects.filter(Day__range=(first_date, last_date))'''
 	#posts = Post.objects.filter(Day__lte=timezone.now()).exclude(Day__lte=timezone.now() - datetime.timedelta(days=1))  #Retrieve all dates equal to or older than today but exclude those from yesterday or older; use timezone.now() instead of datetime.datetime.now() to avoid problems with timezones.
-	p = Post.objects.latest('Day')  #Returns an object instance (not iterable); if latest() is empty, it works with attributes defined by 'class Meta' in models.py. Note latest () only retrieve ONE instance; .values() needs to be inserted in front of latest() to make it iterable as dictionary.
 	posts = Post.objects.filter(Day=p.Day)  #Retrieve all instances with latest day ('p.Day') as QuerySet object.
 	'''print type(p.Day)
 	print p.Day'''
@@ -57,20 +64,11 @@ def DJ_LastDay(request):  #"DJ_LastDay" must be requested from urls.py
 	#The last parameter, which looks like this: {} is a place to integrate objects in models.py (posts) with html ('posts') in template folder.
 
 def DJ_LastWk(request):  #Display value from Wednesday of last week.
-	p = Post.objects.latest('Day')
-	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')  #Convert str to datetime object from datetime module.
-	print LastDay
-	print iso_to_gregorian(LastDay.isocalendar()[0], LastDay.isocalendar()[1]-1, 3)  #Show date from last week's Wednesday.'''
-	posts = Post.objects.filter(Day=iso_to_gregorian(LastDay.isocalendar()[0], LastDay.isocalendar()[1]-1, 3))  #Retrieve all instances from Wednesday of last week.
+	print iso_to_gregorian(LastDay.isocalendar()[0], LastDay.isocalendar()[1]-1, 3)  #Show date from last Wednesday.
+	posts = Post.objects.filter(Day=iso_to_gregorian(LastDay.isocalendar()[0], LastDay.isocalendar()[1]-1, 3))  #Retrieve all instances from last Wednesday.
 	return render(request, 'blog/DJ_LastWk.html', {'LastWk_posts': posts})
 
 def DJ_LastMnth(request):  #Display value from the 1st (trading) day of last month.
-	p = Post.objects.latest('Day')
-	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')
-	#print type(LastDay.strftime('%m'))
-	print LastDay
-	CurrYr = LastDay.strftime('%Y')  #Retrieve current month as string from datetime object, LastDay.
-	CurrMnth = LastDay.strftime('%m')  #Retrieve current month as string from datetime object, LastDay.
 	if int(CurrMnth) >= 2:  #Check whether last month is still within the same year.
 		p = Post.objects.filter(Day__year=CurrYr, Day__month=str(int(CurrMnth)-1)).earliest('Day')  #Retrieve earliest date available from last month.
 		print p.Day
@@ -82,12 +80,6 @@ def DJ_LastMnth(request):  #Display value from the 1st (trading) day of last mon
 	return render(request, 'blog/DJ_LastMnth.html', {'LastMnth_posts': posts})
 
 def DJ_LastQtr(request):  #Display value from the 1st (trading) day of last quarter.
-	p = Post.objects.latest('Day')
-	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')
-	print LastDay
-	#print type(LastDay.strftime('%m'))
-	CurrYr = LastDay.strftime('%Y')
-	CurrMnth = LastDay.strftime('%m')
 	if int(CurrMnth) >= 4:  #Check whether last quarter is still within the same year.
 		p = Post.objects.filter(Day__year=CurrYr, Day__month=str(int(CurrMnth)-3)).earliest('Day')
 		print p.Day
@@ -99,12 +91,6 @@ def DJ_LastQtr(request):  #Display value from the 1st (trading) day of last quar
 	return render(request, 'blog/DJ_LastQtr.html', {'LastQtr_posts': posts})
 
 def DJ_LastYr(request):  #Display value from the 1st (trading) day of last year.
-	p = Post.objects.latest('Day')
-	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')
-	print LastDay
-	#print type(LastDay.strftime('%m'))
-	CurrYr = LastDay.strftime('%Y')
-	CurrMnth = LastDay.strftime('%m')
 	try:
 		p = Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=CurrMnth).earliest('Day')  #Retrieve earliest date available from last year, doesn't matter the month.
 		print p.Day
@@ -152,11 +138,58 @@ def edu_center(request):
 	
 def get_query(request):  #Implement logic for query search.
 	queryset_list = Post.objects.all()
-	query = request.GET.get("q")  #"q" is the name of query object (under input text) in the html.
-	if query:  #Check if user entered a query string.
-		queryset_list = queryset_list.filter(Symbol__iexact=query)  #Apply 'iexact' lookuptype to find case-insensitive filter with exact match in a given field, "Symbol".
+	q = request.GET.get("q")  #"q" is the name of query object in html (under input text).
+	print q.encode('utf-8'), type(q.encode('utf-8')), len(q.encode('utf-8'))
+	query = q.encode('utf-8')  #Convert unicode string to regular (byte) string.
+	if len(query) <= 4:  #Check if user entered a query string (assuming symbol search for character string of 4 or less).
+		queryset_list = queryset_list.filter(
+		Q(Symbol__iexact=query)|
+		Q(Name__icontains=query)
+		)  #Apply 'iexact' lookuptype to find case-insensitive filter with EXACT match in a given field, "Symbol". Use 'icontains' for string containing the query string disregarding case.
 		if len(queryset_list) == 0:  #If no symbol is found, display error message.
 			return HttpResponse('No symbol found.')
-		return render(request, 'blog/results.html', {'query': queryset_list})
-	else:	
-		return HttpResponse('Please submit a search term.')  #If no user input is received, display error message.
+			
+		SymList = queryset_list.values_list('Symbol', flat=True).order_by('Symbol')  #Retrieve only 'Symbol' field from queryset as a list. If flat=True, results are returned as single values, rather than tuples.
+		#print SymList, type(SymList)
+		byte_list = [i.encode('utf-8') for i in SymList]  #Convert unicode to byte string for every item in the list.
+		#print byte_list, type(byte_list)
+		byte_list = list(set(byte_list))  #Eliminate redundancy in the list.
+		print byte_list, type(byte_list)
+		query = query.upper()  #Convert query to uppercase to match list.
+		gcm = get_close_matches(query, byte_list, 1)  #Only retrieve closest match (including matching cases).
+		print gcm, type(gcm)
+		
+		if gcm:  #Check if query matches any of get_close_matches hits.
+			gcm = gcm[0]  #Get the only item in the list as string.
+			#print gcm, type(gcm)
+			queryset_list = queryset_list.filter(Symbol__iexact=gcm)  #Retrieve all day entry for the exact matching symbol.
+			print queryset_list, type(queryset_list)
+			return render(request, 'blog/results.html', {'query': queryset_list})
+		else:
+			return HttpResponse('Please enter a closer match for a symbol or a name.')
+	elif len(query) > 4:  #Check if user entered a query string (assuming name search for character string of 5 or more).
+		queryset_list = queryset_list.filter(Name__icontains=query)
+		if len(queryset_list) == 0:  #If no symbol is found, display error message.
+			return HttpResponse('No symbol found.')
+		SymList = queryset_list.values_list('Name', flat=True).order_by('Name')
+		print SymList, type(SymList)
+		byte_list = [i.encode('utf-8').upper() for i in SymList]
+		byte_list = list(set(byte_list))
+		print byte_list, type(byte_list)
+		query = query.upper()
+		gssm =[]  #Creat a list to get substring match from query.
+		for item in byte_list:
+			#print item
+			if query in item:
+				#gssm += item
+				gssm.append(item)  #Add item to the list if item contains query.
+		print gssm, type(gssm), gssm[0]
+		
+		if gssm:
+			gssm = gssm[0]  #Retrieve only the 1st company entry to display results.
+			queryset_list = queryset_list.filter(Name__icontains=gssm)  #Retrieve all day entry for the matching name.
+			return render(request, 'blog/results.html', {'query': queryset_list})
+		else:
+			return HttpResponse('Please enter a closer match for a company name.')
+	else:  #Display error message if no user input is received.
+		return HttpResponse('Please submit a search term.')

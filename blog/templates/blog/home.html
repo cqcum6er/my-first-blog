@@ -33,7 +33,7 @@
 		ul#nav li a {  /*Display default link appearance.*/
 			background-color: black;
 			color: white;
-			padding: 10px 20px;
+			padding: 10px 20px;  /*Top & bottom padding are 10 px; R & L padding are 20 px.*/
 			text-decoration: none;
 			border-radius: 8px 8px 0 0;  /*upper L; upper R; lower R; lower L*/
 		}
@@ -77,6 +77,10 @@
 			display: block;
 			background-color: #66991c;
 			color: white;
+		}
+		
+		ul#section li a {
+			padding: 20px 20px;
 		}
 		
 		#section a:hover, a:active {	<!--Change link color when cursor hovers over and when clicked.-->
@@ -140,7 +144,7 @@
 				{% url 'blog:DJ_LastYr' as DJLY %}
 				{% url 'blog:feedback' as fdbk %}
 				{% url 'blog:EduCenter' as edu %}
-				{% load make_list %}  <!--Load the custom template tags to prepare an url list.-->
+				{% load make_list %}  <!--Load the custom template tags to prepare an url list (usage: collect 'html' as 'shortcut').-->
 				{% collect DJLD DJLW DJLM DJLQ DJLY as all_db_link %}
 				<!--{% if request.path == home %}<li>active</li>{% endif %}-->
 				<!--<li>{{request.path}}</li>  Check for active path; must be activated with Django simple tag.-->
@@ -186,12 +190,12 @@
 		<p>The information and data on this website are provided for informational purposes only. We cannot guarantee the accuracy or completeness of information and data presented on our website. Any information presented should not be taken as recommendation for any investment vehicle or advice.
 		</p>
 		<p>&copy;Copyright
-		<script>  //Insert current year.
-		var today = new Date()
-		var year = today.getFullYear()
-		document.write(year)
-		</script>
-		fundamentaltrader.com. All Rights Reserved.</p>
+			<script>  //Insert current year.
+			var today = new Date()
+			var year = today.getFullYear()
+			document.write(year)
+			</script>
+			fundamentaltrader.com. All Rights Reserved.</p>
 		</div>
 	</body>
 </html>

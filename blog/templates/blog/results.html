@@ -4,9 +4,9 @@
 
 {% block content %}
 <div id="aside">
-	<p>Display historical data</br>for a symbol:</p>
+	<p>Display historical data</br>for a company:</p>
 	<form method="GET" action="{% url 'blog:results' %}">
-		<input type="text" name="q" placeholder="Enter Symbol" value="{{ request.GET.q }}" /><br/>  <!--include 'name' for search to show up in url; include 'value' to display query while typing.-->
+		<input type="text" name="q" placeholder="Enter Symbol or Name" value="{{ request.GET.q }}" /><br/>  <!--include 'name' for search to show up in url; include 'value' to display query while typing.-->
 		<input type="submit" value="Search" />
 	</form>
 	<p>Display by index:</p>
@@ -22,7 +22,7 @@
 	<thead>
 	<tr style="color:white;background:black;">
 		<th onclick="sortTable(0)">Date</th>
-		<!--<th onclick="sortTable(1)">Symbol</th>-->
+		<th onclick="sortTable(1)">Symbol</th>
 		<th onclick="sortTable(2)">Price</th>
 		<th onclick="sortTable(3)">52-week Change</th>
 		<th onclick="sortTable(4)">52-week High</th>
@@ -47,7 +47,7 @@
 		<p>{{ post.text|linebreaks }}</p>-->
 	<tr align="center">
 		<td>{{ post.Day|date:"Y-m-d" }}</td>  <!--Format date for correct sorting.-->
-		<!--<td>{{ post.Symbol }}</td>-->
+		<td>{{ post.Symbol }}</td>
 		<td>{% firstof post.LastPrice "N/A" %}</td>  <!--Print out value OR "N/A" in case value doesn't exist.-->
 		<!--{% if post.FiftyTwoWkChg|floatformat %}
 			<!--{% widthratio post.FiftyTwoWkChg 1 100 as x %}  Divide by 1 and multiply by 100.-->
@@ -55,7 +55,7 @@
 		<!--{% else %}
 			<td>N/A</td>
 		{% endif %}-->
-		{% load math_op %}
+		{% load math_op %}  <!--load custom tag for math operation (mult, div, & sub)-->
 		{% if post.FiftyTwoWkChg|floatformat %}  <!--Check if conversion to float type is possible.-->
 			<td>{{ post.FiftyTwoWkChg|mult:100|floatformat:2 }}%</td>
 		{% else %}

@@ -1,3 +1,4 @@
+#Collect a bunch of url's as a shortcut list (usage: collect 'html' as 'shortcut').
 from django import template
 
 register = template.Library()
@@ -5,9 +6,9 @@ register = template.Library()
 @register.tag
 def collect(parser, token):
     bits = list(token.split_contents())
-    if len(bits) > 3 and bits[-2] == 'as':
-        varname = bits[-1]
-        items = bits[1:-2]
+    if len(bits) > 3 and bits[-2] == 'as':  #Define syntax for positional argument.
+        varname = bits[-1]  #Last positonal argument is reserved for shortcut list name.
+        items = bits[1:-2]  #Every url between 'collect' and 'as' is collected.
         return CollectNode(items, varname)
     else:
         raise template.TemplateSyntaxError('%r expected format is "item [item ...] as varname"' % bits[0])

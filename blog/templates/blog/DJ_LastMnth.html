@@ -4,9 +4,9 @@
 
 {% block content %}
 <div id="aside">
-	<p>Display historical data</br>for a symbol:</p>
+	<p>Display historical data</br>for a company:</p>
 	<form method="GET" action="{% url 'blog:results' %}">
-		<input type="text" name="q" placeholder="Enter Symbol" value="{{ request.GET.q }}" /><br/>  <!--include 'name' for search to show up in url; include 'value' to display query while typing.-->
+		<input type="text" name="q" placeholder="Enter Symbol or Name" value="{{ request.GET.q }}" /><br/>  <!--include 'name' for search to show up in url; include 'value' to display query while typing.-->
 		<input type="submit" value="Search" />
 	</form>
 	<p>Display by index:</p>
