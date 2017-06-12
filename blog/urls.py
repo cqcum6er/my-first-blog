@@ -1,4 +1,4 @@
-#blog.urls
+#blog.urls. Note that no html template name is used, only shortcut name in urls.py.
 from django.conf.urls import include, url
 from . import views  #Import "views.py" in the current folder to access view function.
 urlpatterns = [
@@ -15,4 +15,5 @@ urlpatterns = [
 	url(r'^EduCenter/', views.edu_center, name='EduCenter'),
 	url(r'^results/', views.get_query, name='results'),
 	#url(r'^results/(?P<Symbol>\d+)/', views.get_query, name='results'),  #(?P<name>pattern), where name is the name of the group and pattern is some pattern to match. The captured values are passed to view functions as keyword arguments rather than positional arguments. For example, the pk argument will be passed to views.get_query as a string object.
+	url(r'^NoMatch/', views.get_query, name='NoMatch'),
 ]

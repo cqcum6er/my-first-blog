@@ -16,16 +16,16 @@
 	</ul>
 </div>
 
-<div id="section" style="margin-left:175px; background-color:#fff;">  <!--Margin added to keep element to the right of aside bar-->
-	<ul style=" list-style:none; display:inline; text-decoration:none;">
-		<li style="display:inline; text-decoration:none;"><a href="{% url 'blog:DJ_LastDay' %}">Last Trading Day</a></li>
+<div id="section">  <!--Margin added to keep element to the right of aside bar-->
+	<ul>
+		<li style="display:inline;">Choose a day to display:</li>
+		<li style="display:inline;"><a href="{% url 'blog:DJ_LastDay' %}">Last Trading Day</a></li>
 		<li style="display:inline; text-decoration:none;"><a style="text-decoration:none;" href="{% url 'blog:DJ_LastWk' %}">Last Week</a></li>
 		<li style="display:inline; text-decoration:none;"><a style="text-decoration:none;" href="{% url 'blog:DJ_LastMnth' %}">Last Month</a></li>
 		<li style="display:inline; text-decoration:none;"><a style="text-decoration:none;" href="{% url 'blog:DJ_LastQtr' %}">Last Quarter</a></li>
 		<li style="display:inline; text-decoration:none;"><a style="text-decoration:none;" href="{% url 'blog:DJ_LastYr' %}">Last Year</a></li>
 	</ul>
 </div>
-
 <table id="myTable" border="8" style="border-collapse: collapse; width:1000px;">
 	<caption>Dow Jones Index ({{ LastDay_posts|length }} symbols returned) - Last Trading Day ({% with LastDay_posts.0 as 1st %} {{ 1st.Day }} {% endwith %})  <!--Get "Day" field value from first item in QuerySet "posts."-->
 	</caption>
@@ -55,7 +55,7 @@
 		<h1><a href="/">{{ post.title }}</a></h1>
 		<p>{{ post.text|linebreaks }}</p>-->
 	<tr align="center">
-		<td>{{ post.Symbol }}</td>
+		<td><a style="text-decoration:none;" href="/results/?q={{ post.Symbol }}">{{ post.Symbol }}</a></td>
 		<td>{% firstof post.LastPrice "N/A" %}</td>  <!--Print out value OR "N/A" in case value doesn't exist.-->
 		<!--{% if post.FiftyTwoWkChg|floatformat %}
 			<!--{% widthratio post.FiftyTwoWkChg 1 100 as x %}  Divide by 1 and multiply by 100.-->
@@ -98,7 +98,6 @@
 	{% endfor %}
 	</tbody>
 </table>
-
 <script>
 function sortTable(n) {  //See <https://www.w3schools.com/howto/howto_js_sort_table.asp> for source code.
   var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;

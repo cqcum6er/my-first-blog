@@ -11,18 +11,18 @@
 	</form>
 	<p>Display by index:</p>
 	<ul>
-		<li><a href="{% url 'blog:DJ_LastDay' %}">Dow Jones Index</a></li>
-		<li><a href="http://finance.yahoo.com/q?s=^gspc">S&amp;P500 Index</a></li>
+		<li><a style="text-decoration:none;" href="{% url 'blog:DJ_LastDay' %}">Dow Jones Index</a></li>
+		<li><a style="text-decoration:none;" href="http://finance.yahoo.com/q?s=^gspc">S&amp;P500 Index</a></li>
 	</ul>
 </div>
 
 <table id="myTable" border="8" style="border-collapse: collapse; width:1000px;">
-	<caption>{% with query.0 as 1st %} {{ 1st.Name }} ({{ query|length }} days returned){% endwith %} <!--Get "Symbol" field value from first item in QuerySet "posts."-->
+	<caption>{% with posts.0 as 1st %} {{ 1st.Name }} ({{ posts|length }} days returned){% endwith %} <!--Get "Symbol" field value from first item in QuerySet "posts."-->
 	</caption>
 	<thead>
 	<tr style="color:white;background:black;">
 		<th onclick="sortTable(0)">Date</th>
-		<th onclick="sortTable(1)">Symbol</th>
+		<!--<th onclick="sortTable(1)">Symbol</th>-->
 		<th onclick="sortTable(2)">Price</th>
 		<th onclick="sortTable(3)">52-week Change</th>
 		<th onclick="sortTable(4)">52-week High</th>
@@ -41,13 +41,13 @@
 	</tr>
 	</thead>
 	<tbody>
-	{% for post in query reversed %}  <!--see views.py for 'posts' list-->
+	{% for post in posts reversed %}  <!--see views.py for 'posts' list-->
 		<!--<p>published: {{ post.published_date }}</p>
 		<h1><a href="/">{{ post.title }}</a></h1>
 		<p>{{ post.text|linebreaks }}</p>-->
 	<tr align="center">
 		<td>{{ post.Day|date:"Y-m-d" }}</td>  <!--Format date for correct sorting.-->
-		<td>{{ post.Symbol }}</td>
+		<!--<td>{{ post.Symbol }}</td>-->
 		<td>{% firstof post.LastPrice "N/A" %}</td>  <!--Print out value OR "N/A" in case value doesn't exist.-->
 		<!--{% if post.FiftyTwoWkChg|floatformat %}
 			<!--{% widthratio post.FiftyTwoWkChg 1 100 as x %}  Divide by 1 and multiply by 100.-->

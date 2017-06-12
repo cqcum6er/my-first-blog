@@ -79,8 +79,26 @@
 			color: white;
 		}
 		
+		#section {
+			margin-left: 165px;  /*Save space for lefthand column*/
+			background-color: #fff;
+		}
+		
+		/*ul#section {
+			list-style: none;
+			display: inline;
+			text-decoration: none;
+		}*/
+		
+		ul#section li {
+			display:inline;
+			text-decoration:none;
+			padding: 10px;
+		}
+		
 		ul#section li a {
-			padding: 20px 20px;
+			display:inline;
+			padding: 20px;
 		}
 		
 		#section a:hover, a:active {	<!--Change link color when cursor hovers over and when clicked.-->
@@ -91,7 +109,6 @@
 		
 		#myTable {  <!--Content area format-->
 			<!--display: inline;  Display content area next to left verti aside bar-->
-			position: relative;
 			float: left;
 			width: 75%;
 			background-color: #fff;
@@ -127,11 +144,17 @@
 		<!--Topbar begins-->
 		<!--<div style="position: fixed; top: 0;">-->
 		
-		<div style="text-align:center; background-color:#fff;">
-			<h1 style="color:#00A100"><a style="text-decoration:none;" href="{% url 'blog:home_link' %}">Fundamental Trader</a></h1>
-			<h2 style="font-size:12pt;">The Comprehensive Fundamental Analysis Database</h2>
+		<div style="text-align:left; background-color:#fff; padding-left: 40px;">
+			<h1 style="color:#00A100; margin:0;"><a style="text-decoration:none;" href="{% url 'blog:home_link' %}">Fundamental Trader</a></h1>
+			<p style="font-size:12pt;">The Comprehensive Fundamental Analysis Database</p>
 		</div>  <!--Topbar ends-->
-
+		<div style="position:absolute; top:0; left:900px; margin-right:20px; background-color:#fff;">
+		<p>Start search for a company:</p>
+		<form method="GET" action="{% url 'blog:results' %}">
+			<input type="text" name="q" placeholder="Enter Symbol or Name" value="{{ request.GET.q }}" />  <!--include 'name' for search to show up in url; include 'value' to display query while typing.-->
+			<input type="submit" value="Search" />
+		</form>
+		</div>
 		<div>  <!--a container for navigation links below header-->
 			<ul id="nav">	<!--Unordered list-->
 				<!--{% load active_nav %}  Load the custom template tags to mark active link.-->
@@ -144,8 +167,9 @@
 				{% url 'blog:DJ_LastYr' as DJLY %}
 				{% url 'blog:feedback' as fdbk %}
 				{% url 'blog:EduCenter' as edu %}
+				{% url 'blog:results' as res %}
 				{% load make_list %}  <!--Load the custom template tags to prepare an url list (usage: collect 'html' as 'shortcut').-->
-				{% collect DJLD DJLW DJLM DJLQ DJLY as all_db_link %}
+				{% collect DJLD DJLW DJLM DJLQ DJLY res as all_db_link %}
 				<!--{% if request.path == home %}<li>active</li>{% endif %}-->
 				<!--<li>{{request.path}}</li>  Check for active path; must be activated with Django simple tag.-->
 				<li><a {% if request.path == home %}class="actlink"{% endif %} href="{% url 'blog:home_link' %}">Home</a></li>
@@ -186,8 +210,8 @@
 		  <p>One benefit associated with stocks is that there are many stocks offered at different price ranges.  With that said, if you only just started to invest, it is suggested that you invest only with amount that you are comfortable with.  However, it is important that you start early to take advantage of compound interest.</p>
 		{% endblock %}
 		</div>
-		<div style="color:grey; margin-bottom:-2000px;">
-		<p>The information and data on this website are provided for informational purposes only. We cannot guarantee the accuracy or completeness of information and data presented on our website. Any information presented should not be taken as recommendation for any investment vehicle or advice.
+		<div style="clear:both; color:grey; padding:10px;">  <!-- position:absolute; bottom:20px; margin-bottom:-1000px;-->
+		<p>The information and data on this website are provided for informational purposes only. We cannot guarantee the accuracy or completeness of information and data presented on our website. Any information presented should not be taken as recommendation for any investment vehicle or advice.</br>All contact information provided to us will solely be used for communication purpose and will not be disclosed to a third party without user consent.
 		</p>
 		<p>&copy;Copyright
 			<script>  //Insert current year.
