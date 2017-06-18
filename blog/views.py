@@ -3,9 +3,9 @@ from django.shortcuts import render, redirect #get_object_or_404
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist  #Display in-app message when an instance isn't found.
 from django.http import HttpResponse
+from difflib import get_close_matches  #Allow 'approximate' search.
 '''
 from django.db.models import Q  #Allow simultaneous search in different fields.
-from difflib import get_close_matches  #Allow 'approximate' search.
 #For email.
 from django.core.mail import EmailMessage, send_mail
 from django.template import Context
@@ -32,7 +32,6 @@ with open('DJ_list.csv', 'rb') as file:  # Need to use absolute path when on Pyt
 '''
 p = Post.objects.latest('Day')  #Returns an object instance (not iterable); if latest() is empty, it works with attributes defined by 'class Meta' in models.py. Note latest () only retrieve ONE instance; .values() needs to be inserted in front of latest() to make it iterable as dictionary; cache queryset object for quick retrieval in html request.
 LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')  #Convert str to datetime object from datetime module.
-print LastDay
 CurrYr = LastDay.strftime('%Y')  #Retrieve current year as string from datetime object, LastDay.
 CurrMnth = LastDay.strftime('%m')  #Retrieve current month as string from datetime object, LastDay.
 
@@ -176,40 +175,31 @@ def get_query(request):  #Implement logic for query search.
 				SymList = queryset_list.values_list('Symbol', flat=True).order_by('Symbol')
 				byte_list = [i.encode('utf-8').upper() for i in SymList]
 				byte_list = list(set(byte_list))
-				'''
-				gssm =[]  #Creat a list to get substring match from query.
-				for item in byte_list:  #Check if query is contained within the substring for each company name retrieved.
-					#print item
-					if query in item:
-						#gssm += item
-						gssm.append(item)  #Add item to the list if a company name contains user query.
-				print gssm, type(gssm)
-				'''
 				print "Symbol(s) found containing user query under 'Name' field:", byte_list, type(byte_list), len(byte_list)
-				'''
-				if len(byte_list) == 1:
-					print "One result contained within 'Name' field:", byte_list, type(byte_list)
-					return render(request, 'blog/results.html', {'query': queryset_list})
-				else:
-				'''
-				print type(queryset_list)
-				queryset_list = queryset_list.values('Symbol', 'Name').distinct()
-				print queryset_list, type(queryset_list)
-				'''
-				Name_words = master_list.values('Name').distinct()
-				print Name_words, type(Name_words), len(Name_words)
-				gssm =[]  #Creat a list to get substring match from query.
-				for item in Name_words:  #Check if query is contained within the substring for each company name retrieved.
-					#print item
-					#if query in item:
-						#gssm += item
-					gssm.append(item)  #Add item to the list if a company name contains user query.
-				print gssm, type(gssm), len(gssm)
-				
-				gcm = get_close_matches(query, Name_words)  #Only retrieve closest match (including matching cases).
-				print "Did you mean?", gcm
-				'''
-				return render(request, 'blog/NoMatch.html', {'posts': queryset_list})
+				if len(byte_list) >= 1:  #At least one 'Name' in the database CONTAINS the query.
+					print type(queryset_list)
+					queryset_list = queryset_list.values('Symbol', 'Name').distinct()
+					print queryset_list, type(queryset_list)
+					
+					return render(request, 'blog/NoMatch.html', {'posts': queryset_list})
+				else:  #Try approximate matching of query string; assemble a unique word list from 'Name' field 1st.
+					Name_words = master_list.values('Name').distinct()
+					print "Distinct 'Name' field:", Name_words, type(Name_words), len(Name_words)
+					Name_words = Name_words.values_list('Name', flat=True).order_by('Symbol')  #Convert distionary ('Name' field only) to ValuesQuerySet format.
+					Name_words = list(Name_words)  #Convert ValuesQuerySet to list format.
+					print "Converted to list:", Name_words, type(Name_words), len(Name_words)
+					gssm = []  #Creat a list to get substring match from query.
+					for unsplit in Name_words:  #Check if query is contained within the substring for each company name retrieved.
+						#print unsplit
+						for word in unsplit.split(' '):
+							#print word
+							gssm.append(word.upper())  #Separate words in 'Name' field and append to new list (in upper case).
+					gssm = list(set(gssm))
+					print gssm, type(gssm), len(gssm)
+					close_matches = get_close_matches(query, gssm)  #Only retrieve closest match (including matching cases).
+					print "Did you mean?", close_matches
+					#return HttpResponse('Did you enter the right search term? Closest match: '+close_matches[0])
+					return render(request, 'blog/NoMatch.html', {'posts': close_matches})
 		'''
 		if len(byte_list) >= 2:  #Offer suggestion if more than one match is found in database.
 			pass

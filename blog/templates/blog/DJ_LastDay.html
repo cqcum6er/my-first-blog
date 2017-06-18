@@ -16,9 +16,9 @@
 	</ul>
 </div>
 
-<div id="section">  <!--Margin added to keep element to the right of aside bar-->
+<div id="section" style="white-space:nowrap;>  <!--Margin added to keep element to the right of aside bar-->
 	<ul>
-		<li style="display:inline;">Choose a day to display:</li>
+		<li style="display:inline;">Period to display:</li>
 		<li style="display:inline;"><a href="{% url 'blog:DJ_LastDay' %}">Last Trading Day</a></li>
 		<li style="display:inline; text-decoration:none;"><a style="text-decoration:none;" href="{% url 'blog:DJ_LastWk' %}">Last Week</a></li>
 		<li style="display:inline; text-decoration:none;"><a style="text-decoration:none;" href="{% url 'blog:DJ_LastMnth' %}">Last Month</a></li>

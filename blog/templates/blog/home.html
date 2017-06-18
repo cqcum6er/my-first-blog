@@ -148,7 +148,7 @@
 			<h1 style="color:#00A100; margin:0;"><a style="text-decoration:none;" href="{% url 'blog:home_link' %}">Fundamental Trader</a></h1>
 			<p style="font-size:12pt;">The Comprehensive Fundamental Analysis Database</p>
 		</div>  <!--Topbar ends-->
-		<div style="position:absolute; top:0; left:900px; margin-right:20px; background-color:#fff;">
+		<div style="position:absolute; top:0; left:900px; margin-right:20px; background-color:#fff; white-space:nowrap;">
 		<p>Start search for a company:</p>
 		<form method="GET" action="{% url 'blog:results' %}">
 			<input type="text" name="q" placeholder="Enter Symbol or Name" value="{{ request.GET.q }}" />  <!--include 'name' for search to show up in url; include 'value' to display query while typing.-->
@@ -156,7 +156,7 @@
 		</form>
 		</div>
 		<div>  <!--a container for navigation links below header-->
-			<ul id="nav">	<!--Unordered list-->
+			<ul id="nav" style="white-space:nowrap;">	<!--Unordered list-->
 				<!--{% load active_nav %}  Load the custom template tags to mark active link.-->
 				{% url 'blog:home_link' as home %}  <!--Must use a replacement name for a link when the link is placed inside a block tag.-->
 				{% url 'blog:inProgress_link' as inPro %}
