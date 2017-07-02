@@ -1,8 +1,9 @@
 #views.py retrieves model instances from the database or instantiate a form (see feedback_form).
-from django.shortcuts import render, redirect #get_object_or_404
+from django.shortcuts import render, render_to_response, redirect #get_object_or_404
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist  #Display in-app message when an instance isn't found.
 from django.http import HttpResponse
+from django.template import RequestContext
 from difflib import get_close_matches  #Allow 'approximate' search.
 '''
 from django.db.models import Q  #Allow simultaneous search in different fields.
@@ -13,6 +14,7 @@ from django.template.loader import get_template
 '''
 from .models import Post, UserComment  #Retrieve model objects from 'models.py' within the same folder.
 from .forms import FeedbackForm
+from .templatetags import index_table
 import requests
 import csv
 import datetime
@@ -48,24 +50,20 @@ def inProgrss(request):  #In-Progress url
 
 def DJ_LastDay(request):  #"DJ_LastDay" must be requested from urls.py
 	#posts = Post.objects.values()  #values() returns content of database as dictionary rather than model instances, making the database iterable.
-	'''first_date = datetime.date(2016, 9, 16)
-	last_date = datetime.date(2016, 9, 17)
-	posts = Post.objects.filter(Day__range=(first_date, last_date))'''
+	#first_date = datetime.date(2016, 9, 16)
+	#last_date = datetime.date(2016, 9, 17)
+	#posts = Post.objects.filter(Day__range=(first_date, last_date))
 	#posts = Post.objects.filter(Day__lte=timezone.now()).exclude(Day__lte=timezone.now() - datetime.timedelta(days=1))  #Retrieve all dates equal to or older than today but exclude those from yesterday or older; use timezone.now() instead of datetime.datetime.now() to avoid problems with timezones.
 	posts = Post.objects.filter(Day=p.Day)  #Retrieve all instances with latest day ('p.Day') as QuerySet object.
-	'''print type(p.Day)
-	print p.Day'''
-	'''TestDay = datetime.datetime.strptime('2017-01-06','%Y-%m-%d')
-	print TestDay
-	print iso_to_gregorian(TestDay.isocalendar()[0], TestDay.isocalendar()[1]-1, 3)'''
-	#print (aniso8601)
-	return render(request, 'blog/DJ_LastDay.html', {'LastDay_posts': posts})#, {'LastDay': p.Day})  #To serve as a template, 'blog/DJ.html' has to be put in blog\template\blog\
+	return render(request, 'blog/DJ_LastDay.html', {'DJ_LastDay_posts': posts})  #To serve as a template, 'blog/DJ.html' has to be put in blog\template\blog\
 	#The last parameter, which looks like this: {} is a place to integrate objects in models.py (posts) with html ('posts') in template folder.
+	#return HttpResponse(index_table.DJ_LastDay(context))
+	#return render_to_response('blog/DJ_LastDay.html', {}, context_instance=RequestContext(request))
 
 def DJ_LastWk(request):  #Display value from Wednesday of last week.
-	print iso_to_gregorian(LastDay.isocalendar()[0], LastDay.isocalendar()[1]-1, 3)  #Show date from last Wednesday.
-	posts = Post.objects.filter(Day=iso_to_gregorian(LastDay.isocalendar()[0], LastDay.isocalendar()[1]-1, 3))  #Retrieve all instances from last Wednesday.
-	return render(request, 'blog/DJ_LastWk.html', {'LastWk_posts': posts})
+	#print iso_to_gregorian(LastDay.isocalendar()[0], LastDay.isocalendar()[1]-1, 3)  #Show date from last Wednesday.
+	posts = Post.objects.filter(Day=iso_to_gregorian(LastDay.isocalendar()[0], LastDay.isocalendar()[1]-1, 3))  #Retrieve all instances from last Wednesday; LastDay.isocalendar()[0] indicates current year, & LastDay.isocalendar()[1] indicates the current ISO week.
+	return render(request, 'blog/DJ_LastWk.html', {'DJ_LastWk_posts': posts})
 
 def DJ_LastMnth(request):  #Display value from the 1st (trading) day of last month.
 	if int(CurrMnth) >= 2:  #Check whether last month is still within the same year.
@@ -76,28 +74,32 @@ def DJ_LastMnth(request):  #Display value from the 1st (trading) day of last mon
 		p = Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+11)).earliest('Day')
 		print p.Day
 		posts = Post.objects.filter(Day=p.Day)
-	return render(request, 'blog/DJ_LastMnth.html', {'LastMnth_posts': posts})
+	return render(request, 'blog/DJ_LastMnth.html', {'DJ_LastMnth_posts': posts})
 
 def DJ_LastQtr(request):  #Display value from the 1st (trading) day of last quarter.
-	if int(CurrMnth) >= 4:  #Check whether last quarter is still within the same year.
-		p = Post.objects.filter(Day__year=CurrYr, Day__month=str(int(CurrMnth)-3)).earliest('Day')
-		print p.Day
+	try:
+		if int(CurrMnth) >= 4:  #Check whether last quarter is still within the same year.
+			p = Post.objects.filter(Day__year=CurrYr, Day__month=str(int(CurrMnth)-3)).earliest('Day')
+			#print p.Day, type(p)#, p.count()
+		else:
+			p = Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+9)).earliest('Day')
+			#print p.Day, type(p)#, p.count()
 		posts = Post.objects.filter(Day=p.Day)
-	else:
-		p = Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+9)).earliest('Day')
-		print p.Day
-		posts = Post.objects.filter(Day=p.Day)
-	return render(request, 'blog/DJ_LastQtr.html', {'LastQtr_posts': posts})
+		print posts.count()
+		return render(request, 'blog/DJ_LastQtr.html', {'DJ_LastQtr_posts': posts})
+	except ObjectDoesNotExist:
+		return render(request, 'blog/NoPeriod.html')
 
 def DJ_LastYr(request):  #Display value from the 1st (trading) day of last year.
 	try:
 		p = Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=CurrMnth).earliest('Day')  #Retrieve earliest date available from last year, doesn't matter the month.
 		print p.Day
 		posts = Post.objects.filter(Day=p.Day)
-		return render(request, 'blog/DJ_LastYr.html', {'LastYr_posts': posts})
+		print posts.count()
+		#if posts.count() != 0:
+		return render(request, 'blog/DJ_LastYr.html', {'DJ_LastYr_posts': posts})
 	except ObjectDoesNotExist:
-		print "No entry exists for this month from last year, please try an earlier date."
-		#return redirect('/NoData/') 
+		return render(request, 'blog/NoPeriod.html') 
 
 def thanks(request):
 	return render(request, 'blog/thanks.html')
@@ -193,7 +195,7 @@ def get_query(request):  #Implement logic for query search.
 						#print unsplit
 						for word in unsplit.split(' '):
 							#print word
-							gssm.append(word.upper())  #Separate words in 'Name' field and append to new list (in upper case).
+							gssm.append(word.replace('&APOS;',"'").replace('AMP;',"").replace('(','').replace(')','').upper())  #Separate words in 'Name' field and append to new list (in upper case).
 					gssm = list(set(gssm))
 					print gssm, type(gssm), len(gssm)
 					close_matches = get_close_matches(query, gssm)  #Only retrieve closest match (including matching cases).

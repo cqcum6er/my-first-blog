@@ -42,8 +42,8 @@
 			color: black;
 		}
 		ul#nav li a:hover, a:active {
-			background-color: orange;
-			color: black;
+			background-color: #66991c;
+			color: white;
 		}  /*LVHA-order= :link, :visited, :hover, :active.*/
 		
 		#aside {	<!--Left vertical navigation bar format; define a different style for a different element identified by id="aside".-->
@@ -84,16 +84,10 @@
 			background-color: #fff;
 		}
 		
-		/*ul#section {
-			list-style: none;
-			display: inline;
-			text-decoration: none;
-		}*/
-		
-		ul#section li {
+		#section li {
 			display:inline;
 			text-decoration:none;
-			padding: 10px;
+			padding: 10px 0;
 		}
 		
 		ul#section li a {
@@ -101,7 +95,12 @@
 			padding: 20px;
 		}
 		
-		#section a:hover, a:active {	<!--Change link color when cursor hovers over and when clicked.-->
+		#section li a.sect_actlink { /*Active link modifier must be placed before LVHA modifier to work.*/
+			background-color: orange;
+			color: black;
+		}
+		
+		#section li a:hover, a:active {	<!--Change link color when cursor hovers over and when clicked.-->
 			display: block;
 			background-color: #66991c;
 			color: white;
@@ -145,10 +144,10 @@
 		<!--<div style="position: fixed; top: 0;">-->
 		
 		<div style="text-align:left; background-color:#fff; padding-left: 40px;">
-			<h1 style="color:#00A100; margin:0;"><a style="text-decoration:none;" href="{% url 'blog:home_link' %}">Fundamental Trader</a></h1>
-			<p style="font-size:12pt;">The Comprehensive Fundamental Analysis Database</p>
+			<h1 style="color:#00A100; margin:0; white-space:nowrap;"><a style="text-decoration:none;" href="{% url 'blog:home_link' %}">Fundamental Trader</a></h1>
+			<p style="font-size:12pt; white-space:nowrap;">The Comprehensive Fundamental Analysis Database</p>
 		</div>  <!--Topbar ends-->
-		<div style="position:absolute; top:0; left:900px; margin-right:20px; background-color:#fff; white-space:nowrap;">
+		<div style="position:absolute; top:0; left:900px; margin-right:20px; background-color:#fff; white-space:nowrap;">  <!--use 'nowrap' to prevent elements within the div from breaking into another line from screen resizing.-->
 		<p>Start search for a company:</p>
 		<form method="GET" action="{% url 'blog:results' %}">
 			<input type="text" name="q" placeholder="Enter Symbol or Name" value="{{ request.GET.q }}" />  <!--include 'name' for search to show up in url; include 'value' to display query while typing.-->

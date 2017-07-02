@@ -1,49 +1,24 @@
-{% extends "blog/home.html" %}  <!--Must include 'blog/' before html name for Django to look up-->
-
-{% block title %}Fundamental Trader-DJ Index-Search Results{% endblock %}
-
-{% block content %}
-<div id="aside">
-	<p>Display historical data</br>for a company:</p>
-	<form method="GET" action="{% url 'blog:results' %}">
-		<input type="text" name="q" placeholder="Enter Symbol or Name" value="{{ request.GET.q }}" /><br/>  <!--include 'name' for search to show up in url; include 'value' to display query while typing.-->
-		<input type="submit" value="Search" />
-	</form>
-	<p>Display by index:</p>
-	<ul>
-		<li><a style="text-decoration:none;" href="{% url 'blog:DJ_LastDay' %}">Dow Jones Index</a></li>
-		<li><a style="text-decoration:none;" href="http://finance.yahoo.com/q?s=^gspc">S&amp;P500 Index</a></li>
-	</ul>
-</div>
-<div id="section" style="white-space:nowrap;">
-	<ul>
-		<li>Display as:</li>
-		<li><a  style="text-decoration:none; background-color: orange; color: black;" href="">Table</a></li>
-		<li><a style="text-decoration:none;" href="">Graph</a></li>
-	</ul>
-</div>
 <table id="myTable" border="8" style="border-collapse: collapse; width:1000px;">
-	<caption>{% with posts.0 as 1st %} {{ 1st.Name }} ({{ posts|length }} days returned){% endwith %} <!--Get "Symbol" field value from first item in QuerySet "posts."-->
+	<caption>Dow Jones Index ({{ posts|length }} symbols returned) - Last Trading Day ({% with posts.0 as 1st %} {{ 1st.Day }} {% endwith %})  <!--Get "Day" field value from first item in QuerySet "posts."-->
 	</caption>
 	<thead>
 	<tr style="color:white;background:black;">
-		<th onclick="sortTable(0)">Date</th>
-		<!--<th onclick="sortTable(1)">Symbol</th>-->
-		<th onclick="sortTable(2)">Price</th>
-		<th onclick="sortTable(3)">52-week Change</th>
-		<th onclick="sortTable(4)">52-week High</th>
-		<th onclick="sortTable(5)">52-week Low</th>
-		<th onclick="sortTable(6)">Trailing Annual Dividend Yield</th>
-		<th onclick="sortTable(7)">Trailing P/E</th>
-		<th onclick="sortTable(8)">Forward P/E</th>
-		<th onclick="sortTable(9)">PEG Ratio</th>
-		<th onclick="sortTable(10)">Price/Sales</th>
-		<th onclick="sortTable(11)">Price/Book</th>
-		<th onclick="sortTable(12)">Market Cap</th>
-		<th onclick="sortTable(13)">Operating Cash Flow</th>
-		<th onclick="sortTable(14)">Market Per Cash Flow</th>
-		<th onclick="sortTable(15)">Enterprise Value/EBITDA</th>
-		<!--<th onclick="sortTable(16)">Name</th>-->
+		<th onclick="sortTable(0)">Symbol</th>
+		<th onclick="sortTable(1)">Price</th>
+		<th onclick="sortTable(2)">52-week Change</th>
+		<th onclick="sortTable(3)">52-week High</th>
+		<th onclick="sortTable(4)">52-week Low</th>
+		<th onclick="sortTable(5)">Trailing Annual Dividend Yield</th>
+		<th onclick="sortTable(6)">Trailing P/E</th>
+		<th onclick="sortTable(7)">Forward P/E</th>
+		<th onclick="sortTable(8)">PEG Ratio</th>
+		<th onclick="sortTable(9)">Price/Sales</th>
+		<th onclick="sortTable(10)">Price/Book</th>
+		<th onclick="sortTable(11)">Market Cap</th>
+		<th onclick="sortTable(12)">Operating Cash Flow</th>
+		<th onclick="sortTable(13)">Market Per Cash Flow</th>
+		<th onclick="sortTable(14)">Enterprise Value/EBITDA</th>
+		<th onclick="sortTable(15)">Name</th>
 	</tr>
 	</thead>
 	<tbody>
@@ -52,8 +27,7 @@
 		<h1><a href="/">{{ post.title }}</a></h1>
 		<p>{{ post.text|linebreaks }}</p>-->
 	<tr align="center">
-		<td>{{ post.Day|date:"Y-m-d" }}</td>  <!--Format date for correct sorting.-->
-		<!--<td>{{ post.Symbol }}</td>-->
+		<td><a style="text-decoration:none;" href="/results/?q={{ post.Symbol }}">{{ post.Symbol }}</a></td>
 		<td>{% firstof post.LastPrice "N/A" %}</td>  <!--Print out value OR "N/A" in case value doesn't exist.-->
 		<!--{% if post.FiftyTwoWkChg|floatformat %}
 			<!--{% widthratio post.FiftyTwoWkChg 1 100 as x %}  Divide by 1 and multiply by 100.-->
@@ -61,7 +35,7 @@
 		<!--{% else %}
 			<td>N/A</td>
 		{% endif %}-->
-		{% load math_op %}  <!--load custom tag for math operation (mult, div, & sub)-->
+		{% load math_op %}
 		{% if post.FiftyTwoWkChg|floatformat %}  <!--Check if conversion to float type is possible.-->
 			<td>{{ post.FiftyTwoWkChg|mult:100|floatformat:2 }}%</td>
 		{% else %}
@@ -91,12 +65,11 @@
 		{% endif %}
 		<td>{% firstof post.Market_per_CashFlow|floatformat:2 "N/A" %}</td>
 		<td>{% firstof post.Enterprise_per_EBITDA|floatformat:2 "N/A" %}</td>
-		<!--<td>{% firstof post.Name "N/A" %}</td>-->
+		<td>{% firstof post.Name "N/A" %}</td>
 	</tr>
 	{% endfor %}
 	</tbody>
 </table>
-
 <script>
 function sortTable(n) {  //See <https://www.w3schools.com/howto/howto_js_sort_table.asp> for source code.
   var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
@@ -204,4 +177,3 @@ function sortTable(n) {  //See <https://www.w3schools.com/howto/howto_js_sort_ta
   }
 }
 </script>
-{% endblock %}
