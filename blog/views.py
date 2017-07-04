@@ -41,19 +41,19 @@ def home(request):
 	return render(request, 'blog/home.html')
 
 def Ind_LastWk(request):
-	return render(request, 'blog/indices_LastWeek.html')
+	return render(request, 'blog/Indices_LastWeek.html')
 
 def Ind_LastQtr(request):
-	return render(request, 'blog/indices_LastQuarter.html')
+	return render(request, 'blog/Indices_LastQuarter.html')
 
 def Ind_Last6Mnth(request):
-	return render(request, 'blog/indices_Last6Months.html')
+	return render(request, 'blog/Indices_Last6Months.html')
 
 def Ind_LastYr(request):
-	return render(request, 'blog/indices_LastYear.html')
+	return render(request, 'blog/Indices_LastYear.html')
 
 def Ind_Last5Yr(request):
-	return render(request, 'blog/indices_Last5Years.html')
+	return render(request, 'blog/Indices_Last5Years.html')
 	
 def inProgrss(request):  #In-Progress url
 	return render(request, 'blog/InProgress.html')
