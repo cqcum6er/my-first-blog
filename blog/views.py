@@ -109,6 +109,10 @@ def DJ_LastQtr(request):  #Display value from the 1st (trading) day of last quar
 		return render(request, 'blog/NoPeriod.html')
 
 def DJ_LastYr(request):  #Display value from the 1st (trading) day of last year.
+	p = Post.objects.latest('Day')
+	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')
+	CurrYr = LastDay.strftime('%Y')
+	CurrMnth = LastDay.strftime('%m')
 	try:
 		p = Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=CurrMnth).earliest('Day')  #Retrieve earliest date available from last year, doesn't matter the month.
 		print p.Day
