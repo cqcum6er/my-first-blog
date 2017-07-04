@@ -32,28 +32,36 @@ with open('DJ_list.csv', 'rb') as file:  # Need to use absolute path when on Pyt
 		Post.objects.create(**dict(zip(fields, row)))
 #...end of block.
 '''
-p = Post.objects.latest('Day')  #Returns an object instance (not iterable); if latest() is empty, it works with attributes defined by 'class Meta' in models.py. Note latest () only retrieve ONE instance; .values() needs to be inserted in front of latest() to make it iterable as dictionary; cache queryset object for quick retrieval in html request.
-LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')  #Convert str to datetime object from datetime module.
-CurrYr = LastDay.strftime('%Y')  #Retrieve current year as string from datetime object, LastDay.
-CurrMnth = LastDay.strftime('%m')  #Retrieve current month as string from datetime object, LastDay.
-
 def iso_to_gregorian(iso_year, iso_week, iso_day):  #Converts ISO week date format to Gregorian calendar date format.
 	jan4 = datetime.date(iso_year, 1, 4)  #1st week ('Week 01') of new year always contains Jan 4th.
 	start = jan4 - datetime.timedelta(days=jan4.isoweekday()-1)  #Get the year for ISO week date.
 	return start + datetime.timedelta(weeks=iso_week-1, days=iso_day-1)
 
-def home(request):  #Home url
+def home(request):
 	return render(request, 'blog/home.html')
 
+def Ind_LastWk(request):
+	return render(request, 'blog/indices_LastWeek.html')
+
+def Ind_LastQtr(request):
+	return render(request, 'blog/indices_LastQuarter.html')
+
+def Ind_Last6Mnth(request):
+	return render(request, 'blog/indices_Last6Months.html')
+
+def Ind_LastYr(request):
+	return render(request, 'blog/indices_LastYear.html')
+
+def Ind_Last5Yr(request):
+	return render(request, 'blog/indices_Last5Years.html')
+	
 def inProgrss(request):  #In-Progress url
 	return render(request, 'blog/InProgress.html')
 
 def DJ_LastDay(request):  #"DJ_LastDay" must be requested from urls.py
 	#posts = Post.objects.values()  #values() returns content of database as dictionary rather than model instances, making the database iterable.
-	#first_date = datetime.date(2016, 9, 16)
-	#last_date = datetime.date(2016, 9, 17)
-	#posts = Post.objects.filter(Day__range=(first_date, last_date))
 	#posts = Post.objects.filter(Day__lte=timezone.now()).exclude(Day__lte=timezone.now() - datetime.timedelta(days=1))  #Retrieve all dates equal to or older than today but exclude those from yesterday or older; use timezone.now() instead of datetime.datetime.now() to avoid problems with timezones.
+	p = Post.objects.latest('Day')  #Returns an object instance (not iterable); if latest() is empty, it works with attributes defined by 'class Meta' in models.py. Note latest () only retrieve ONE instance; .values() needs to be inserted in front of latest() to make it iterable as dictionary; cache queryset object for quick retrieval in html request.
 	posts = Post.objects.filter(Day=p.Day)  #Retrieve all instances with latest day ('p.Day') as QuerySet object.
 	return render(request, 'blog/DJ_LastDay.html', {'DJ_LastDay_posts': posts})  #To serve as a template, 'blog/DJ.html' has to be put in blog\template\blog\
 	#The last parameter, which looks like this: {} is a place to integrate objects in models.py (posts) with html ('posts') in template folder.
@@ -61,11 +69,17 @@ def DJ_LastDay(request):  #"DJ_LastDay" must be requested from urls.py
 	#return render_to_response('blog/DJ_LastDay.html', {}, context_instance=RequestContext(request))
 
 def DJ_LastWk(request):  #Display value from Wednesday of last week.
+	p = Post.objects.latest('Day')
+	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')  #Convert str to datetime object from datetime module.
 	#print iso_to_gregorian(LastDay.isocalendar()[0], LastDay.isocalendar()[1]-1, 3)  #Show date from last Wednesday.
 	posts = Post.objects.filter(Day=iso_to_gregorian(LastDay.isocalendar()[0], LastDay.isocalendar()[1]-1, 3))  #Retrieve all instances from last Wednesday; LastDay.isocalendar()[0] indicates current year, & LastDay.isocalendar()[1] indicates the current ISO week.
 	return render(request, 'blog/DJ_LastWk.html', {'DJ_LastWk_posts': posts})
 
 def DJ_LastMnth(request):  #Display value from the 1st (trading) day of last month.
+	p = Post.objects.latest('Day')
+	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')
+	CurrYr = LastDay.strftime('%Y')  #Retrieve current year as string from datetime object, LastDay.
+	CurrMnth = LastDay.strftime('%m')  #Retrieve current month as string from datetime object, LastDay.
 	if int(CurrMnth) >= 2:  #Check whether last month is still within the same year.
 		p = Post.objects.filter(Day__year=CurrYr, Day__month=str(int(CurrMnth)-1)).earliest('Day')  #Retrieve earliest date available from last month.
 		print p.Day
@@ -77,6 +91,10 @@ def DJ_LastMnth(request):  #Display value from the 1st (trading) day of last mon
 	return render(request, 'blog/DJ_LastMnth.html', {'DJ_LastMnth_posts': posts})
 
 def DJ_LastQtr(request):  #Display value from the 1st (trading) day of last quarter.
+	p = Post.objects.latest('Day')
+	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')
+	CurrYr = LastDay.strftime('%Y')
+	CurrMnth = LastDay.strftime('%m')
 	try:
 		if int(CurrMnth) >= 4:  #Check whether last quarter is still within the same year.
 			p = Post.objects.filter(Day__year=CurrYr, Day__month=str(int(CurrMnth)-3)).earliest('Day')

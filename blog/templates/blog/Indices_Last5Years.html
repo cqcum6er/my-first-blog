@@ -1,0 +1,26 @@
+{% extends "blog/home.html" %}
+
+{% block title %} Fundamental Trader-Indices-Last 5 Years {% endblock %}
+
+{% block index_fig %}
+<div id="fig_cont">
+	<h2>Last 5 Years</h2>
+	<figure>
+		<figcaption>Dow Jones Industrial Average</figcaption>
+		<img width="423" height="201.75" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=6CMT6"/>
+	</figure>
+	<figure>
+		<figcaption>S&P 500 Index</figcaption>
+		<img width="423" height="201.75" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=TWTBW"/>
+	</figure>
+	<br>  <!--Break for 2nd row of figures.-->
+	<figure>
+		<figcaption>NASDAQ Composite</figcaption>
+		<img width="423" height="201.75" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=C38R8"/>
+	</figure>
+	<figure>
+		<figcaption>NYSE Composite</figcaption>
+		<img width="423" height="201.75" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=SS7V8"/>
+	</figure>
+</div>
+{% endblock %}

@@ -18,8 +18,8 @@
 <div id="section" style="white-space:nowrap;">
 	<ul>
 		<li>Display as:</li>
-		<li><a  style="text-decoration:none; background-color: orange; color: black;" href="">Table</a></li>
-		<li><a style="text-decoration:none;" href="">Graph</a></li>
+		<li><a {% if request.path == res %}class="sect_actlink"{% endif %} href="">Table</a></li>
+		<li><a {% if request.path == DJLD %}class="sect_actlink"{% endif %} href="">Graph</a></li>
 	</ul>
 </div>
 <table id="myTable" border="8" style="border-collapse: collapse; width:1000px;">

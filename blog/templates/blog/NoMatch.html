@@ -33,7 +33,7 @@
 			<tbody>
 			{% for post in posts %}
 				<tr align="center">
-				<td><a href="/results/?q={{ post.Symbol }}">{{ post.Symbol }}</a></td>
+				<td><a style="text-decoration:none;" href="/results/?q={{ post.Symbol }}">{{ post.Symbol }}</a></td>
 				<td>{{ post.Name }}</td>
 				</tr>
 			{% endfor %}
@@ -52,7 +52,7 @@
 			<tbody>
 			{% for post in posts %}
 				<tr align="center">
-				<td><a href="/results/?q={{ post.Symbol }}">{{ post.Symbol }}</a></td>
+				<td><a style="text-decoration:none;" href="/results/?q={{ post.Symbol }}">{{ post.Symbol }}</a></td>
 				<td>{{ post.Name }}</td>
 				</tr>
 			{% endfor %}
@@ -61,7 +61,7 @@
 		{% elif not 1st.Name %}  <!--check for existence of "Name" field in the 1st query entry; lack of the "Name" field indicates approximate matches from views.py (.get_close_matches()).-->
 			<p>Do you mean the following?</p>
 			{% for post in posts %}
-				<p><a href="/results/?q={{ post }}">{{ post }}<a></p>
+				<p><a style="text-decoration:none;" href="/results/?q={{ post }}">{{ post }}<a></p>
 			{% endfor %}
 		{% endif %}
 	{% endwith %}

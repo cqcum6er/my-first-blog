@@ -1,0 +1,26 @@
+{% extends "blog/home.html" %}
+
+{% block title %} Fundamental Trader-Indices-Last 6 Months {% endblock %}
+
+{% block index_fig %}
+<div id="fig_cont">
+	<h2>Last 6 Months</h2>
+	<figure>
+		<figcaption>Dow Jones Industrial Average</figcaption>
+		<img width="423" height="201.75" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=3RF7N"/>
+	</figure>
+	<figure>
+		<figcaption>S&P 500 Index</figcaption>
+		<img width="423" height="201.75" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=XYXMV"/>
+	</figure>
+	<br>  <!--Break for 2nd row of figures.-->
+	<figure>
+		<figcaption>NASDAQ Composite</figcaption>
+		<img width="423" height="201.75" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=BQMXS"/>
+	</figure>
+	<figure>
+		<figcaption>NYSE Composite</figcaption>
+		<img width="423" height="201.75" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=DJXCG"/>
+	</figure>
+</div>
+{% endblock %}

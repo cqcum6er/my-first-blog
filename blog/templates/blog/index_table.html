@@ -27,14 +27,8 @@
 		<h1><a href="/">{{ post.title }}</a></h1>
 		<p>{{ post.text|linebreaks }}</p>-->
 	<tr align="center">
-		<td><a style="text-decoration:none;" href="/results/?q={{ post.Symbol }}">{{ post.Symbol }}</a></td>
+		<td id="table-link"><a href="/results/?q={{ post.Symbol }}">{{ post.Symbol }}</a></td>
 		<td>{% firstof post.LastPrice "N/A" %}</td>  <!--Print out value OR "N/A" in case value doesn't exist.-->
-		<!--{% if post.FiftyTwoWkChg|floatformat %}
-			<!--{% widthratio post.FiftyTwoWkChg 1 100 as x %}  Divide by 1 and multiply by 100.-->
-			<!--<td>{{ x }}%</td>  Parse to 2 decimal places OR print out "N/A" if type isn't float.-->
-		<!--{% else %}
-			<td>N/A</td>
-		{% endif %}-->
 		{% load math_op %}
 		{% if post.FiftyTwoWkChg|floatformat %}  <!--Check if conversion to float type is possible.-->
 			<td>{{ post.FiftyTwoWkChg|mult:100|floatformat:2 }}%</td>
