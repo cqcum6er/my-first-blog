@@ -3,28 +3,17 @@
 {% block title %}Fundamental Trader-DJ Index-Search Results{% endblock %}
 
 {% block content %}
-<div id="aside">
-	<p>Display historical data</br>for a company:</p>
-	<form method="GET" action="{% url 'blog:results' %}">
-		<input type="text" name="q" placeholder="Enter Symbol or Name" value="{{ request.GET.q }}" /><br/>  <!--include 'name' for search to show up in url; include 'value' to display query while typing.-->
-		<input type="submit" value="Search" />
-	</form>
-	<p>Display by index:</p>
-	<ul>
-		<li><a style="text-decoration:none;" href="{% url 'blog:DJ_LastDay' %}">Dow Jones Index</a></li>
-		<li><a style="text-decoration:none;" href="http://finance.yahoo.com/q?s=^gspc">S&amp;P500 Index</a></li>
-	</ul>
-</div>
+{% include "blog/aside_database.html" %}  <!--Display left-hand column.-->
 <div id="section" style="white-space:nowrap;">
 	<ul>
-		<li>Display as:</li>
+		<li><b>Display as:</b></li>
 		<li><a {% if request.path == res %}class="sect_actlink"{% endif %} href="">Table</a></li>
 		<li><a {% if request.path == DJLD %}class="sect_actlink"{% endif %} href="">Graph</a></li>
 	</ul>
 </div>
 <table id="myTable" border="8" style="border-collapse: collapse; width:1000px;">
-	<caption>{% with posts.0 as 1st %} {{ 1st.Name }} ({{ posts|length }} days returned){% endwith %} <!--Get "Symbol" field value from first item in QuerySet "posts."-->
-	</caption>
+	<caption><b>{% with posts.0 as 1st %} {{ 1st.Name }} ({{ posts|length }} days returned){% endwith %} <!--Get "Symbol" field value from first item in QuerySet "posts."-->
+	</b></caption>
 	<thead>
 	<tr style="color:white;background:black;">
 		<th onclick="sortTable(0)">Date</th>

@@ -1,4 +1,4 @@
-#blog.urls. Note that no html template name is used, only shortcut name in urls.py.
+#blog.urls. Note that no html template name is used, only shortcut name in urls.py. Each distinct page has its own url path, even if most other elements within the page remain the same.
 from django.conf.urls import include, url
 from . import views  #Import "views.py" in the current folder to access view function.
 urlpatterns = [
@@ -14,7 +14,7 @@ urlpatterns = [
 	url(r'^EduCenter/', views.edu_center, name='EduCenter'),
 	url(r'^results/', views.get_query, name='results'),
 	#url(r'^results/(?P<Symbol>\d+)/', views.get_query, name='results'),  #(?P<name>pattern), where name is the name of the group and pattern is some pattern to match. The captured values are passed to view functions as keyword arguments rather than positional arguments. For example, the pk argument will be passed to views.get_query as a string object.
-	url(r'^NoMatch/', views.get_query, name='NoMatch'),
+	#url(r'^NoMatch/', views.get_query, name='NoMatch'),
 	url(r'^Indices_LastWeek/', views.Ind_LastWk, name='Ind_LastWk'),
 	url(r'^Indices_LastQuarter/', views.Ind_LastQtr, name='Ind_LastQtr'),
 	url(r'^Indices_Last6Months/', views.Ind_Last6Mnth, name='Ind_Last6Mnth'),

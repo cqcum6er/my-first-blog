@@ -6,47 +6,54 @@
 		#header {/*Refer to http://www.w3schools.com/html/html_layout.asp for layout referrence*/}
 								
 		body {  /*Viewable area format*/
-			font: 10pt Verdana, "Times New Roman", Gerogia, sans-serif;
-			background-color: #EADCAE;
-			margin: 0;	/*Margin defines the space outside the element border; set to 0 to occupy the whole browser window.*/
+			font:10pt Verdana, "Times New Roman", Gerogia, sans-serif;
+			background-color:#EADCAE;
+			margin:0;	/*Margin defines the space outside the element border; set to 0 to occupy the whole browser window.*/
 		}
 		
 		h1,h2 {
-			font-family: arial;
+			font-family:arial;
 		}
 
 		/*.main {  /*.class*/
-			padding: 16px;
-			margin-top: 0px;
-			height: 50px; /* Used to enable scrolling */
+			padding:16px;
+			margin-top:0;
+			height:50px; /* Used to enable scrolling */
 		}*/
 		
-		ul#nav {  /*HTML element#id selector*/
-			/*Don't use html comment format to comment out modifier under css if file is saved as html (the modifier will still be read!)*/
-			/*position: fixed; Set the navbar to fixed position*/
+		body a:hover, a:active {	<!--Change link color when cursor hovers over and when clicked.-->
+			display:block;
+			background-color:#66991c;
+			color:white;
 		}
-		ul#nav li {  /*matches all list item (li) in selector ul#nav*/
+		
+		#nav ul {
+			padding-left:10px;
+		}
+		
+		#nav li {  /*matches all list item (li) in selector ul#nav*/
 			display: inline;  <!--Display an element as an inline element (like <span>); applies to <li>.-->
+			margin:10px;
 		}
 
-		ul#nav li a {  /*Display default link appearance.*/
-			background-color: black;
-			color: white;
-			padding: 10px 20px;  /*Top & bottom padding are 10 px; R & L padding are 20 px.*/
-			text-decoration: none;
-			border-radius: 8px 8px 0 0;  /*upper L; upper R; lower R; lower L*/
+		#nav li a {  /*Display default link appearance.*/
+			background-color:black;
+			color:white;
+			padding:10px 20px;  /*Top & bottom padding are 10 px; R & L padding are 20 px.*/
+			text-decoration:none;
+			border-radius:8px 8px 0 0;  /*upper L; upper R; lower R; lower L*/
 		}
-		ul#nav li a.actlink { /*Active link modifier must be placed before LVHA modifier to work.*/
-			background-color: orange;
-			color: black;
+		#nav li a.actlink { /*Active link modifier must be placed before LVHA modifier to work.*/
+			background-color:orange;
+			color:black;
 		}
-		ul#nav li a:hover, a:active {
-			background-color: #66991c;
-			color: white;
+		#nav li a:hover, a:active {
+			background-color:#66991c;
+			color:white;
 		}  /*LVHA-order= :link, :visited, :hover, :active.*/
 		
 		#fig_cont {
-			margin-left:165px;
+			margin-left:175px;
 			white-space:nowrap;
 			width:850px;  /*Defines boundary for fig_cont title, which is text-align to center.*/
 		}
@@ -61,38 +68,57 @@
 			text-align:center;
 		}
 
+		#mover_cont {
+			margin-left:175px;
+			white-space:nowrap;
+		}
+
+		.mover {
+			display:inline-block;
+			margin:0; /*Need to specify margin to overwrite default setting from inline-block.*/
+			width:425px;
+		}
+
+		.mover a {
+			text-decoration:none;
+			display:block;
+			color:black;
+		}
+
+		.mover a:hover, a:active {
+			background-color:#66991c;
+			color:white;
+		}
+
 		#aside {	<!--Left vertical navigation bar format; define a different style for a different element identified by id="aside".-->
-			width: 125px;
-			float: left;
-			margin-top: 0;
-			margin-right: 18px;
-			margin-bottom: -2000px;
-			margin-left: 0;
-			padding-left: 0;	<!--padding defines the space between element and element border-->
-			padding-bottom: 2000px;
+			width:125px;
+			float:left;
+			margin-bottom:-2000px;  /*Clear space to the right for table.*/
+			margin-left:0;
+			padding-left:10px;	<!--padding defines the space between element and element border-->
+			padding-bottom:2000px;
 		}
 		#aside ul {
-			background-color: #ffcc66;
-			list-style: none;  <!--Remove list indicator (bullet)-->
-			margin: 0 0 0 12px;  <!--Reserve margin for the entire list-->
-			padding-left: 5px;  <!--Remove space reserved for list indicator-->
-			clear: left;
+			background-color:#ffcc66;
+			width:155px;
+			margin:0; /*Set both margin and padding to 0 to remove indentation from un-styled list items.*/
+			padding:0;
+			clear:left;
 		}
 		#aside li {
-			border-bottom: 1px solid #fff;
-			padding: 4px;
-			text-align: center;
-			text-decoration:none;  <!--Remove hyperlink formating (i.e.underline); from links.-->
+			list-style:none;  /*Remove list indicator (bullet)*/
+			border-bottom:1px solid #fff;
+			text-align:center;
 		}
-		#aside a {	<!--Format hyperlink in all stats(i.e.link, visited, etc.)-->
-			padding:8px;
-			display:block;  <!--Expand clickable boundary to the entire cell-->
+		#aside a {	/*Format hyperlink in all stats(i.e.link, visited, etc.)*/
+			text-decoration:none;
+			display:block;  /*Expand clickable boundary to the entire cell.*/
+			padding:4px;
+			color:black;
 		}
 		
 		#aside a.aside_act {
-			display:block;
 			background-color:orange;
-			color:black;
 		}
 		
 		#aside a:hover, a:active {	<!--Change link color when cursor hovers over and when clicked.-->
@@ -102,7 +128,7 @@
 		}
 		
 		#section {
-			margin-left: 165px;  /*Save space for lefthand column*/
+			margin-left:175px;  /*Save space for lefthand column*/
 			background-color: #fff;
 			white-space:nowrap;  /*Prevents element shifting due to changing screen size.*/
 		}
@@ -113,43 +139,42 @@
 		
 		#section a {
 			text-decoration:none;
+			color:black;
 		}
 		
 		#section a.sect_actlink { /*Active link modifier must be placed before LVHA modifier to work.*/
-			background-color: orange;
-			color: black;
+			background-color:orange;
 		}
 		
 		#section a:hover, a:active {	<!--Change link color when cursor hovers over and when clicked.-->
-			display: block;
-			background-color: #66991c;
-			color: white;
+			display:block;
+			background-color:#66991c;
+			color:white;
 		}
 		
-		#myTable {  <!--Content area format-->
-			<!--display: inline;  Display content area next to left verti aside bar-->
-			float: left;
-			width: 75%;
-			background-color: #fff;
-			padding: 6px;
-			margin-left:165px;	<!--Margin added to keep element to the right of aside bar-->
+		#myTable {
+			float:left;
+			width:75%;
+			background-color:#fff;
+			padding:6px;
+			margin-left:175px;	/*Margin added to keep element to the right of aside bar*/
 		}
 
 		#myTable th {
-			cursor: pointer;  <!--Indicate clickable table header-->
+			cursor:pointer;  <!--Indicate clickable table header-->
 		}
 		
 		#myTable th:hover {
-			background-color: #66991c;
-			color: white;
+			background-color:#66991c;
+			color:white;
 		}
 		
 		#myTable tr:nth-child(even) {
-			background-color: #eee;
+			background-color:#eee;
 		}  <!--Set alternating table row background color (even row).-->
 		
 		#myTable tr:nth-child(odd) {
-			background-color: #fff;
+			background-color:#fff;
 		}  <!--Set alternating table row background color (odd row).-->
 
 		#table-link {
@@ -157,7 +182,7 @@
 			text-decoration:none;
 			background-color:black;
 			color:white;
-			border-radius:5px
+			border-radius:5px;
 		}
 		
 		#table-link a {
@@ -165,7 +190,7 @@
 			text-decoration:none;
 			background-color:black;
 			color:white;
-			border-radius:5px
+			border-radius:5px;
 		}
 
 		#table-link a:hover {
@@ -173,13 +198,37 @@
 			text-decoration:none;
 			background-color:#66991c;
 			color:white;
-			border-radius:5px
+			border-radius:5px;
 		}
 
+		#NoMatch-link {
+			display:block;
+			text-decoration:none;
+			background-color:black;
+			color:white;
+			border-radius:5px;
+		}
+		
+		#NoMatch-link a {
+			display:block;
+			text-decoration:none;
+			background-color:black;
+			color:white;
+			border-radius:5px;
+		}
+
+		#NoMatch-link a:hover {
+			display:block;
+			text-decoration:none;
+			background-color:#66991c;
+			color:white;
+			border-radius:5px;
+		}
+		
 		.fieldWrapper div {
-			width: 700px;
-			padding: 20px;
-			border: 1px solid;
+			width:700px;
+			padding:20px;
+			border:1px solid;
 		}
 		</style>	
 	</head>
@@ -187,9 +236,9 @@
 		<!--Topbar begins-->
 		<!--<div style="position: fixed; top: 0;">-->
 		
-		<div style="text-align:left; background-color:#fff; padding-left: 40px; white-space:nowrap;">
-			<h1 style="color:#00A100; margin:0;"><a style="text-decoration:none;" href="{% url 'blog:home_link' %}">Fundamental Trader</a></h1>
-			<p style="font-size:12pt;">The Comprehensive Fundamental Analysis Database</p>
+		<div style="height:70px; text-align:left; background-color:#fff; padding-left:10px; white-space:nowrap;">
+			<h1 style="margin:0;"><a style="text-decoration:none; color:green;" href="{% url 'blog:home_link' %}">Fundamental Trader</a></h1>
+			<h2 style="font-size:12pt;">The Comprehensive Fundamental Analysis Database</h2>
 		</div>  <!--Topbar ends-->
 		<div style="position:absolute; top:0; left:900px; margin-right:20px; background-color:#fff; white-space:nowrap;">  <!--use 'nowrap' to prevent elements within the div from breaking into another line from screen resizing.-->
 		<p>Start search for a company:</p>
@@ -198,8 +247,8 @@
 			<input type="submit" value="Search" />
 		</form>
 		</div>
-		<div>  <!--a container for navigation links below header-->
-			<ul id="nav" style="white-space:nowrap;">	<!--Unordered list-->
+		<div id="nav" style="white-space:nowrap;">  <!--a container for navigation links below header-->
+			<ul>	<!--Unordered list-->
 				<!--{% load active_nav %}  Load the custom template tags to mark active link.-->
 				{% url 'blog:home_link' as home %}  <!--Must use a replacement name for a link when the link is placed inside a block tag.-->
 				{% url 'blog:inProgress_link' as inPro %}
@@ -242,40 +291,77 @@
 				<li><a {% if request.path == IndL5Y %}class="aside_act"{% endif %} href="{% url 'blog:Ind_Last5Yr' %}">Last 5 Years</a></li>
 			</ul>
 			</div>
-		{% block index_fig %}
-		<div id="fig_cont">
-			<h2>Last Trading Day</h2>
-			<figure>
-				<figcaption>Dow Jones Industrial Average</figcaption>
-				<img width="423" height="201.75" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=WN6SR"/>
-			</figure>
-			<figure>
-				<figcaption>S&P 500 Index</figcaption>
-				<img width="423" height="201.75" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=L5M39"/>
-			</figure>
-			<br>  <!--Break for 2nd row of figures.-->
-			<figure>
-				<figcaption>NASDAQ Composite</figcaption>
-				<img width="423" height="201.75" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=T8J69"/>
-			</figure>
-			<figure>
-				<figcaption>NYSE Composite</figcaption>
-				<img width="423" height="201.75" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=FB2VK"/>
-			</figure>
+			{% block index_fig %}
+			<div id="fig_cont">
+				<h2>Last Trading Day</h2>
+				<figure>
+					<figcaption>Dow Jones Industrial Average</figcaption>
+					<img width="423" height="201.75" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=WN6SR"/>
+				</figure>
+				<figure>
+					<figcaption>S&P 500 Index</figcaption>
+					<img width="423" height="201.75" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=L5M39"/>
+				</figure>
+				<br>  <!--Break for 2nd row of figures.-->
+				<figure>
+					<figcaption>NASDAQ Composite</figcaption>
+					<img width="423" height="201.75" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=T8J69"/>
+				</figure>
+				<figure>
+					<figcaption>NYSE Composite</figcaption>
+					<img width="423" height="201.75" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=FB2VK"/>
+				</figure>
+			</div>
+			{% endblock %}
+		<div id="mover_cont">
+			<div class="mover">
+			<table align=center>
+			<caption><h2 style="text-align:center; color:red;"><b>Daily Losers</b></h2></caption>
+			<thead>
+			<tr>
+				<th>Company (Symbol)</th>
+				<th>% Change</th>
+			</tr>
+			</thead>
+			{% for DailyMover in DailyMovers|slice:":5" %}  <!--Iterate list of tuples ('DailyMovers').-->
+			<tbody>
+			<tr style="background-color:white">
+				<td style="background-color: #ffcc66;"><a href="/results/?q={{ DailyMover.0 }}"> {{ DailyMover.1 }} ({{ DailyMover.0 }}) </a></td>
+				<td style="text-align:center;"> {{ DailyMover.2|floatformat:2 }}% </td>
+			</tr>
+			</tbody>
+			{% endfor %}
+			</table>
+			</div>
+			<div class="mover">
+			<table align=center>
+			<caption><h2 style="text-align:center; color:green;"><b>Daily Gainers</b></h2></caption>
+			<thead>
+			<tr>
+				<th>Company (Symbol)</th>
+				<th>% Change</th>
+			</tr>
+			</thead>
+			{% for DailyMover in DailyMovers|slice:"-5:" reversed %}  <!--Iterate list of tuples ('DailyMovers').-->
+			<tbody>
+			<tr style="background-color:white">
+				<td style="background-color: #ffcc66;"><a href="/results/?q={{ DailyMover.0 }}"> {{ DailyMover.1 }} ({{ DailyMover.0 }}) </a></td>
+				<td style="text-align:center;"> {{ DailyMover.2|floatformat:2 }}% </td>
+			</tr>
+			</tbody>
+			{% endfor %}
+			</table>
+			</div>
 		</div>
-		{% endblock %}
-		<div style="clear:both;">
-			<h2>Daily top mover</h2>
-		</div>
-		<div>
-		  <p>Why do you want your money in stock?</p>
+		<div style="margin-left:175px; width:850px;">
+		  <p><b>Why do you want your money in stock?</b></p>
 		  <ol>
 			<li>Stock performs better than bond or bank CD in fighting inflation.</li>
-			<li>Unlike real estate, which can take months and years to appreciate in value, you can trade stocks much easier and in a shorter period.</li>
-			<li>With shorter turnover time in stock, you can take your earning and reinvest that money in more undervalued stocks and watch your money grow!</li>
+			<li>Unlike real estate, stocks are liquid asset and can be traded more easily.</li>
+			<li>With shorter turnover time in stock, you can take your earning and reinvest that money in more undervalued stocks.</li>
 		  </ol>
 		  <p>Even though you have your money in stocks, what can you do to help yourself minimize the risks associated with stocks?  After all, many people invest in stock outside their normal career so they have little time to dedicate to evaluate the value of a stock.  If you decided to invest in a stock, it is preferably to hold it for long term.</p>
-		  <p>Why invest in stock for long term?  Below are some of the benefits of investing for long term:</p>
+		  <p><b>Why invest in stock for long term?  Below are some of the benefits of investing for long term:</b></p>
 		  <ol>
 			<li>Most investors lack the time and resources to trade like a day trader.  We know your time is precious so with our method you pick a few stock to invest in and check back in a few weeks or months.</li>
 			<li>Invest for longer term (i.e. more than a year) reduces your taxable portion so you get to keep more of your earnings!</li>
@@ -283,7 +369,7 @@
 			<li>Take the panic out of trading stocks.  Stocks can rise and fall greatly in a short period of time, but it is the behavior of a stock over the long run that behaves more predictably.  The stocks I picked will very likely follow an upward trend over the long run.</li>
 			<li>Take the hassle out of moving your money from one stock to the next.</li>
 		  </ol>
-		  <p>How much money do I need to start investing in stocks?  Is there a high cost of entry?</p>
+		  <p><b>How much money do I need to start investing in stocks?  Is there a high cost of entry?</b></p>
 		  <p>One benefit associated with stocks is that there are many stocks offered at different price ranges.  With that said, if you only just started to invest, it is suggested that you invest only with amount that you are comfortable with.  However, it is important that you start early to take advantage of compound interest.</p>
 		{% endblock %}
 		</div>
@@ -296,7 +382,7 @@
 			var year = today.getFullYear()
 			document.write(year)
 			</script>
-			fundamentaltrader.com. All rights reserved.</p>
+			fundamentaltrader.net. All rights reserved.</p>
 		</div>
 	</body>
 </html>

@@ -1,6 +1,29 @@
-<table id="myTable" border="8" style="border-collapse: collapse; width:1000px;">
-	<caption>Dow Jones Index ({{ posts|length }} symbols returned) - Last Trading Day ({% with posts.0 as 1st %} {{ 1st.Day }} {% endwith %})  <!--Get "Day" field value from first item in QuerySet "posts."-->
-	</caption>
+<div id="section">  <!--Margin added to keep element to the right of aside bar-->
+	<ul>
+		<li><b>Period to display:</b></li>
+		<li><a {% if 'LastDay' in request.path %}class="sect_actlink"{% endif %} href="{% url 'blog:DJ_LastDay' %}">Last Trading Day</a></li>
+		<li><a {% if 'LastWeek' in request.path %}class="sect_actlink"{% endif %} href="{% url 'blog:DJ_LastWk' %}">Last Week</a></li>
+		<li><a {% if 'LastMonth' in request.path %}class="sect_actlink"{% endif %} href="{% url 'blog:DJ_LastMnth' %}">Last Month</a></li>
+		<li><a {% if 'LastQuarter' in request.path %}class="sect_actlink"{% endif %} href="{% url 'blog:DJ_LastQtr' %}">Last Quarter</a></li>
+		<li><a {% if 'LastYear' in request.path %}class="sect_actlink"{% endif %} href="{% url 'blog:DJ_LastYr' %}">Last Year</a></li>
+	</ul>
+</div>
+
+<table id="myTable" border="8" style="border-collapse:collapse; width:1000px;">
+	<caption><b>Dow Jones Index ({{ posts|length }} symbols returned) - 
+	{% if 'LastDay' in request.path %}
+		Last Trading Day
+	{% elif 'LastWeek' in request.path %}
+		Last Week
+	{% elif 'LastMonth' in request.path %}
+		Last Month
+	{% elif 'LastQuarter' in request.path %}
+		Last Quarter
+	{% elif 'LastYear' in request.path %}
+		Last Year
+	{% endif %}
+	({% with posts.0 as 1st %} {{ 1st.Day }} {% endwith %})  <!--Get "Day" field value from first item in QuerySet "posts."-->
+	</b></caption>
 	<thead>
 	<tr style="color:white;background:black;">
 		<th onclick="sortTable(0)">Symbol</th>

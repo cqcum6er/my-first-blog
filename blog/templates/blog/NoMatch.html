@@ -3,24 +3,13 @@
 {% block title %}Fundamental Trader-DJ Index-No Match{% endblock %}
 
 {% block content %}
-<div id="aside">
-	<p>Display historical data</br>for a company:</p>
-	<form method="GET" action="{% url 'blog:results' %}">
-		<input type="text" name="q" placeholder="Enter Symbol or Name" value="{{ request.GET.q }}" /><br/>  <!--include 'name' for search to show up in url; include 'value' to display query while typing.-->
-		<input type="submit" value="Search" />
-	</form>
-	<p>Display by index:</p>
-	<ul>
-		<li><a style="text-decoration:none;" href="{% url 'blog:DJ_LastDay' %}">Dow Jones Index</a></li>
-		<li><a style="text-decoration:none;" href="http://finance.yahoo.com/q?s=^gspc">S&amp;P500 Index</a></li>
-	</ul>
-</div>
-<div style="position:relative; margin-left:165px; padding:100px; background-color: #fff;">
+{% include "blog/aside_database.html" %}
+<div style="position:relative; margin-left:175px; padding:100px; background-color: #fff;">
 	{% with posts.0 as 1st %}  <!--Take the 1st item in query object to check for existence of individual fields.-->
 		{% if posts|length == 0 %}
 			<p>No match found.</p>
 			<p>Try searching one of the indices in the left column.</p>
-		{% elif posts|length == 1 and 1st.Name %}  <!--Check if query length equals to one (doesn't matter dict or not) AND if the "Name" field exists in the 1st item in query object.-->
+		{% elif posts|length == 1 and 1st.Name %}  <!--Check if query length equals to one (posts doesn't need to be any one type) AND if the "Name" field exists in the 1st item in query object.-->
 			<p>One match found in database.</p>
 			<table id="" border="8" style="border-collapse: collapse; width:500px;">
 			<caption>Search results<caption>

@@ -19,6 +19,7 @@ import requests
 import csv
 import datetime
 import aniso8601
+import operator
 '''
 #To update database with the current date, save scheduled csv record from Pythonanywhere, then run local server ONCE to populate local database before commenting out this block; comment out this block before saving views.py to Pythonanywhere to use scheduled csv instead...
 #if not Post:  #Check to see if database is empty.  If it's not, do nothing, else empty existing entry to prepare for update. (Remove the 'if' statement if run as a scheduler command on Pythonanywhere.)
@@ -32,28 +33,40 @@ with open('DJ_list.csv', 'rb') as file:  # Need to use absolute path when on Pyt
 		Post.objects.create(**dict(zip(fields, row)))
 #...end of block.
 '''
-def iso_to_gregorian(iso_year, iso_week, iso_day):  #Converts ISO week date format to Gregorian calendar date format.
-	jan4 = datetime.date(iso_year, 1, 4)  #1st week ('Week 01') of new year always contains Jan 4th.
-	start = jan4 - datetime.timedelta(days=jan4.isoweekday()-1)  #Get the year for ISO week date.
-	return start + datetime.timedelta(weeks=iso_week-1, days=iso_day-1)
+
+def DailyMovers():
+	p = Post.objects.latest('Day')  #Returns an object instance (not iterable); if latest() is empty, it works with attributes defined by 'class Meta' in models.py. Note latest () only retrieve ONE instance; .values() needs to be inserted in front of latest() to make it iterable as dictionary; cache queryset object for quick retrieval in html request.
+	#print p.LastPrice, type(p.LastPrice)
+	posts = Post.objects.filter(Day=p.Day)
+	Movers = []
+	for post in posts:
+		Yesterday = p.Day - datetime.timedelta(days=1)  #Get datetime for yesterday.
+		ypost = Post.objects.filter(Day=Yesterday).filter(Symbol=post.Symbol)[0]  #Use '[0]' with filter to get the first entry in queryset.
+		#print post.Symbol, post.LastPrice, ypost.LastPrice,
+		PercDayMov = ((float(post.LastPrice) - float(ypost.LastPrice))/float(ypost.LastPrice))*100
+		#print PercDayMov
+		Movers.append(tuple((post.Symbol, post.Name, PercDayMov)))  #Add each symbol and it daily % movement as a tuple to a list ('Movers').
+	Movers.sort(key=lambda tup: tup[2])  #Sort based on daily % movement (or 3rd element of each tuple).
+	#print Movers, type(Movers)
+	return Movers
 
 def home(request):
-	return render(request, 'blog/home.html')
+	return render(request, 'blog/home.html', {'DailyMovers': DailyMovers()})
 
 def Ind_LastWk(request):
-	return render(request, 'blog/Indices_LastWeek.html')
+	return render(request, 'blog/Indices_LastWeek.html', {'DailyMovers': DailyMovers()})
 
 def Ind_LastQtr(request):
-	return render(request, 'blog/Indices_LastQuarter.html')
+	return render(request, 'blog/Indices_LastQuarter.html', {'DailyMovers': DailyMovers()})
 
 def Ind_Last6Mnth(request):
-	return render(request, 'blog/Indices_Last6Months.html')
+	return render(request, 'blog/Indices_Last6Months.html', {'DailyMovers': DailyMovers()})
 
 def Ind_LastYr(request):
-	return render(request, 'blog/Indices_LastYear.html')
+	return render(request, 'blog/Indices_LastYear.html', {'DailyMovers': DailyMovers()})
 
 def Ind_Last5Yr(request):
-	return render(request, 'blog/Indices_Last5Years.html')
+	return render(request, 'blog/Indices_Last5Years.html', {'DailyMovers': DailyMovers()})
 	
 def inProgrss(request):  #In-Progress url
 	return render(request, 'blog/InProgress.html')
@@ -67,6 +80,11 @@ def DJ_LastDay(request):  #"DJ_LastDay" must be requested from urls.py
 	#The last parameter, which looks like this: {} is a place to integrate objects in models.py (posts) with html ('posts') in template folder.
 	#return HttpResponse(index_table.DJ_LastDay(context))
 	#return render_to_response('blog/DJ_LastDay.html', {}, context_instance=RequestContext(request))
+
+def iso_to_gregorian(iso_year, iso_week, iso_day):  #Converts ISO week date format to Gregorian calendar date format.
+	jan4 = datetime.date(iso_year, 1, 4)  #1st week ('Week 01') of new year always contains Jan 4th.
+	start = jan4 - datetime.timedelta(days=jan4.isoweekday()-1)  #Get the year for ISO week date.
+	return start + datetime.timedelta(weeks=iso_week-1, days=iso_day-1)
 
 def DJ_LastWk(request):  #Display value from Wednesday of last week.
 	p = Post.objects.latest('Day')

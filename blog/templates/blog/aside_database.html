@@ -1,0 +1,13 @@
+<!--Use for database left-side column.-->
+<div id="aside">
+	<p>Display historical data<br>for a company:</p>
+	<form method="GET" action="{% url 'blog:results' %}">
+		<input type="text" name="q" placeholder="Enter Symbol or Name" value="{{ request.GET.q }}" /><br>  <!--include 'name' for search to show up in url; include 'value' to display query while typing.-->
+		<input type="submit" value="Search" />
+	</form>
+	<p>Display by index:</p>
+	<ul>
+		<li><a style="text-decoration:none;" {% if request.path in all_db_link %}class="aside_act"{% endif %} href="{% url 'blog:DJ_LastDay' %}">Dow Jones Index</a></li>  <!--Implement "aside_act" to customize active link.-->
+		<li><a style="text-decoration:none;" href="http://finance.yahoo.com/q?s=^gspc">S&amp;P500 Index</a></li>
+	</ul>
+</div>
