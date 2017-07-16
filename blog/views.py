@@ -20,7 +20,7 @@ import csv
 import datetime
 import aniso8601
 import operator
-
+'''
 #To update database with the current date, save scheduled csv record from Pythonanywhere, then run local server ONCE to populate local database before commenting out this block; comment out this block before saving views.py to Pythonanywhere to use scheduled csv instead...
 #if not Post:  #Check to see if database is empty.  If it's not, do nothing, else empty existing entry to prepare for update. (Remove the 'if' statement if run as a scheduler command on Pythonanywhere.)
 	#pass
@@ -32,7 +32,7 @@ with open('DJ_list.csv', 'rb') as file:  # Need to use absolute path when on Pyt
 	for row in infile:
 		Post.objects.create(**dict(zip(fields, row)))
 #...end of block.
-
+'''
 def DailyMovers():
 	p = Post.objects.latest('Day')  #Returns an object instance (not iterable); if latest() is empty, it works with attributes defined by 'class Meta' in models.py. Note latest () only retrieve ONE instance; .values() needs to be inserted in front of latest() to make it iterable as dictionary; cache queryset object for quick retrieval in html request.
 	#print p.LastPrice, type(p.LastPrice)
