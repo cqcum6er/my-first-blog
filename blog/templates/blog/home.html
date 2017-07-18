@@ -79,6 +79,10 @@
 			width:425px;
 		}
 
+		.mover table td {
+			padding:6px;
+		}
+
 		.mover a {
 			text-decoration:none;
 			display:block;
@@ -315,23 +319,23 @@
 			{% endblock %}
 		<div id="mover_cont">
 			<div class="mover">
-			<table align=center>
-			<caption><h2 style="text-align:center; color:red;"><b>Daily Losers</b></h2></caption>
-			<thead>
-			<tr>
-				<th>Company (Symbol)</th>
-				<th>% Change</th>
-			</tr>
-			</thead>
-			{% for DailyMover in DailyMovers|slice:":5" %}  <!--Iterate list of tuples ('DailyMovers').-->
-			<tbody>
-			<tr style="background-color:white">
-				<td style="background-color: #ffcc66;"><a href="/results/?q={{ DailyMover.0 }}"> {{ DailyMover.1 }} ({{ DailyMover.0 }}) </a></td>
-				<td style="text-align:center;"> {{ DailyMover.2|floatformat:2 }}% </td>
-			</tr>
-			</tbody>
-			{% endfor %}
-			</table>
+				<table align=center>
+				<caption><h2 style="text-align:center; color:red;"><b>Daily Losers</b></h2></caption>
+				<thead>
+				<tr>
+					<th>Company (Symbol)</th>
+					<th>% Change</th>
+				</tr>
+				</thead>
+				<tbody>
+				{% for tick in DailyMovers|slice:":5" %}  <!--Iterate list of tuples ('DailyMovers').-->
+				<tr style="background-color:white">
+					<td style="background-color: #ffcc66;"><a href="/results/?q={{ tick.0 }}"> {{ tick.1 }} ({{ tick.0 }}) </a></td>
+					<td style="text-align:center;"> {{ tick.2|floatformat:2 }}% </td>
+				</tr>
+				{% endfor %}
+				</tbody>
+				</table>
 			</div>
 			<div class="mover">
 			<table align=center>
@@ -342,14 +346,14 @@
 				<th>% Change</th>
 			</tr>
 			</thead>
-			{% for DailyMover in DailyMovers|slice:"-5:" reversed %}  <!--Iterate list of tuples ('DailyMovers').-->
 			<tbody>
+			{% for tick in DailyMovers|slice:"-5:" reversed %}  <!--Iterate list of tuples ('DailyMovers').-->
 			<tr style="background-color:white">
-				<td style="background-color: #ffcc66;"><a href="/results/?q={{ DailyMover.0 }}"> {{ DailyMover.1 }} ({{ DailyMover.0 }}) </a></td>
-				<td style="text-align:center;"> {{ DailyMover.2|floatformat:2 }}% </td>
+				<td style="background-color: #ffcc66;"><a href="/results/?q={{ tick.0 }}"> {{ tick.1 }} ({{ tick.0 }}) </a></td>
+				<td style="text-align:center;"> {{ tick.2|floatformat:2 }}% </td>
 			</tr>
-			</tbody>
 			{% endfor %}
+			</tbody>
 			</table>
 			</div>
 		</div>
@@ -382,7 +386,7 @@
 			var year = today.getFullYear()
 			document.write(year)
 			</script>
-			fundamentaltrader.net. All rights reserved.</p>
+			www.fundamentaltrader.net. All rights reserved.</p>
 		</div>
 	</body>
 </html>

@@ -1,9 +1,9 @@
 #views.py retrieves model instances from the database or instantiate a form (see feedback_form).
-from django.shortcuts import render, render_to_response, redirect #get_object_or_404
-from django.utils import timezone
+from django.shortcuts import render  #, render_to_response, redirect #get_object_or_404
+#from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist  #Display in-app message when an instance isn't found.
-from django.http import HttpResponse
-from django.template import RequestContext
+#from django.http import HttpResponse
+#from django.template import RequestContext
 from difflib import get_close_matches  #Allow 'approximate' search.
 '''
 from django.db.models import Q  #Allow simultaneous search in different fields.
@@ -14,12 +14,11 @@ from django.template.loader import get_template
 '''
 from .models import Post, UserComment  #Retrieve model objects from 'models.py' within the same folder.
 from .forms import FeedbackForm
-from .templatetags import index_table
+#from .templatetags import index_table
 import requests
 import csv
 import datetime
-import aniso8601
-import operator
+# aniso8601
 '''
 #To update database with the current date, save scheduled csv record from Pythonanywhere, then run local server ONCE to populate local database before commenting out this block; comment out this block before saving views.py to Pythonanywhere to use scheduled csv instead...
 #if not Post:  #Check to see if database is empty.  If it's not, do nothing, else empty existing entry to prepare for update. (Remove the 'if' statement if run as a scheduler command on Pythonanywhere.)
@@ -41,9 +40,13 @@ def DailyMovers():
 	for post in posts:
 		Yesterday = p.Day - datetime.timedelta(days=1)  #Get datetime for yesterday.
 		ypost = Post.objects.filter(Day=Yesterday).filter(Symbol=post.Symbol)[0]  #Use '[0]' with filter to get the first entry in queryset.
-		#print post.Symbol, post.LastPrice, ypost.LastPrice,
-		PercDayMov = ((float(post.LastPrice) - float(ypost.LastPrice))/float(ypost.LastPrice))*100
-		#print PercDayMov
+		print post.Symbol, post.LastPrice, type(post.LastPrice), ypost.LastPrice, type(ypost.LastPrice),
+		if post.LastPrice == "N/A" or ypost.LastPrice == "N/A":
+			PercDayMov = 0.0
+			print PercDayMov
+		else:
+			PercDayMov = ((float(post.LastPrice) - float(ypost.LastPrice))/float(ypost.LastPrice))*100
+			print PercDayMov
 		Movers.append(tuple((post.Symbol, post.Name, PercDayMov)))  #Add each symbol and it daily % movement as a tuple to a list ('Movers').
 	Movers.sort(key=lambda tup: tup[2])  #Sort based on daily % movement (or 3rd element of each tuple).
 	#print Movers, type(Movers)
