@@ -2,6 +2,7 @@
 <html lang="en">
 	<head>
 		<title>{% block title %}Fundamental Trader-Home{% endblock %}</title>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 		<style type="text/css">
 		#header {/*Refer to http://www.w3schools.com/html/html_layout.asp for layout referrence*/}
 								
@@ -51,7 +52,36 @@
 			background-color:#66991c;
 			color:white;
 		}  /*LVHA-order= :link, :visited, :hover, :active.*/
-		
+
+		.fa {
+			padding: 5px;
+			font-size: 20px;
+			width: 25px;
+			text-align: center;
+			text-decoration: none;
+			margin: 5px 2px;
+			border-radius: 50%;
+		}
+
+		.fa:hover {
+			opacity: 0.7;
+		}
+
+		.fa-facebook {
+			background: #3B5998;
+			color: white;
+		}
+
+		.fa-twitter {
+			background: #55ACEE;
+			color: white;
+		}
+
+		.fa-linkedin {
+			background: #007bb5;
+			color: white;
+		}
+
 		#fig_cont {
 			margin-left:175px;
 			white-space:nowrap;
@@ -282,6 +312,11 @@
 			</ul>
 		</div>
 		<!--</div>  top nav bar ends-->
+		<div style="position:absolute; top:70px; left:900px; margin-right:20px; background-color:#EADCAE; white-space:nowrap;">
+			<a href="http://www.facebook.com/sharer.php?u=https://www.fundamentaltrader.net" class="fa fa-facebook"></a>
+			<a href="https://twitter.com/share?url=https://www.fundamentaltrader.net" class="fa fa-twitter"></a>
+			<a href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://www.fundamentaltrader.net" class="fa fa-linkedin"></a>
+		</div>
 		<div class="main">
 		{% block content %}
 			<div id="aside">  <!--Margin added to keep element to the right of aside bar-->
@@ -328,10 +363,10 @@
 				</tr>
 				</thead>
 				<tbody>
-				{% for tick in DailyMovers|slice:":5" %}  <!--Iterate list of tuples ('DailyMovers').-->
+				{% for tick in DailyMovers|slice:":5" %}  <!--Iterate the 1st 5 items from the list of tuples ('DailyMovers').-->
 				<tr style="background-color:white">
 					<td style="background-color: #ffcc66;"><a href="/results/?q={{ tick.0 }}"> {{ tick.1 }} ({{ tick.0 }}) </a></td>
-					<td style="text-align:center;"> {{ tick.2|floatformat:2 }}% </td>
+					<td style="text-align:center; color:red;"> {{ tick.2|floatformat:2 }}% </td>
 				</tr>
 				{% endfor %}
 				</tbody>
@@ -347,10 +382,10 @@
 			</tr>
 			</thead>
 			<tbody>
-			{% for tick in DailyMovers|slice:"-5:" reversed %}  <!--Iterate list of tuples ('DailyMovers').-->
+			{% for tick in DailyMovers|slice:"-5:" reversed %}  <!--Iterate in reverse order the last 5 items from the list of tuples.-->
 			<tr style="background-color:white">
 				<td style="background-color: #ffcc66;"><a href="/results/?q={{ tick.0 }}"> {{ tick.1 }} ({{ tick.0 }}) </a></td>
-				<td style="text-align:center;"> {{ tick.2|floatformat:2 }}% </td>
+				<td style="text-align:center; color:green;"> {{ tick.2|floatformat:2 }}% </td>
 			</tr>
 			{% endfor %}
 			</tbody>

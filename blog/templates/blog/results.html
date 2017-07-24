@@ -12,7 +12,7 @@
 	</ul>
 </div>
 <table id="myTable" border="8" style="border-collapse: collapse; width:1000px;">
-	<caption><b>{% with posts.0 as 1st %} {{ 1st.Name }} ({{ posts|length }} days returned){% endwith %} <!--Get "Symbol" field value from first item in QuerySet "posts."-->
+	<caption><b>{{ last_element.Name }} ({{ last_element.Symbol }}) ({{ posts|length }} days found) <!--Get "Symbol" field value from the last item in the QuerySet.-->
 	</b></caption>
 	<thead>
 	<tr style="color:white;background:black;">
