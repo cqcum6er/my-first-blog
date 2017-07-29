@@ -13,7 +13,7 @@ from django.template import Context
 from django.template.loader import get_template
 '''
 from .models import Post, UserComment  #Retrieve model objects from 'models.py' within the same folder.
-from .forms import FeedbackForm
+from .forms import ContactForm
 #from .templatetags import index_table
 import csv
 import datetime
@@ -67,9 +67,12 @@ def Ind_LastYr(request):
 
 def Ind_Last5Yr(request):
 	return render(request, 'blog/Indices_Last5Years.html', {'DailyMovers': DailyMovers()})
-	
-def inProgrss(request):  #In-Progress url
-	return render(request, 'blog/InProgress.html')
+
+def ResCenter_Def(request):
+	return render(request, 'blog/ResCenter_Def.html')
+
+def	ResCenter_Links(request):
+	return render(request, 'blog/ResCenter_Links.html')
 
 def DJ_LastDay(request):  #"DJ_LastDay" must be requested from urls.py
 	#posts = Post.objects.values()  #values() returns content of database as dictionary rather than model instances, making the database iterable.
@@ -150,15 +153,15 @@ def DJ_LastYr(request):  #Display value from the 1st (trading) day of last year.
 	except ObjectDoesNotExist:
 		return render(request, 'blog/NoPeriod.html') 
 
-def thanks(request):
-	return render(request, 'blog/thanks.html')
-	
-def feedback_form(request):
+def AboutMe(request):  #In-Progress url
+	return render(request, 'blog/AboutMe.html')
+
+def contact_form(request):
 	'''
-	form_class = FeedbackForm  #use for email submission.
+	form_class = ContactForm  #use for email submission.
 	'''
 	if request.method == 'POST':
-		form = FeedbackForm(request.POST)  #Accept user input as 'request.POST'; use form_class(request.POST) with email submission.
+		form = ContactForm(request.POST)  #Accept user input as 'request.POST'; use form_class(request.POST) with email submission.
 		if form.is_valid():  #runs validation checks for all fields and returns Boolean.
 			obj = UserComment()  #Generate new UserComment object (see models.py).
 			obj.name = form.cleaned_data['name']
@@ -167,8 +170,8 @@ def feedback_form(request):
 			obj.save()  #Save the object to db.
 			return render(request, 'blog/thanks.html')
 	else:  #If a GET (such as first time the form is displayed), a blank form is created.
-		form = FeedbackForm()
-	return render(request, 'blog/feedback.html', {'form': form})
+		form = ContactForm()
+	return render(request, 'blog/contact.html', {'form': form})
 	'''
 			contact_name = request.POST.get('contact_name', '')
 			contact_email = request.POST.get('contact_email', '')
@@ -180,12 +183,12 @@ def feedback_form(request):
 			email.send()
 			#return redirect('thanks.html')
 			return render(request, 'blog/thanks.html')
-	return render(request, 'blog/feedback.html', {'form': form_class,})
+	return render(request, 'blog/contact.html', {'form': form_class,})
 	'''
 
-def edu_center(request):
-	return render(request, 'blog/EduCenter.html')
-	
+def thanks(request):
+	return render(request, 'blog/thanks.html')
+
 def get_query(request):  #Implement logic for query search.
 	master_list = Post.objects.all()  #master_list should be accessible at all lower nested levels to refine filter.
 	q = request.GET.get("q")  #"q" is the name of query object in html (under input text).

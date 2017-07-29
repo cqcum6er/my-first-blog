@@ -1,0 +1,28 @@
+{% extends "blog/home.html" %}  <!--Must include 'blog/' before html name for Django to look up-->
+
+{% block title %} Fundamental Trader-Resource Center-Links {% endblock %}
+
+{% block content %}
+{% include "blog/aside_ResCenter.html" %}
+<div id="links" style="margin-left:175px; width:850px;">
+<h2>Reference Websites</h2>
+<p><a href="https://www.bloomberg.com/">Bloomberg</a></p>
+<p><a href="https://www.dowjones.com/">Dow Jones</a></p>
+<p><a href="http://www.marketwatch.com/">MarketWatch</a></p>
+<p><a href="http://www.morningstar.com/">Morningstar</a></p>
+<p><a href="http://www.nasdaq.com/">NASDAQ</a></p>
+<h2>Government and Regulatory Bodies</h2>
+<p><a href="https://www.finra.org/">Financial Industry Regulatory Authority</a></p>
+<p><a style="text-decoration:none;" href="https://www.sec.gov/">US Security and Exchange Commission</a></p>
+<h2>Online Brokerage</h2>
+<p><a href="http://invest.ally.com/">Ally Financial</a></p>
+<p><a href="https://www.schwab.com/">Charles Schwab</a></p>
+<p><a href="https://us.etrade.com/">E*TRADE</a></p>
+<p><a href="https://www.fidelity.com/">Fidelity</a></p>
+<p><a href="https://www.firstrade.com/">Firstrade</a></p>
+<p><a href="https://www.merrilledge.com/">Merrill Edge</a></p>
+<p><a href="http://www.tdameritrade.com/">TD Ameritrade</a></p>
+<p><a href="http://www.tradestation.com/">TradeStation</a></p>
+
+</div>
+{% endblock %}

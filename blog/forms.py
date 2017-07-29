@@ -13,7 +13,7 @@ class FeedbackForm(forms.ModelForm):
 		exclude = []
 '''
 #Use the following form if feedback isn't linked to model instances.
-class FeedbackForm(forms.Form):
+class ContactForm(forms.Form):
 	name = forms.CharField(error_messages={'required': 'Please enter your name.'})  #Display error message if no user input is received.
 	email = forms.EmailField(required=False)
 	message = forms.CharField(error_messages={'required': 'Please enter a message.'}, widget=forms.Textarea)  #Makes the "content" field a larger Textarea.

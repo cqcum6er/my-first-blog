@@ -1,6 +1,6 @@
 {% extends "blog/home.html" %}  <!--Must include 'blog/' before html name for Django to look up-->
 
-{% block title %}Fundamental Trader-DJ Index-Search Results{% endblock %}
+{% block title %}Fundamental Trader-Search Results{% endblock %}
 
 {% block content %}
 {% include "blog/aside_database.html" %}  <!--Display left-hand column.-->
@@ -8,7 +8,7 @@
 	<ul>
 		<li><b>Display as:</b></li>
 		<li><a {% if request.path == res %}class="sect_actlink"{% endif %} href="">Table</a></li>
-		<li><a {% if request.path == DJLD %}class="sect_actlink"{% endif %} href="">Graph</a></li>
+		<li><a {% if request.path == DJLD %}class="sect_actlink"{% endif %} href="">Graph (coming soon!)</a></li>
 	</ul>
 </div>
 <table id="myTable" border="8" style="border-collapse: collapse; width:1000px;">

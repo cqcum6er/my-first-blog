@@ -1,0 +1,7 @@
+<!--Use for database left-side column.-->
+<div id="aside">
+	<ul>
+		<li><a {% if request.path == rc %}class="aside_act"{% endif %} href="{% url 'blog:ResCenter_link' %}">Definitions</a></li>  <!--Implement "aside_act" to customize active link.-->
+		<li><a {% if request.path == rc_l %}class="aside_act"{% endif %} href="{% url 'blog:ResCenter_Links_link' %}">Links</a></li>
+	</ul>
+</div>

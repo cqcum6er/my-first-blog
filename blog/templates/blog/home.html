@@ -53,6 +53,23 @@
 			color:white;
 		}  /*LVHA-order= :link, :visited, :hover, :active.*/
 
+		#social {
+			position:absolute;
+			top:70px;
+			left:850px;
+			background-color:#EADCAE;
+			white-space:nowrap;
+		}
+
+		#social ul {
+			display:table-cell;  /*Make each ul element acts like table cell; also helps remove padding around li; also removes styling from list-style.*/
+			padding:0;
+		}
+
+		#social li {
+			display:inline;
+		}
+
 		.fa {
 			padding: 5px;
 			font-size: 20px;
@@ -109,14 +126,11 @@
 			width:425px;
 		}
 
-		.mover table td {
-			padding:6px;
-		}
-
 		.mover a {
 			text-decoration:none;
-			display:block;
+			display:block;  /*Make the whole link area clickable, not just the text.*/
 			color:black;
+			padding:6px;
 		}
 
 		.mover a:hover, a:active {
@@ -165,8 +179,13 @@
 			margin-left:175px;  /*Save space for lefthand column*/
 			background-color: #fff;
 			white-space:nowrap;  /*Prevents element shifting due to changing screen size.*/
+			padding:4px;
 		}
 		
+		#section ul {
+			margin:0;  /*Remove default margin with ul.*/
+		}
+
 		#section li {
 			display:inline;
 		}
@@ -174,6 +193,7 @@
 		#section a {
 			text-decoration:none;
 			color:black;
+			padding:4px;
 		}
 		
 		#section a.sect_actlink { /*Active link modifier must be placed before LVHA modifier to work.*/
@@ -259,6 +279,10 @@
 			border-radius:5px;
 		}
 		
+		#links a {
+			text-decoration:none;
+		}
+		
 		.fieldWrapper div {
 			width:700px;
 			padding:20px;
@@ -274,25 +298,26 @@
 			<h1 style="margin:0;"><a style="text-decoration:none; color:green;" href="{% url 'blog:home_link' %}">Fundamental Trader</a></h1>
 			<h2 style="font-size:12pt;">The Comprehensive Fundamental Analysis Database</h2>
 		</div>  <!--Topbar ends-->
-		<div style="position:absolute; top:0; left:900px; margin-right:20px; background-color:#fff; white-space:nowrap;">  <!--use 'nowrap' to prevent elements within the div from breaking into another line from screen resizing.-->
-		<p>Start search for a company:</p>
-		<form method="GET" action="{% url 'blog:results' %}">
-			<input type="text" name="q" placeholder="Enter Symbol or Name" value="{{ request.GET.q }}" />  <!--include 'name' for search to show up in url; include 'value' to display query while typing.-->
-			<input type="submit" value="Search" />
-		</form>
+		<div style="position:absolute; top:0; left:900px; margin-right:20px; background-color:#fff; white-space:nowrap; float:right;">  <!--use 'nowrap' to prevent elements within the div from breaking into another line from screen resizing.-->
+			<p>Start search for a company:</p>
+			<form method="GET" action="{% url 'blog:results' %}">
+				<input type="text" name="q" placeholder="Enter Symbol or Name" value="{{ request.GET.q }}" />  <!--include 'name' for search to show up in url; include 'value' to display query while typing.-->
+				<input type="submit" value="Search" />
+			</form>
 		</div>
 		<div id="nav" style="white-space:nowrap;">  <!--a container for navigation links below header-->
 			<ul>	<!--Unordered list-->
 				<!--{% load active_nav %}  Load the custom template tags to mark active link.-->
 				{% url 'blog:home_link' as home %}  <!--Must use a replacement name for a link when the link is placed inside a block tag.-->
-				{% url 'blog:inProgress_link' as inPro %}
+				{% url 'blog:AboutMe_link' as inPro %}
 				{% url 'blog:DJ_LastDay' as DJLD %}
 				{% url 'blog:DJ_LastWk' as DJLW %}
 				{% url 'blog:DJ_LastMnth' as DJLM %}
 				{% url 'blog:DJ_LastQtr' as DJLQ %}
 				{% url 'blog:DJ_LastYr' as DJLY %}
-				{% url 'blog:feedback' as fdbk %}
-				{% url 'blog:EduCenter' as edu %}
+				{% url 'blog:contact_link' as cont %}
+				{% url 'blog:ResCenter_link' as rc %}
+				{% url 'blog:ResCenter_Links_link' as rc_l %}
 				{% url 'blog:results' as res %}
 				{% load make_list %}  <!--Load the custom template tags to prepare an url list (usage: collect 'html' as 'shortcut').-->
 				{% collect DJLD DJLW DJLM DJLQ DJLY res as all_db_link %}
@@ -302,20 +327,24 @@
 				{% url 'blog:Ind_LastYr' as IndLY %}
 				{% url 'blog:Ind_Last5Yr' as IndL5Y %}
 				{% collect home IndLW IndLQ IndL6M IndLY IndL5Y as all_ind_link %}
+				{% collect rc rc_l as all_ResCent_link %}
 				<!--{% if request.path == home %}<li>active</li>{% endif %}-->
 				<!--<li>{{request.path}}</li>  Check for active path; must be activated with Django simple tag.-->
 				<li><a {% if request.path in all_ind_link %}class="actlink"{% endif %} href="{% url 'blog:home_link' %}">Home</a></li>
-				<li><a {% if request.path == edu %}class="actlink"{% endif %} href="{% url 'blog:EduCenter' %}">Education Center</a></li>
+				<li><a {% if request.path in all_ResCent_link %}class="actlink"{% endif %} href="{% url 'blog:ResCenter_link' %}">Resource Center</a></li>
 				<li><a {% if request.path in all_db_link %}class="actlink"{% endif %} href="{% url 'blog:DJ_LastDay' %}">Database</a></li>
-				<li><a {% if request.path == inPro %}class="actlink"{% endif %} href="{% url 'blog:inProgress_link' %}">Links</a></li>
-				<li><a {% if request.path == fdbk %}class="actlink"{% endif %} href="{% url 'blog:feedback' %}">Contact</a></li>
+				<li><a {% if request.path == inPro %}class="actlink"{% endif %} href="{% url 'blog:AboutMe_link' %}">About Me</a></li>
+				<li><a {% if request.path == cont %}class="actlink"{% endif %} href="{% url 'blog:contact_link' %}">Contact</a></li>
 			</ul>
 		</div>
 		<!--</div>  top nav bar ends-->
-		<div style="position:absolute; top:70px; left:900px; margin-right:20px; background-color:#EADCAE; white-space:nowrap;">
-			<a href="http://www.facebook.com/sharer.php?u=https://www.fundamentaltrader.net" class="fa fa-facebook"></a>
-			<a href="https://twitter.com/share?url=https://www.fundamentaltrader.net" class="fa fa-twitter"></a>
-			<a href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://www.fundamentaltrader.net" class="fa fa-linkedin"></a>
+		<div id="social">
+			<ul>
+				<li><b>Share on</b></li>
+				<li><a href="http://www.facebook.com/sharer.php?u=https://www.fundamentaltrader.net" class="fa fa-facebook"></a></li>
+				<li><a href="https://twitter.com/share?url=https://www.fundamentaltrader.net" class="fa fa-twitter"></a></li>
+				<li><a href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://www.fundamentaltrader.net" class="fa fa-linkedin"></a></li>
+			<ul>
 		</div>
 		<div class="main">
 		{% block content %}
@@ -359,7 +388,7 @@
 				<thead>
 				<tr>
 					<th>Company (Symbol)</th>
-					<th>% Change</th>
+					<th>% Change*</th>
 				</tr>
 				</thead>
 				<tbody>
@@ -378,7 +407,7 @@
 			<thead>
 			<tr>
 				<th>Company (Symbol)</th>
-				<th>% Change</th>
+				<th>% Change*</th>
 			</tr>
 			</thead>
 			<tbody>
@@ -391,29 +420,30 @@
 			</tbody>
 			</table>
 			</div>
+			<p style="color:grey;"><i>*% Changes are calculated at the end of previously open market.</i></p>
 		</div>
 		<div style="margin-left:175px; width:850px;">
 		  <p><b>Why do you want your money in stock?</b></p>
 		  <ol>
-			<li>Stock performs better than bond or bank CD in fighting inflation.</li>
-			<li>Unlike real estate, stocks are liquid asset and can be traded more easily.</li>
-			<li>With shorter turnover time in stock, you can take your earning and reinvest that money in more undervalued stocks.</li>
+			<li>Even with a higher risk, stock performs better than bond or bank CD in preserving personal wealth and reducing the effect that inflation will have on your asset.</li>
+			<li>Stocks are liquid asset and can be traded more easily compared to lots of other investnment options.</li>
+			<li>With higher liquidity, you can take advantage of compounding your earning by reinvesting the earning in more undervalued stocks.</li>
 		  </ol>
-		  <p>Even though you have your money in stocks, what can you do to help yourself minimize the risks associated with stocks?  After all, many people invest in stock outside their normal career so they have little time to dedicate to evaluate the value of a stock.  If you decided to invest in a stock, it is preferably to hold it for long term.</p>
+		  <p>Even though risk is an inherent part of trading in stocks, what can be done to minimize the risk?  After all, most people invest in stock as an investment vehicle, not as part of their normal career, so they have little time to evaluate their investment choices.  With that said, a time-tested strategy is to diversify your portfolio and to hold it for long term.</p>
 		  <p><b>Why invest in stock for long term?  Below are some of the benefits of investing for long term:</b></p>
 		  <ol>
-			<li>Most investors lack the time and resources to trade like a day trader.  We know your time is precious so with our method you pick a few stock to invest in and check back in a few weeks or months.</li>
-			<li>Invest for longer term (i.e. more than a year) reduces your taxable portion so you get to keep more of your earnings!</li>
-			<li>It has been demonstrated that long term (more than a year) investment has higher yield than short term.  Many stocks also pay dividend, which guarantees yield in the long term even when stock price depreciates.</li>
-			<li>Take the panic out of trading stocks.  Stocks can rise and fall greatly in a short period of time, but it is the behavior of a stock over the long run that behaves more predictably.  The stocks I picked will very likely follow an upward trend over the long run.</li>
-			<li>Take the hassle out of moving your money from one stock to the next.</li>
+			<li>Most investors lack the time and resources to trade like a day trader.  With a diversified portfolio, there will be little need to constantly checking for performance of your investment.</li>
+			<li>Invest for longer term (i.e. more than a year) reduces your taxable portion so you get to keep more of your earnings.</li>
+			<li>It has been demonstrated that long term investment has higher yield than short term.  Many stocks also pay dividend, which guarantees yield in the long term even when stock price fluctuates.</li>
+			<li>Stocks can rise and fall greatly in a short period of time, especially if investment is in a single company, but as long as the fundamentals are sound, you should not worry too much about the effect that news cycle will have on your investment in the long run.</li>
 		  </ol>
-		  <p><b>How much money do I need to start investing in stocks?  Is there a high cost of entry?</b></p>
-		  <p>One benefit associated with stocks is that there are many stocks offered at different price ranges.  With that said, if you only just started to invest, it is suggested that you invest only with amount that you are comfortable with.  However, it is important that you start early to take advantage of compound interest.</p>
+		  <p><b>How much money is recommended to start investing in stocks?  Is there a high cost of entry?</b></p>
+		  <p>One benefit associated with stocks is that there are many stocks offered at different price ranges.  With that said, it is suggested that individual should invest only with amount that they are comfortable with, which will differ between individuals based on their age and their tolerance for risks. A great recommendation for individual just started to invest is to invest in index funds, which may represent many companies in a given sector or geographical area and have greater stability than investent in individual companies.</p>
+		  
 		{% endblock %}
 		</div>
 		<div style="clear:both; color:grey; padding:10px;">  <!-- position:absolute; bottom:20px; margin-bottom:-1000px;-->
-		<p>The information and data on this website are provided for informational purposes only. We cannot guarantee the accuracy or completeness of information and data presented on our website. Any information presented should not be taken as recommendation for any investment vehicle or advice.</br>All contact information provided to us will solely be used for communication purpose and will not be disclosed to a third party without user consent.
+		<p>The information and data on this website are provided for informational purposes only. We ("Fundamental Trader") cannot guarantee the accuracy or completeness of information and data presented on our website. Any information presented should not be taken as recommendation for any company, investment vehicle, or investment advice and should only be used at the user's discretion.</br>All contact information provided to us will solely be used for communication purpose and will not be disclosed to a third party without explicit user consent.
 		</p>
 		<p>Copyright&copy;
 			<script>  //Insert current year.
