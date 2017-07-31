@@ -4,6 +4,7 @@
 
 {% block content %}
 {% include "blog/aside_database.html" %}  <!--Display left-hand column.-->
+{% include "blog/PeriodToDisplay.html" %}  <!--Display Period selection for index table.-->
 {% load index_table %}
 {% DJ_LastDay %}
 {% endblock %}

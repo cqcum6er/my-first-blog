@@ -28,5 +28,9 @@ def DJ_LastQtr(context):
 	return {'posts': context['DJ_LastQtr_posts'], 'request':context['request']}
 
 @register.inclusion_tag('blog/index_table.html', takes_context=True)
+def DJ_Last6Mnth(context):
+	return {'posts': context['DJ_Last6Mnth_posts'], 'request':context['request']}
+
+@register.inclusion_tag('blog/index_table.html', takes_context=True)
 def DJ_LastYr(context):
 	return {'posts': context['DJ_LastYr_posts'], 'request':context['request']}

@@ -1,6 +1,6 @@
 <!--Use for database left-side column.-->
 <div id="aside">
-	<p>Display historical data<br>for a company:</p>
+	<p>Display historical<br>data for a company:</p>
 	<form method="GET" action="{% url 'blog:results' %}">
 		<input type="text" name="q" placeholder="Enter Symbol or Name" value="{{ request.GET.q }}" /><br>  <!--include 'name' for search to show up in url; include 'value' to display query while typing.-->
 		<input type="submit" style="width:100px;" value="Search" />

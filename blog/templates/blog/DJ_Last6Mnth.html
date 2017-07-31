@@ -1,10 +1,10 @@
 {% extends "blog/home.html" %}  <!--Must include 'blog/' before html name for Django to look up-->
 
-{% block title %} Fundamental Trader-DJ Index-Last Week {% endblock %}
+{% block title %} Fundamental Trader-DJ Index-Last 6 Months {% endblock %}
 
 {% block content %}
 {% include "blog/aside_database.html" %}  <!--Display left-hand column.-->
 {% include "blog/PeriodToDisplay.html" %}
 {% load index_table %}
-{% DJ_LastWk %}
+{% DJ_Last6Mnth %}
 {% endblock %}

@@ -184,6 +184,7 @@
 		
 		#section ul {
 			margin:0;  /*Remove default margin with ul.*/
+			padding:0;
 		}
 
 		#section li {
@@ -313,6 +314,7 @@
 				{% url 'blog:DJ_LastDay' as DJLD %}
 				{% url 'blog:DJ_LastWk' as DJLW %}
 				{% url 'blog:DJ_LastMnth' as DJLM %}
+				{% url 'blog:DJ_Last6Mnth' as DJL6M %}
 				{% url 'blog:DJ_LastQtr' as DJLQ %}
 				{% url 'blog:DJ_LastYr' as DJLY %}
 				{% url 'blog:contact_link' as cont %}
@@ -320,7 +322,7 @@
 				{% url 'blog:ResCenter_Links_link' as rc_l %}
 				{% url 'blog:results' as res %}
 				{% load make_list %}  <!--Load the custom template tags to prepare an url list (usage: collect 'html' as 'shortcut').-->
-				{% collect DJLD DJLW DJLM DJLQ DJLY res as all_db_link %}
+				{% collect DJLD DJLW DJLM DJL6M DJLQ DJLY res as all_db_link %}
 				{% url 'blog:Ind_LastWk' as IndLW %}
 				{% url 'blog:Ind_LastQtr' as IndLQ %}
 				{% url 'blog:Ind_Last6Mnth' as IndL6M %}

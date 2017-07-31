@@ -128,13 +128,29 @@ def DJ_LastQtr(request):  #Display value from the 1st (trading) day of last quar
 	try:
 		if int(CurrMnth) >= 4:  #Check whether last quarter is still within the same year.
 			p = Post.objects.filter(Day__year=CurrYr, Day__month=str(int(CurrMnth)-3)).earliest('Day')
-			#print p.Day, type(p)#, p.count()
 		else:
 			p = Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+9)).earliest('Day')
-			#print p.Day, type(p)#, p.count()
 		posts = Post.objects.filter(Day=p.Day)
 		print posts.count()
 		return render(request, 'blog/DJ_LastQtr.html', {'DJ_LastQtr_posts': posts})
+	except ObjectDoesNotExist:
+		return render(request, 'blog/NoPeriod.html')
+
+def DJ_Last6Mnth(request):  #Display value from the 1st (trading) day of last quarter.
+	p = Post.objects.latest('Day')
+	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')
+	CurrYr = LastDay.strftime('%Y')
+	CurrMnth = LastDay.strftime('%m')
+	try:
+		if int(CurrMnth) >= 7:  #Check whether last quarter is still within the same year.
+			p = Post.objects.filter(Day__year=CurrYr, Day__month=str(int(CurrMnth)-6)).earliest('Day')
+			#print p.Day, type(p)#, p.count()
+		else:
+			p = Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+6)).earliest('Day')
+			#print p.Day, type(p)#, p.count()
+		posts = Post.objects.filter(Day=p.Day)
+		print posts.count()
+		return render(request, 'blog/DJ_Last6Mnth.html', {'DJ_Last6Mnth_posts': posts})
 	except ObjectDoesNotExist:
 		return render(request, 'blog/NoPeriod.html')
 
