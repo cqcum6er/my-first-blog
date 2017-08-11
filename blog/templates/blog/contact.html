@@ -11,7 +11,7 @@
 	<!--{{ form.as_p }}   'form.as_p' automatically wraps the form in <p> tags.-->
 	{{ form.non_field_errors }}  <!--Displays a list of form errors, rendered as an unordered list.-->
 	<div class="fieldWrapper">
-		<i style="color:red;">{{ form.name.errors }}</i>  <!--Manually change field title.-->
+		<i style="color:red;">{{ form.name.errors }}</i>  <!--Format error message.-->
 		{{ form.name.label_tag }}
 		{{ form.name }}
 	</div>

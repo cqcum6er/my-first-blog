@@ -23,22 +23,28 @@ import datetime
 #if not Post:  #Check to see if database is empty.  If it's not, do nothing, else empty existing entry to prepare for update. (Remove the 'if' statement if run as a scheduler command on Pythonanywhere.)
 	#pass
 #else:
-Post.objects.all().delete()  #Clean the database before entry from csv file.
+#Post.objects.all().delete()  #Clean the database before entry from csv file.
+p = Post.objects.latest('Day')  #Check what's the lastest day then append to db from then on.
 fields = ['Day', 'Symbol', 'LastPrice', 'FiftyTwoWkChg', 'FiftyTwoWkLo', 'FiftyTwoWkHi', 'DivYild', 'TrailPE', 'ForwardPE', 'PEG_Ratio', 'PpS', 'PpB', 'Market_Cap', 'Free_Cash_Flow', 'Market_per_CashFlow', 'Enterprise_per_EBITDA', 'Name']  #Must match individual field (column) names in models.py.
 with open('DJ_list.csv', 'rb') as file:  # Need to use absolute path when on Pythonanywhere server (i.e. use '/home/cqcum6er/my-first-blog/DJ_list.csv' as file path.)
 	infile = csv.reader(file, delimiter=",", quotechar='"')  #Specify csv item boundary.
 	for row in infile:
-		Post.objects.create(**dict(zip(fields, row)))
+		row_datetime = datetime.datetime.strptime(row[0],'%Y-%m-%d')  #row[0] is converted from str to datetime format.
+		#print row_datetime.date()
+		row_date = row_datetime.date()  #Converting from datetime to date.
+		if row_date > p.Day:  #Only append entry if the date of the entry is greater than that in db.
+			#print row_date
+			Post.objects.create(**dict(zip(fields, row)))
 #...end of block.
 '''
 def DailyMovers():
 	p = Post.objects.latest('Day')  #Returns an object instance (not iterable); if latest() is empty, it works with attributes defined by 'class Meta' in models.py. Note latest () only retrieve ONE instance; .values() needs to be inserted in front of latest() to make it iterable as dictionary; cache queryset object for quick retrieval in html request.
 	#print p.LastPrice, type(p.LastPrice)
 	posts = Post.objects.filter(Day=p.Day)
+	Yesterday = p.Day - datetime.timedelta(days=1)  #Get datetime for yesterday.
 	Movers = []
 	for post in posts:
-		Yesterday = p.Day - datetime.timedelta(days=1)  #Get datetime for yesterday.
-		ypost = Post.objects.filter(Day=Yesterday).filter(Symbol=post.Symbol)[0]  #Use '[0]' with filter to get the first entry in queryset.
+		ypost = Post.objects.filter(Day=Yesterday).filter(Symbol=post.Symbol).first()  #Use .first() or '[0]' with filter to get the first entry in queryset.
 		print post.Symbol, post.LastPrice, type(post.LastPrice), ypost.LastPrice, type(ypost.LastPrice),
 		if post.LastPrice == "N/A" or ypost.LastPrice == "N/A":
 			PercDayMov = 0.0
@@ -169,39 +175,6 @@ def DJ_LastYr(request):  #Display value from the 1st (trading) day of last year.
 	except ObjectDoesNotExist:
 		return render(request, 'blog/NoPeriod.html') 
 
-def AboutMe(request):  #In-Progress url
-	return render(request, 'blog/AboutMe.html')
-
-def contact_form(request):
-	'''
-	form_class = ContactForm  #use for email submission.
-	'''
-	if request.method == 'POST':
-		form = ContactForm(request.POST)  #Accept user input as 'request.POST'; use form_class(request.POST) with email submission.
-		if form.is_valid():  #runs validation checks for all fields and returns Boolean.
-			obj = UserComment()  #Generate new UserComment object (see models.py).
-			obj.name = form.cleaned_data['name']
-			obj.email = form.cleaned_data['email']
-			obj.message = form.cleaned_data['message']
-			obj.save()  #Save the object to db.
-			return render(request, 'blog/thanks.html')
-	else:  #If a GET (such as first time the form is displayed), a blank form is created.
-		form = ContactForm()
-	return render(request, 'blog/contact.html', {'form': form})
-	'''
-			contact_name = request.POST.get('contact_name', '')
-			contact_email = request.POST.get('contact_email', '')
-			form_content = request.POST.get('content', '')
-			template = get_template('blog/contact_template.txt')
-			context = Context({'contact_name': contact_name, 'contact_email': contact_email, 'form_content': form_content,})
-			content = template.render(context)
-			email = EmailMessage("New contact form submission", content, "Fundamental Trader"+'', ['ericsun1221@gmail.com'], headers = {'Reply-To': contact_email })  #Must specify email inbox to send to.
-			email.send()
-			#return redirect('thanks.html')
-			return render(request, 'blog/thanks.html')
-	return render(request, 'blog/contact.html', {'form': form_class,})
-	'''
-
 def thanks(request):
 	return render(request, 'blog/thanks.html')
 
@@ -293,3 +266,36 @@ def get_query(request):  #Implement logic for query search.
 			else:
 				return HttpResponse('Please enter a closer match for a company name. Search suggestion:')
 		'''
+
+def AboutMe(request):  #In-Progress url
+	return render(request, 'blog/AboutMe.html')
+
+def contact_form(request):
+	'''
+	form_class = ContactForm  #use for email submission.
+	'''
+	if request.method == 'POST':
+		form = ContactForm(request.POST)  #Accept user input as 'request.POST'; use form_class(request.POST) with email submission.
+		if form.is_valid():  #runs validation checks for all fields and returns Boolean.
+			obj = UserComment()  #Generate new UserComment object (see models.py).
+			obj.name = form.cleaned_data['name']  #'cleaned_data' is used with 'is_valid' form method and normalizes input data to a consistent format.
+			obj.email = form.cleaned_data['email']
+			obj.message = form.cleaned_data['message']
+			obj.save()  #Save the object to db.
+			return render(request, 'blog/thanks.html')
+	else:  #If a GET (such as first time the form is displayed), a blank form is created.
+		form = ContactForm()
+	return render(request, 'blog/contact.html', {'form': form})
+	'''
+			contact_name = request.POST.get('contact_name', '')
+			contact_email = request.POST.get('contact_email', '')
+			form_content = request.POST.get('content', '')
+			template = get_template('blog/contact_template.txt')
+			context = Context({'contact_name': contact_name, 'contact_email': contact_email, 'form_content': form_content,})
+			content = template.render(context)
+			email = EmailMessage("New contact form submission", content, "Fundamental Trader"+'', ['ericsun1221@gmail.com'], headers = {'Reply-To': contact_email })  #Must specify email inbox to send to.
+			email.send()
+			#return redirect('thanks.html')
+			return render(request, 'blog/thanks.html')
+	return render(request, 'blog/contact.html', {'form': form_class,})
+	'''

@@ -8,6 +8,7 @@ class PostAdmin(admin.ModelAdmin):  #Create an admin class for customized admin 
 	list_display_links = ['Symbol']  #Specify linkable attribute under display.
 	list_filter = ['Day', 'Symbol']  #Add filter function for admin page.
 	search_fields = ['Day', 'Symbol', 'LastPrice']  #Implment search function for specific fields.
+	list_per_page = 400
 '''
 	class Meta:  #Use if feedback form is linked to model instances.
 		model = Post
