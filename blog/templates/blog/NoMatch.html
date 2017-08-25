@@ -4,7 +4,7 @@
 
 {% block content %}
 {% include "blog/aside_database.html" %}
-<div style="position:relative; margin-left:175px; padding:100px; background-color: #fff;">
+<div style="position:relative; margin-left:175px; padding:200px; background-color: #fff;">
 	{% with posts.0 as 1st %}  <!--Take the 1st item in query object to check for existence of individual fields.-->
 		{% if posts|length == 0 %}
 			<p>No match found.</p>

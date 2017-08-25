@@ -45,12 +45,12 @@ def DailyMovers():
 	Movers = []
 	for post in posts:
 		ypost = Post.objects.filter(Day=Yesterday).filter(Symbol=post.Symbol).first()  #Use .first() or '[0]' with filter to get the first entry in queryset.
-		print post.Symbol, post.LastPrice, type(post.LastPrice), ypost.LastPrice, type(ypost.LastPrice),
+		#print post.Symbol, post.LastPrice, type(post.LastPrice), ypost.LastPrice, type(ypost.LastPrice),
 		if post.LastPrice == "N/A" or ypost.LastPrice == "N/A":
 			PercDayMov = 0.0
 		else:
 			PercDayMov = ((float(post.LastPrice) - float(ypost.LastPrice))/float(ypost.LastPrice))*100
-		print PercDayMov
+		#print PercDayMov
 		Movers.append(tuple((post.Symbol, post.Name, PercDayMov)))  #Add each symbol and it daily % movement as a tuple to a list ('Movers').
 	Movers.sort(key=lambda tup: tup[2])  #Sort based on daily % movement (or 3rd element of each tuple).
 	#print Movers, type(Movers)
@@ -116,11 +116,11 @@ def DJ_LastMnth(request):  #Display value from the 1st (trading) day of last mon
 	try:
 		if int(CurrMnth) >= 2:  #Check whether last month is still within the same year.
 			p = Post.objects.filter(Day__year=CurrYr, Day__month=str(int(CurrMnth)-1)).earliest('Day')  #Retrieve earliest date available from last month.
-			print p.Day
+			#print p.Day
 			posts = Post.objects.filter(Day=p.Day)
 		else:
 			p = Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+11)).earliest('Day')
-			print p.Day
+			#print p.Day
 			posts = Post.objects.filter(Day=p.Day)
 		return render(request, 'blog/DJ_LastMnth.html', {'DJ_LastMnth_posts': posts})
 	except ObjectDoesNotExist:
@@ -137,7 +137,7 @@ def DJ_LastQtr(request):  #Display value from the 1st (trading) day of last quar
 		else:
 			p = Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+9)).earliest('Day')
 		posts = Post.objects.filter(Day=p.Day)
-		print posts.count()
+		#print posts.count()
 		return render(request, 'blog/DJ_LastQtr.html', {'DJ_LastQtr_posts': posts})
 	except ObjectDoesNotExist:
 		return render(request, 'blog/NoPeriod.html')
@@ -155,7 +155,7 @@ def DJ_Last6Mnth(request):  #Display value from the 1st (trading) day of last qu
 			p = Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+6)).earliest('Day')
 			#print p.Day, type(p)#, p.count()
 		posts = Post.objects.filter(Day=p.Day)
-		print posts.count()
+		#print posts.count()
 		return render(request, 'blog/DJ_Last6Mnth.html', {'DJ_Last6Mnth_posts': posts})
 	except ObjectDoesNotExist:
 		return render(request, 'blog/NoPeriod.html')
@@ -167,9 +167,9 @@ def DJ_LastYr(request):  #Display value from the 1st (trading) day of last year.
 	CurrMnth = LastDay.strftime('%m')
 	try:
 		p = Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=CurrMnth).earliest('Day')  #Retrieve earliest date available from last year, doesn't matter the month.
-		print p.Day
+		#print p.Day
 		posts = Post.objects.filter(Day=p.Day)
-		print posts.count()
+		#print posts.count()
 		#if posts.count() != 0:
 		return render(request, 'blog/DJ_LastYr.html', {'DJ_LastYr_posts': posts})
 	except ObjectDoesNotExist:
@@ -186,52 +186,51 @@ def get_query(request):  #Implement logic for query search.
 		return render(request, 'blog/NoMatch.html')
 	else:
 		query = q.encode('utf-8').upper()  #Convert unicode string to regular (byte) string and uppercase to match database.
-		print "User query:", query, type(query), len(query)
+		#print "User query:", query, type(query), len(query)
 		queryset_list = master_list.filter(Symbol__iexact=query)  #Apply 'iexact' lookuptype to find case-insensitive filter with EXACT match in a given field, "Symbol".
 		SymList = queryset_list.values_list('Symbol', flat=True).order_by('Symbol')  #Retrieve only 'Symbol' field from queryset as a list for all symbols matching the query. If flat=True, results are returned as single values, rather than tuples.
 		#print SymList, type(SymList)
 		byte_list = [i.encode('utf-8') for i in SymList]  #Convert unicode to byte string for every item in the list.
 		#print byte_list, type(byte_list)
 		byte_list = list(set(byte_list))  #Eliminate redundancy in the list.
-		print "Symbol list from 'Symbol' field EXACTLY matching user query:", byte_list, type(byte_list), len(byte_list)
+		#print "Symbol list from 'Symbol' field EXACTLY matching user query:", byte_list, type(byte_list), len(byte_list)
 		if len(byte_list) == 1:  #One EXACT match is found in 'Symbol' field of the database.
 			#return HttpResponse('One symbol found.')
-			print "One result found with EXACT match to user query:", byte_list, type(byte_list)
+			#print "One result found with EXACT match to user query:", byte_list, type(byte_list)
 			last_element = queryset_list.last()  #Get the last entry in the queryset to display latest company name as table caption in html.
 			return render(request, 'blog/results.html', {'posts': queryset_list, 'last_element': last_element})
 		else:  #0 or more than 1 match is found in 'Symbol' field of the database.
-			print "Look for 'Symbol' CONTAINING user query."
+			#print "Look for 'Symbol' CONTAINING user query."
 			queryset_list = master_list.filter(Symbol__icontains=query)  #If no exact match of symbol search is found, apply 'icontains' lookuptype to apply case-insensitive filter with SUBSTRING match in a given field, "Symbol".
 			#print queryset_list
 			SymList = queryset_list.values_list('Symbol', flat=True).order_by('Symbol')
 			byte_list = [i.encode('utf-8') for i in SymList]
 			byte_list = list(set(byte_list))
-			print "'Symbol' CONTAINING user query:", byte_list, type(byte_list), len(byte_list)
+			#print "'Symbol' CONTAINING user query:", byte_list, type(byte_list), len(byte_list)
 			if len(byte_list) >= 1:  #At least one 'Symbol' in the database CONTAINS the query.
-				print "At least one 'Symbol(s)' CONTAINS user query:", byte_list, type(byte_list), len(byte_list)
-				print type(queryset_list)
+				#print "At least one 'Symbol(s)' CONTAINS user query:", byte_list, type(byte_list), len(byte_list)
+				#print type(queryset_list)
 				queryset_list = queryset_list.values('Symbol', 'Name').distinct()  #Use .values() to include all fields to display in results table; add .distinct() to retrieve all unique field combination; queryset_list is converted from QuerySet object to ValuesQuerySet object.
-				print queryset_list, type(queryset_list)
+				#print queryset_list, type(queryset_list)
 				return render(request, 'blog/NoMatch.html', {'posts': queryset_list})
 			else:  #User query doesn't match any symbol in the database (exact or partial).
-				print "None of the 'Symbols' in the database matches user query. Try searching 'Name' field."
+				#print "None of the 'Symbols' in the database matches user query. Try searching 'Name' field."
 				queryset_list = master_list.filter(Name__icontains=query)  #If no exact or substring match is found in the "Symbol" field, check if query substring is CONTAINED within 'Name' field using 'icontains' (disregarding case).
 				SymList = queryset_list.values_list('Symbol', flat=True).order_by('Symbol')
 				byte_list = [i.encode('utf-8').upper() for i in SymList]
 				byte_list = list(set(byte_list))
-				print "Symbol(s) found containing user query under 'Name' field:", byte_list, type(byte_list), len(byte_list)
+				#print "Symbol(s) found containing user query under 'Name' field:", byte_list, type(byte_list), len(byte_list)
 				if len(byte_list) >= 1:  #At least one 'Name' in the database CONTAINS the query.
-					print type(queryset_list)
+					#print type(queryset_list)
 					queryset_list = queryset_list.values('Symbol', 'Name').distinct()
-					print queryset_list, type(queryset_list)
-					
+					#print queryset_list, type(queryset_list)
 					return render(request, 'blog/NoMatch.html', {'posts': queryset_list})
 				else:  #Try approximate matching of query string; assemble a unique word list from 'Name' field 1st.
 					Name_words = master_list.values('Name').distinct()
-					print "Distinct 'Name' field:", Name_words, type(Name_words), len(Name_words)
+					#print "Distinct 'Name' field:", Name_words, type(Name_words), len(Name_words)
 					Name_words = Name_words.values_list('Name', flat=True).order_by('Symbol')  #Convert distionary ('Name' field only) to ValuesQuerySet format.
 					Name_words = list(Name_words)  #Convert ValuesQuerySet to list format.
-					print "Converted to list:", Name_words, type(Name_words), len(Name_words)
+					#print "Converted to list:", Name_words, type(Name_words), len(Name_words)
 					gssm = []  #Creat a list to get substring match from query.
 					for unsplit in Name_words:  #Check if query is contained within the substring for each company name retrieved.
 						#print unsplit
@@ -239,33 +238,11 @@ def get_query(request):  #Implement logic for query search.
 							#print word
 							gssm.append(word.replace('&APOS;',"'").replace('AMP;',"").replace('(','').replace(')','').upper())  #Separate words in 'Name' field and append to new list (in upper case).
 					gssm = list(set(gssm))
-					print gssm, type(gssm), len(gssm)
+					#print gssm, type(gssm), len(gssm)
 					close_matches = get_close_matches(query, gssm)  #Only retrieve closest match (including matching cases).
-					print "Did you mean?", close_matches
+					#print "Did you mean?", close_matches
 					#return HttpResponse('Did you enter the right search term? Closest match: '+close_matches[0])
 					return render(request, 'blog/NoMatch.html', {'posts': close_matches})
-		'''
-		if len(byte_list) >= 2:  #Offer suggestion if more than one match is found in database.
-			pass
-		elif len(byte_list) == 1:
-			gcm = get_close_matches(query, byte_list, 1)  #Only retrieve closest match (including matching cases).
-			print gcm, type(gcm)
-			if gcm:  #Check if query matches any of get_close_matches hits.
-				gcm = gcm[0]  #Get only the 1st item in the list as string.
-				#print gcm, type(gcm)
-				queryset_list = queryset_list.filter(Symbol__iexact=gcm)  #Retrieve all day entry for the exact matching symbol.
-				print queryset_list, type(queryset_list)
-				return render(request, 'blog/results.html', {'query': queryset_list})
-			else:
-				return HttpResponse('Please enter a closer match for a symbol or a name. Search suggestion:')
-
-			if gssm:
-				gssm = gssm[0]
-				queryset_list = queryset_list.filter(Name__icontains=gssm)  #Retrieve all day entry for the matching name.
-				return render(request, 'blog/results.html', {'query': queryset_list})
-			else:
-				return HttpResponse('Please enter a closer match for a company name. Search suggestion:')
-		'''
 
 def AboutMe(request):  #In-Progress url
 	return render(request, 'blog/AboutMe.html')

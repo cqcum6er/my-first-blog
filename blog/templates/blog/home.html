@@ -81,7 +81,8 @@
 		}
 
 		.fa:hover {
-			opacity: 0.7;
+			background:#66991c;
+			color: white;
 		}
 
 		.fa-facebook {
@@ -333,9 +334,9 @@
 				<!--{% if request.path == home %}<li>active</li>{% endif %}-->
 				<!--<li>{{request.path}}</li>  Check for active path; must be activated with Django simple tag.-->
 				<li><a {% if request.path in all_ind_link %}class="actlink"{% endif %} href="{% url 'blog:home_link' %}">Home</a></li>
-				<li><a {% if request.path in all_ResCent_link %}class="actlink"{% endif %} href="{% url 'blog:ResCenter_link' %}">Resource Center</a></li>
+				<li><a {% if request.path in all_ResCent_link %}class="actlink"{% endif %} href="{% url 'blog:ResCenter_link' %}">Resources</a></li>
 				<li><a {% if request.path in all_db_link %}class="actlink"{% endif %} href="{% url 'blog:DJ_LastDay' %}">Database</a></li>
-				<li><a {% if request.path == inPro %}class="actlink"{% endif %} href="{% url 'blog:AboutMe_link' %}">About Me</a></li>
+				<li><a {% if request.path == inPro %}class="actlink"{% endif %} href="{% url 'blog:AboutMe_link' %}">About</a></li>
 				<li><a {% if request.path == cont %}class="actlink"{% endif %} href="{% url 'blog:contact_link' %}">Contact</a></li>
 			</ul>
 		</div>
