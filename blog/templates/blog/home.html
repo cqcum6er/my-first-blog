@@ -397,8 +397,14 @@
 				<tbody>
 				{% for tick in DailyMovers|slice:":5" %}  <!--Iterate the 1st 5 items from the list of tuples ('DailyMovers').-->
 				<tr style="background-color:white">
-					<td style="background-color: #ffcc66;"><a href="/results/?q={{ tick.0 }}"> {{ tick.1 }} ({{ tick.0 }}) </a></td>
-					<td style="text-align:center; color:red;"> {{ tick.2|floatformat:2 }}% </td>
+					<td style="background-color: #ffcc66;"><a href="/results/?q={{ tick.0 }}"> {{ tick.1 }} ({{ tick.0 }}) </a></td>  <!--tick.0 = post.Symbol, tick.1 = post.Name, tick.2 = PercDayMov-->
+					<td style="text-align:center;
+					{% if tick.2 < 0 %}
+						color:red
+					{% else %}
+						color:green
+					{% endif %}
+					;"> {{ tick.2|floatformat:2 }}% </td>
 				</tr>
 				{% endfor %}
 				</tbody>
@@ -417,7 +423,13 @@
 			{% for tick in DailyMovers|slice:"-5:" reversed %}  <!--Iterate in reverse order the last 5 items from the list of tuples.-->
 			<tr style="background-color:white">
 				<td style="background-color: #ffcc66;"><a href="/results/?q={{ tick.0 }}"> {{ tick.1 }} ({{ tick.0 }}) </a></td>
-				<td style="text-align:center; color:green;"> {{ tick.2|floatformat:2 }}% </td>
+				<td style="text-align:center;
+				{% if tick.2 < 0 %}
+					color:red
+				{% else %}
+					color:green
+				{% endif %}
+				;"> {{ tick.2|floatformat:2 }}% </td>
 			</tr>
 			{% endfor %}
 			</tbody>
@@ -429,7 +441,7 @@
 		  <p><b>Why do you want your money in stock?</b></p>
 		  <ol>
 			<li>Even with a higher risk, stock performs better than bond or bank CD in preserving personal wealth and reducing the effect that inflation will have on your asset.</li>
-			<li>Stocks are liquid asset and can be traded more easily compared to lots of other investnment options.</li>
+			<li>Stocks are liquid asset and can be traded more easily compared to lots of other investment options.</li>
 			<li>With higher liquidity, you can take advantage of compounding your earning by reinvesting the earning in more undervalued stocks.</li>
 		  </ol>
 		  <p>Even though risk is an inherent part of trading in stocks, what can be done to minimize the risk?  After all, most people invest in stock as an investment vehicle, not as part of their normal career, so they have little time to evaluate their investment choices.  With that said, a time-tested strategy is to diversify your portfolio and to hold it for long term.</p>
@@ -441,7 +453,7 @@
 			<li>Stocks can rise and fall greatly in a short period of time, especially if investment is in a single company, but as long as the fundamentals are sound, you should not worry too much about the effect that news cycle will have on your investment in the long run.</li>
 		  </ol>
 		  <p><b>How much money is recommended to start investing in stocks?  Is there a high cost of entry?</b></p>
-		  <p>One benefit associated with stocks is that there are many stocks offered at different price ranges.  With that said, it is suggested that individual should invest only with amount that they are comfortable with, which will differ between individuals based on their age and their tolerance for risks. A great recommendation for individual just started to invest is to invest in index funds, which may represent many companies in a given sector or geographical area and have greater stability than investent in individual companies.</p>
+		  <p>One benefit associated with stocks is that there are many stocks offered at different price ranges.  With that said, it is suggested that individual should invest only with amount that they are comfortable with, which will differ between individuals based on their age and their tolerance for risks. A great recommendation for individual just started to invest is to invest in index funds, which may represent many companies in a given sector or geographical area and have greater stability than investment in individual companies.</p>
 		  
 		{% endblock %}
 		</div>

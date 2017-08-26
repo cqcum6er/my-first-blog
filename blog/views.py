@@ -15,11 +15,10 @@ from django.template.loader import get_template
 from .models import Post, UserComment  #Retrieve model objects from 'models.py' within the same folder.
 from .forms import ContactForm
 #from .templatetags import index_table
-import csv
 import datetime
-# aniso8601
 '''
 #To update database with the current date, save scheduled csv record from Pythonanywhere, then run local server ONCE to populate local database before commenting out this block; comment out this block before saving views.py to Pythonanywhere to use scheduled csv instead...
+import csv
 #if not Post:  #Check to see if database is empty.  If it's not, do nothing, else empty existing entry to prepare for update. (Remove the 'if' statement if run as a scheduler command on Pythonanywhere.)
 	#pass
 #else:
