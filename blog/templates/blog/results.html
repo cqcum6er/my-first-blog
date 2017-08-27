@@ -9,6 +9,7 @@
 		<li><b>Display as:</b></li>
 		<li><a {% if request.path == res %}class="sect_actlink"{% endif %} href="">Table</a></li>
 		<li><a {% if request.path == DJLD %}class="sect_actlink"{% endif %} href="">Graph (coming soon!)</a></li>
+		<li><button onclick="goBack()">&lt; Back</button></li>
 	</ul>
 </div>
 <table id="myTable" border="8" style="border-collapse: collapse; width:1000px;">
@@ -87,6 +88,9 @@
 </table>
 
 <script>
+function goBack() {
+  window.history.back();  //Back button
+}
 function sortTable(n) {  //See <https://www.w3schools.com/howto/howto_js_sort_table.asp> for source code.
   var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
   //var reTest = /[A-Za-z]/

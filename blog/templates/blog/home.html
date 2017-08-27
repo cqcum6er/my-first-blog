@@ -2,6 +2,29 @@
 <html lang="en">
 	<head>
 		<title>{% block title %}Fundamental Trader-Home{% endblock %}</title>
+		<script>
+		function startTime() {
+		  var timeNow = new Date();
+		  timeNow.setHours(timeNow.getHours() + 3);  //Add 3 hours ahead for Eastern Standard Time.
+		  var year = timeNow.getFullYear(), month = timeNow.getMonth();
+		  var months = new Array('JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC');
+		  var d = timeNow.getDate(), day = timeNow.getDay();
+		  var days = new Array('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat');
+		  var h = timeNow.getHours(), m = timeNow.getMinutes(), s = timeNow.getSeconds();
+		  m = checkTime(m);
+		  s = checkTime(s);
+		  if (h < 13) {
+		    document.getElementById('date_time').innerHTML = "EST: " + days[day] + " " + months[month] + " " + d + ", " + year +", " + h + ":" + m + ":" + s + " AM";
+		  } else {
+			document.getElementById('date_time').innerHTML = "EST: " + days[day] + " " + months[month] + " " + d + ", " + year +", " + (h - 12) + ":" + m + ":" + s + " PM";
+		  }
+		  setTimeout(startTime, 500);  //Display real time; setTimeout() evaluates an expression after a specified number of milliseconds.
+		}
+		function checkTime(i) {
+		  if (i < 10) {i = "0" + i}  //add zero in front of numbers < 10
+		  return i;
+		}
+		</script>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 		<style type="text/css">
 		#header {/*Refer to http://www.w3schools.com/html/html_layout.asp for layout referrence*/}
@@ -56,7 +79,7 @@
 		#social {
 			position:absolute;
 			top:70px;
-			left:850px;
+			left:900px;
 			background-color:#EADCAE;
 			white-space:nowrap;
 		}
@@ -292,7 +315,7 @@
 		}
 		</style>	
 	</head>
-	<body>
+	<body onload="startTime()">
 		<!--Topbar begins-->
 		<!--<div style="position: fixed; top: 0;">-->
 		
@@ -338,6 +361,7 @@
 				<li><a {% if request.path in all_db_link %}class="actlink"{% endif %} href="{% url 'blog:DJ_LastDay' %}">Database</a></li>
 				<li><a {% if request.path == inPro %}class="actlink"{% endif %} href="{% url 'blog:AboutMe_link' %}">About</a></li>
 				<li><a {% if request.path == cont %}class="actlink"{% endif %} href="{% url 'blog:contact_link' %}">Contact</a></li>
+				<li id="date_time"></li>
 			</ul>
 		</div>
 		<!--</div>  top nav bar ends-->
@@ -462,8 +486,8 @@
 		</p>
 		<p>Copyright&copy;
 			<script>  //Insert current year.
-			var today = new Date()
-			var year = today.getFullYear()
+			var timeNow = new Date()
+			var year = timeNow.getFullYear()
 			document.write(year)
 			</script>
 			www.fundamentaltrader.net. All rights reserved.</p>
