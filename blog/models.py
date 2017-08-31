@@ -43,7 +43,7 @@ class Post(models.Model):  #Defines our model ('models' is a python class; 'Post
 	'''
 class SP500_Post(models.Model):
 	Day = models.DateField(blank=False, default=datetime.date.today().strftime('%Y-%m-%d'))
-	Symbol = models.CharField(max_length=20, default='N/A')  #Add default value so the initiated table will have prepopulated value.
+	Symbol = models.CharField(max_length=20, default='N/A')
 	LastPrice = models.CharField(max_length=30, default='N/A')
 	FiftyTwoWkChg = models.CharField(max_length=30, default='N/A')
 	FiftyTwoWkHi = models.CharField(max_length=30, default='N/A')
@@ -65,7 +65,7 @@ class SP500_Post(models.Model):
 
 class NASDAQ_Post(models.Model):
 	Day = models.DateField(blank=False, default=datetime.date.today().strftime('%Y-%m-%d'))
-	Symbol = models.CharField(max_length=20, default='N/A')  #Add default value so the initiated table will have prepopulated value.
+	Symbol = models.CharField(max_length=20, default='N/A')
 	LastPrice = models.CharField(max_length=30, default='N/A')
 	FiftyTwoWkChg = models.CharField(max_length=30, default='N/A')
 	FiftyTwoWkHi = models.CharField(max_length=30, default='N/A')

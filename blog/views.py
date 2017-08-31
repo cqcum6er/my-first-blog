@@ -12,7 +12,7 @@ from django.core.mail import EmailMessage, send_mail
 from django.template import Context
 from django.template.loader import get_template
 '''
-from .models import Post, UserComment  #Retrieve model objects from 'models.py' within the same folder.
+from .models import Post, SP500_Post, UserComment  #Retrieve model objects from 'models.py' within the same folder.
 from .forms import ContactForm
 #from .templatetags import index_table
 import datetime
@@ -31,9 +31,18 @@ with open('DJ_list.csv', 'rb') as file:  # Need to use absolute path when on Pyt
 		row_datetime = datetime.datetime.strptime(row[0],'%Y-%m-%d')  #row[0] is converted from str to datetime format.
 		#print row_datetime.date()
 		row_date = row_datetime.date()  #Converting from datetime to date.
-		if row_date > p.Day:  #Only append entry if the date of the entry is greater than that in db.
+		if row_date > p.Day:  #Only append entry if the date of the entry is later than the most recent in db.
 			#print row_date
 			Post.objects.create(**dict(zip(fields, row)))
+p = SP500_Post.objects.latest('Day')
+fields = ['Day', 'Symbol', 'LastPrice', 'FiftyTwoWkChg', 'FiftyTwoWkLo', 'FiftyTwoWkHi', 'DivYild', 'TrailPE', 'ForwardPE', 'PEG_Ratio', 'PpS', 'PpB', 'Market_Cap', 'Free_Cash_Flow', 'Market_per_CashFlow', 'Enterprise_per_EBITDA', 'Name']
+with open('SP500_list.csv', 'rb') as file:
+	infile = csv.reader(file, delimiter=",", quotechar='"')
+	for row in infile:
+		row_datetime = datetime.datetime.strptime(row[0],'%Y-%m-%d')
+		row_date = row_datetime.date()
+		if row_date > p.Day:
+			SP500_Post.objects.create(**dict(zip(fields, row)))
 #...end of block.
 '''
 def DailyMovers():
@@ -79,6 +88,11 @@ def ResCenter_Def(request):
 def	ResCenter_Links(request):
 	return render(request, 'blog/ResCenter_Links.html')
 
+def iso_to_gregorian(iso_year, iso_week, iso_day):  #Converts ISO week date format to Gregorian calendar date format.
+	jan4 = datetime.date(iso_year, 1, 4)  #1st week ('Week 01') of new year always contains Jan 4th.
+	start = jan4 - datetime.timedelta(days=jan4.isoweekday()-1)  #Get the year for ISO week date.
+	return start + datetime.timedelta(weeks=iso_week-1, days=iso_day-1)
+	
 def DJ_LastDay(request):  #"DJ_LastDay" must be requested from urls.py
 	#posts = Post.objects.values()  #values() returns content of database as dictionary rather than model instances, making the database iterable.
 	#posts = Post.objects.filter(Day__lte=timezone.now()).exclude(Day__lte=timezone.now() - datetime.timedelta(days=1))  #Retrieve all dates equal to or older than today but exclude those from yesterday or older; use timezone.now() instead of datetime.datetime.now() to avoid problems with timezones.
@@ -92,10 +106,13 @@ def DJ_LastDay(request):  #"DJ_LastDay" must be requested from urls.py
 	except ObjectDoesNotExist:
 		return render(request, 'blog/NoPeriod.html')
 
-def iso_to_gregorian(iso_year, iso_week, iso_day):  #Converts ISO week date format to Gregorian calendar date format.
-	jan4 = datetime.date(iso_year, 1, 4)  #1st week ('Week 01') of new year always contains Jan 4th.
-	start = jan4 - datetime.timedelta(days=jan4.isoweekday()-1)  #Get the year for ISO week date.
-	return start + datetime.timedelta(weeks=iso_week-1, days=iso_day-1)
+def SP_LastDay(request):
+	p = SP500_Post.objects.latest('Day')
+	try:
+		posts = SP500_Post.objects.filter(Day=p.Day)
+		return render(request, 'blog/SP_LastDay.html', {'SP_LastDay_posts': posts})
+	except ObjectDoesNotExist:
+		return render(request, 'blog/NoPeriod_SP.html')
 
 def DJ_LastWk(request):  #Display value from Wednesday of last week.
 	p = Post.objects.latest('Day')
@@ -106,6 +123,15 @@ def DJ_LastWk(request):  #Display value from Wednesday of last week.
 		return render(request, 'blog/DJ_LastWk.html', {'DJ_LastWk_posts': posts})
 	except ObjectDoesNotExist:
 		return render(request, 'blog/NoPeriod.html')
+
+def SP_LastWk(request):
+	p = SP500_Post.objects.latest('Day')
+	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')
+	try:
+		posts = SP500_Post.objects.filter(Day=iso_to_gregorian(LastDay.isocalendar()[0], LastDay.isocalendar()[1]-1, 3))
+		return render(request, 'blog/SP_LastWk.html', {'SP_LastWk_posts': posts})
+	except ObjectDoesNotExist:
+		return render(request, 'blog/NoPeriod_SP.html')
 
 def DJ_LastMnth(request):  #Display value from the 1st (trading) day of last month.
 	p = Post.objects.latest('Day')
@@ -125,6 +151,22 @@ def DJ_LastMnth(request):  #Display value from the 1st (trading) day of last mon
 	except ObjectDoesNotExist:
 		return render(request, 'blog/NoPeriod.html')
 
+def SP_LastMnth(request):
+	p = SP500_Post.objects.latest('Day')
+	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')
+	CurrYr = LastDay.strftime('%Y')
+	CurrMnth = LastDay.strftime('%m')
+	try:
+		if int(CurrMnth) >= 2:
+			p = SP500_Post.objects.filter(Day__year=CurrYr, Day__month=str(int(CurrMnth)-1)).earliest('Day')
+			posts = SP500_Post.objects.filter(Day=p.Day)
+		else:
+			p = SP500_Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+11)).earliest('Day')
+			posts = SP500_Post.objects.filter(Day=p.Day)
+		return render(request, 'blog/SP_LastMnth.html', {'SP_LastMnth_posts': posts})
+	except ObjectDoesNotExist:
+		return render(request, 'blog/NoPeriod_SP.html')
+
 def DJ_LastQtr(request):  #Display value from the 1st (trading) day of last quarter.
 	p = Post.objects.latest('Day')
 	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')
@@ -140,6 +182,21 @@ def DJ_LastQtr(request):  #Display value from the 1st (trading) day of last quar
 		return render(request, 'blog/DJ_LastQtr.html', {'DJ_LastQtr_posts': posts})
 	except ObjectDoesNotExist:
 		return render(request, 'blog/NoPeriod.html')
+
+def SP_LastQtr(request):
+	p = SP500_Post.objects.latest('Day')
+	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')
+	CurrYr = LastDay.strftime('%Y')
+	CurrMnth = LastDay.strftime('%m')
+	try:
+		if int(CurrMnth) >= 4:
+			p = SP500_Post.objects.filter(Day__year=CurrYr, Day__month=str(int(CurrMnth)-3)).earliest('Day')
+		else:
+			p = SP500_Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+9)).earliest('Day')
+		posts = SP500_Post.objects.filter(Day=p.Day)
+		return render(request, 'blog/SP_LastQtr.html', {'SP_LastQtr_posts': posts})
+	except ObjectDoesNotExist:
+		return render(request, 'blog/NoPeriod_SP.html')
 
 def DJ_Last6Mnth(request):  #Display value from the 1st (trading) day of last quarter.
 	p = Post.objects.latest('Day')
@@ -159,6 +216,21 @@ def DJ_Last6Mnth(request):  #Display value from the 1st (trading) day of last qu
 	except ObjectDoesNotExist:
 		return render(request, 'blog/NoPeriod.html')
 
+def SP_Last6Mnth(request):
+	p = SP500_Post.objects.latest('Day')
+	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')
+	CurrYr = LastDay.strftime('%Y')
+	CurrMnth = LastDay.strftime('%m')
+	try:
+		if int(CurrMnth) >= 7:
+			p = SP500_Post.objects.filter(Day__year=CurrYr, Day__month=str(int(CurrMnth)-6)).earliest('Day')
+		else:
+			p = SP500_Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+6)).earliest('Day')
+		posts = SP500_Post.objects.filter(Day=p.Day)
+		return render(request, 'blog/SP_Last6Mnth.html', {'SP_Last6Mnth_posts': posts})
+	except ObjectDoesNotExist:
+		return render(request, 'blog/NoPeriod_SP.html')
+
 def DJ_LastYr(request):  #Display value from the 1st (trading) day of last year.
 	p = Post.objects.latest('Day')
 	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')
@@ -173,6 +245,18 @@ def DJ_LastYr(request):  #Display value from the 1st (trading) day of last year.
 		return render(request, 'blog/DJ_LastYr.html', {'DJ_LastYr_posts': posts})
 	except ObjectDoesNotExist:
 		return render(request, 'blog/NoPeriod.html') 
+
+def SP_LastYr(request):
+	p = SP500_Post.objects.latest('Day')
+	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')
+	CurrYr = LastDay.strftime('%Y')
+	CurrMnth = LastDay.strftime('%m')
+	try:
+		p = SP500_Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=CurrMnth).earliest('Day')
+		posts = SP500_Post.objects.filter(Day=p.Day)
+		return render(request, 'blog/SP_LastYr.html', {'SP_LastYr_posts': posts})
+	except ObjectDoesNotExist:
+		return render(request, 'blog/NoPeriod_SP.html') 
 
 def thanks(request):
 	return render(request, 'blog/thanks.html')

@@ -1,0 +1,10 @@
+{% extends "blog/home.html" %}
+
+{% block title %} Fundamental Trader-SP500 Index-Last Year {% endblock %}
+
+{% block content %}
+{% include "blog/aside_database.html" %}
+{% include "blog/PeriodToDisplay_SP.html" %}
+{% load index_table %}
+{% SP_LastYr %}
+{% endblock %}

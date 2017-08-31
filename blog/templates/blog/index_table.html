@@ -1,5 +1,11 @@
 <table id="myTable" border="8" style="border-collapse:collapse; width:1000px;">
-	<caption><b>Dow Jones Index ({{ posts|length }} symbols returned) - 
+	<caption><b>
+	{% if 'DJ' in request.path %}
+		Dow Jones
+	{% elif 'SP' in request.path %}
+		S&amp;P500
+	{% endif %}
+		Index ({{ posts|length }} symbols returned) - 
 	{% if 'LastDay' in request.path %}
 		Last Trading Day
 	{% elif 'LastWeek' in request.path %}

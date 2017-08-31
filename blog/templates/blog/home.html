@@ -3,14 +3,16 @@
 	<head>
 		<title>{% block title %}Fundamental Trader-Home{% endblock %}</title>
 		<script>
+		document.getElementById("demo").innerHTML = Date.getTime();
 		function startTime() {
 		  var timeNow = new Date();
+		  //timeNow = timeNow.toISOString()
 		  timeNow.setHours(timeNow.getHours() + 3);  //Add 3 hours ahead for Eastern Standard Time.
 		  var year = timeNow.getFullYear(), month = timeNow.getMonth();
 		  var months = new Array('JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC');
 		  var d = timeNow.getDate(), day = timeNow.getDay();
 		  var days = new Array('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat');
-		  var h = timeNow.getHours(), m = timeNow.getMinutes(), s = timeNow.getSeconds();
+		  var h = timeNow.getHours(), m = timeNow.getMinutes(), s = timeNow.getSeconds(); //UTC = timeNow.getTime();
 		  m = checkTime(m);
 		  s = checkTime(s);
 		  if (h < 13) {
@@ -50,9 +52,14 @@
 			background-color:#66991c;
 			color:white;
 		}
-		
+
+		#nav {
+			clear:left;  //Clear just the title to occupy same space as social media bar floated to the right.
+			background-color:#EADCAE;
+		}
+
 		#nav ul {
-			padding-left:10px;
+			padding:10px;
 		}
 		
 		#nav li {  /*matches all list item (li) in selector ul#nav*/
@@ -77,16 +84,14 @@
 		}  /*LVHA-order= :link, :visited, :hover, :active.*/
 
 		#social {
-			position:absolute;
-			top:70px;
-			left:900px;
-			background-color:#EADCAE;
+			background:#EADCAE;
 			white-space:nowrap;
+			margin-top:20px;
 		}
 
 		#social ul {
 			display:table-cell;  /*Make each ul element acts like table cell; also helps remove padding around li; also removes styling from list-style.*/
-			padding:0;
+			padding:5px;
 		}
 
 		#social li {
@@ -166,7 +171,6 @@
 			width:125px;
 			float:left;
 			margin-bottom:-2000px;  /*Clear space to the right for table.*/
-			margin-left:0;
 			padding-left:10px;	<!--padding defines the space between element and element border-->
 			padding-bottom:2000px;
 		}
@@ -316,19 +320,26 @@
 		</style>	
 	</head>
 	<body onload="startTime()">
-		<!--Topbar begins-->
 		<!--<div style="position: fixed; top: 0;">-->
-		
-		<div style="height:70px; text-align:left; background-color:#fff; padding-left:10px; white-space:nowrap;">
+		<div style="float:left; padding:10px 10px 0; white-space:nowrap;">  <!--padding: top R&L bottom; use 'nowrap' to prevent elements within the div from breaking into another line from screen resizing.-->
 			<h1 style="margin:0;"><a style="text-decoration:none; color:green;" href="{% url 'blog:home_link' %}">Fundamental Trader</a></h1>
 			<h2 style="font-size:12pt;">The Comprehensive Fundamental Analysis Database</h2>
-		</div>  <!--Topbar ends-->
-		<div style="position:absolute; top:0; left:900px; margin-right:20px; background-color:#fff; white-space:nowrap; float:right;">  <!--use 'nowrap' to prevent elements within the div from breaking into another line from screen resizing.-->
+		</div>
+		<div style="position:absolute; height:85px; width:1500px; background:#fff; z-index:-1;"></div>  <!--Spacer between title and search bar-->
+		<div style="float:right; background:#fff; white-space:nowrap; margin-right:10px;">  <!--Define elements float to the right side of the screen regardless of screen size.-->
 			<p>Start search for a company:</p>
 			<form method="GET" action="{% url 'blog:results' %}">
 				<input type="text" name="q" placeholder="Enter Symbol or Name" value="{{ request.GET.q }}" />  <!--include 'name' for search to show up in url; include 'value' to display query while typing.-->
 				<input type="submit" value="Search" />
 			</form>
+			<div id="social">
+				<ul>
+					<li><b>Share on</b></li>
+					<li><a class="fa fa-facebook" href="http://www.facebook.com/sharer.php?u=https://www.fundamentaltrader.net"></a></li>
+					<li><a class="fa fa-twitter" href="https://twitter.com/share?url=https://www.fundamentaltrader.net"></a></li>
+					<li><a class="fa fa-linkedin" href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://www.fundamentaltrader.net"></a></li>
+				</ul>
+			</div>
 		</div>
 		<div id="nav" style="white-space:nowrap;">  <!--a container for navigation links below header-->
 			<ul>	<!--Unordered list-->
@@ -346,7 +357,14 @@
 				{% url 'blog:ResCenter_Links_link' as rc_l %}
 				{% url 'blog:results' as res %}
 				{% load make_list %}  <!--Load the custom template tags to prepare an url list (usage: collect 'html' as 'shortcut').-->
-				{% collect DJLD DJLW DJLM DJL6M DJLQ DJLY res as all_db_link %}
+				{% collect DJLD DJLW DJLM DJL6M DJLQ DJLY res as all_DJ_link %}
+				{% url 'blog:SP_LastDay' as SPLD %}
+				{% url 'blog:SP_LastWk' as SPLW %}
+				{% url 'blog:SP_LastMnth' as SPLM %}
+				{% url 'blog:SP_Last6Mnth' as SPL6M %}
+				{% url 'blog:SP_LastQtr' as SPLQ %}
+				{% url 'blog:SP_LastYr' as SPLY %}
+				{% collect SPLD SPLW SPLM SPL6M SPLQ SPLY res as all_SP_link %}
 				{% url 'blog:Ind_LastWk' as IndLW %}
 				{% url 'blog:Ind_LastQtr' as IndLQ %}
 				{% url 'blog:Ind_Last6Mnth' as IndL6M %}
@@ -358,21 +376,14 @@
 				<!--<li>{{request.path}}</li>  Check for active path; must be activated with Django simple tag.-->
 				<li><a {% if request.path in all_ind_link %}class="actlink"{% endif %} href="{% url 'blog:home_link' %}">Home</a></li>
 				<li><a {% if request.path in all_ResCent_link %}class="actlink"{% endif %} href="{% url 'blog:ResCenter_link' %}">Resources</a></li>
-				<li><a {% if request.path in all_db_link %}class="actlink"{% endif %} href="{% url 'blog:DJ_LastDay' %}">Database</a></li>
+				<li><a {% if request.path in all_DJ_link or request.path in all_SP_link %}class="actlink"{% endif %} href="{% url 'blog:DJ_LastDay' %}">Database</a></li>
 				<li><a {% if request.path == inPro %}class="actlink"{% endif %} href="{% url 'blog:AboutMe_link' %}">About</a></li>
 				<li><a {% if request.path == cont %}class="actlink"{% endif %} href="{% url 'blog:contact_link' %}">Contact</a></li>
-				<li id="date_time"></li>
+				<li id="date_time" style="background:#EADCAE; padding:10px 0 15px;"></li>
+				<li id="demo"></li>
 			</ul>
 		</div>
 		<!--</div>  top nav bar ends-->
-		<div id="social">
-			<ul>
-				<li><b>Share on</b></li>
-				<li><a href="http://www.facebook.com/sharer.php?u=https://www.fundamentaltrader.net" class="fa fa-facebook"></a></li>
-				<li><a href="https://twitter.com/share?url=https://www.fundamentaltrader.net" class="fa fa-twitter"></a></li>
-				<li><a href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://www.fundamentaltrader.net" class="fa fa-linkedin"></a></li>
-			<ul>
-		</div>
 		<div class="main">
 		{% block content %}
 			<div id="aside">  <!--Margin added to keep element to the right of aside bar-->
@@ -423,7 +434,9 @@
 				<tr style="background-color:white">
 					<td style="background-color: #ffcc66;"><a href="/results/?q={{ tick.0 }}"> {{ tick.1 }} ({{ tick.0 }}) </a></td>  <!--tick.0 = post.Symbol, tick.1 = post.Name, tick.2 = PercDayMov-->
 					<td style="text-align:center;
-					{% if tick.2 < 0 %}
+					{% if tick.2 == 0 %}
+						color:black
+					{% elif tick.2 < 0 %}
 						color:red
 					{% else %}
 						color:green
@@ -448,7 +461,9 @@
 			<tr style="background-color:white">
 				<td style="background-color: #ffcc66;"><a href="/results/?q={{ tick.0 }}"> {{ tick.1 }} ({{ tick.0 }}) </a></td>
 				<td style="text-align:center;
-				{% if tick.2 < 0 %}
+				{% if tick.2 == 0 %}
+					color:black
+				{% elif tick.2 < 0 %}
 					color:red
 				{% else %}
 					color:green

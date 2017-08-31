@@ -1,0 +1,12 @@
+<!--Choose a period to display for the index table .in the Database-->
+<div id="section">
+	<ul>
+		<li><b>Period to display:</b></li>
+		<li><a {% if 'LastDay' in request.path %}class="sect_actlink"{% endif %} href="{% url 'blog:SP_LastDay' %}">Last Trading Day</a></li>
+		<li><a {% if 'LastWeek' in request.path %}class="sect_actlink"{% endif %} href="{% url 'blog:SP_LastWk' %}">Last Week</a></li>
+		<li><a {% if 'LastMonth' in request.path %}class="sect_actlink"{% endif %} href="{% url 'blog:SP_LastMnth' %}">Last Month</a></li>
+		<li><a {% if 'LastQuarter' in request.path %}class="sect_actlink"{% endif %} href="{% url 'blog:SP_LastQtr' %}">Last Quarter</a></li>
+		<li><a {% if 'Last6Month' in request.path %}class="sect_actlink"{% endif %} href="{% url 'blog:SP_Last6Mnth' %}">Last 6 Months</a></li>
+		<li><a {% if 'LastYear' in request.path %}class="sect_actlink"{% endif %} href="{% url 'blog:SP_LastYr' %}">Last Year</a></li>
+	</ul>
+</div>

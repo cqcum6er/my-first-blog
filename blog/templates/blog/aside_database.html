@@ -7,8 +7,8 @@
 	</form>
 	<p>Display by index:</p>
 	<ul>
-		<li><a {% if request.path in all_db_link %}class="aside_act"{% endif %} href="{% url 'blog:DJ_LastDay' %}">Dow Jones</a></li>  <!--Implement "aside_act" to customize active link.-->
-		<li><a href="">S&amp;P500 (coming soon!)</a></li>
+		<li><a {% if request.path in all_DJ_link %}class="aside_act"{% endif %} href="{% url 'blog:DJ_LastDay' %}">Dow Jones</a></li>  <!--Implement "aside_act" to customize active link.-->
+		<li><a {% if request.path in all_SP_link %}class="aside_act"{% endif %} href="{% url 'blog:SP_LastDay' %}">S&amp;P500</a></li>
 		<li><a href="">NASDAQ (coming soon!)</a></li>
 	</ul>
 	<p>Display by industry:</p>

@@ -1,0 +1,10 @@
+{% extends "blog/home.html" %}
+
+{% block title %} Fundamental Trader-SP500 Index-Last Day {% endblock %}
+
+{% block content %}
+{% include "blog/aside_database.html" %}  <!--Display left-hand column.-->
+{% include "blog/PeriodToDisplay_SP.html" %}  <!--Display Period selection for index table.-->
+{% load index_table %}
+{% SP_LastDay %}
+{% endblock %}
