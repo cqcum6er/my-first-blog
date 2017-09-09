@@ -345,7 +345,7 @@
 			<ul>	<!--Unordered list-->
 				<!--{% load active_nav %}  Load the custom template tags to mark active link.-->
 				{% url 'blog:home_link' as home %}  <!--Must use a replacement name for a link when the link is placed inside a block tag.-->
-				{% url 'blog:AboutMe_link' as inPro %}
+				{% url 'blog:AboutMe_link' as About %}
 				{% url 'blog:DJ_LastDay' as DJLD %}
 				{% url 'blog:DJ_LastWk' as DJLW %}
 				{% url 'blog:DJ_LastMnth' as DJLM %}
@@ -357,14 +357,14 @@
 				{% url 'blog:ResCenter_Links_link' as rc_l %}
 				{% url 'blog:results' as res %}
 				{% load make_list %}  <!--Load the custom template tags to prepare an url list (usage: collect 'html' as 'shortcut').-->
-				{% collect DJLD DJLW DJLM DJL6M DJLQ DJLY res as all_DJ_link %}
+				{% collect DJLD DJLW DJLM DJL6M DJLQ DJLY as all_DJ_link %}
 				{% url 'blog:SP_LastDay' as SPLD %}
 				{% url 'blog:SP_LastWk' as SPLW %}
 				{% url 'blog:SP_LastMnth' as SPLM %}
 				{% url 'blog:SP_Last6Mnth' as SPL6M %}
 				{% url 'blog:SP_LastQtr' as SPLQ %}
 				{% url 'blog:SP_LastYr' as SPLY %}
-				{% collect SPLD SPLW SPLM SPL6M SPLQ SPLY res as all_SP_link %}
+				{% collect SPLD SPLW SPLM SPL6M SPLQ SPLY as all_SP_link %}
 				{% url 'blog:Ind_LastWk' as IndLW %}
 				{% url 'blog:Ind_LastQtr' as IndLQ %}
 				{% url 'blog:Ind_Last6Mnth' as IndL6M %}
@@ -376,8 +376,8 @@
 				<!--<li>{{request.path}}</li>  Check for active path; must be activated with Django simple tag.-->
 				<li><a {% if request.path in all_ind_link %}class="actlink"{% endif %} href="{% url 'blog:home_link' %}">Home</a></li>
 				<li><a {% if request.path in all_ResCent_link %}class="actlink"{% endif %} href="{% url 'blog:ResCenter_link' %}">Resources</a></li>
-				<li><a {% if request.path in all_DJ_link or request.path in all_SP_link %}class="actlink"{% endif %} href="{% url 'blog:DJ_LastDay' %}">Database</a></li>
-				<li><a {% if request.path == inPro %}class="actlink"{% endif %} href="{% url 'blog:AboutMe_link' %}">About</a></li>
+				<li><a {% if request.path in all_DJ_link or request.path in all_SP_link or request.path == res %}class="actlink"{% endif %} href="{% url 'blog:DJ_LastDay' %}">Database</a></li>
+				<li><a {% if request.path == About %}class="actlink"{% endif %} href="{% url 'blog:AboutMe_link' %}">About</a></li>
 				<li><a {% if request.path == cont %}class="actlink"{% endif %} href="{% url 'blog:contact_link' %}">Contact</a></li>
 				<li id="date_time" style="background:#EADCAE; padding:10px 0 15px;"></li>
 				<li id="demo"></li>
