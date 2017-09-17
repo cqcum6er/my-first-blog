@@ -85,6 +85,42 @@ class NASDAQ_Post(models.Model):
 	def __str__(self):
 		return self.Symbol
 
+class All_ks(models.Model):
+	Day = models.DateField(blank=False, default=datetime.date.today().strftime('%Y-%m-%d'))
+	Symbol = models.CharField(max_length=20, default='N/A')
+	LastPrice = models.CharField(max_length=30, default='N/A')
+	FiftyTwoWkChg = models.CharField(max_length=30, default='N/A')
+	FiftyTwoWkHi = models.CharField(max_length=30, default='N/A')
+	FiftyTwoWkLo = models.CharField(max_length=30, default='N/A')
+	DivYild = models.CharField(max_length=30, default='N/A')
+	TrailPE = models.CharField(max_length=30, default='N/A')
+	ForwardPE = models.CharField(max_length=30, default='N/A')
+	PEG_Ratio = models.CharField(max_length=30, default='N/A')
+	PpS = models.CharField(max_length=30, default='N/A')
+	PpB = models.CharField(max_length=30, default='N/A')
+	Market_Cap = models.CharField(max_length=30, default='N/A')
+	Free_Cash_Flow = models.CharField(max_length=30, default='N/A')
+	Market_per_CashFlow = models.CharField(max_length=30, default='N/A')
+	Enterprise_per_EBITDA = models.CharField(max_length=30, default='N/A')
+	Name = models.CharField(max_length=50, default='N/A')
+
+	def __str__(self):
+		return self.Symbol
+
+class Index_DJ(models.Model):
+	Day = models.DateField(blank=False, default=datetime.date.today().strftime('%Y-%m-%d'))
+	Symbol = models.CharField(max_length=20, default='N/A')
+
+	def __str__(self):
+		return self.Symbol
+
+class Index_SP500(models.Model):
+	Day = models.DateField(blank=False, default=datetime.date.today().strftime('%Y-%m-%d'))
+	Symbol = models.CharField(max_length=20, default='N/A')
+
+	def __str__(self):
+		return self.Symbol
+
 class UserComment(models.Model):
 	name = models.CharField(max_length=80)
 	email = models.EmailField()
