@@ -12,7 +12,7 @@ from django.core.mail import EmailMessage, send_mail
 from django.template import Context
 from django.template.loader import get_template
 '''
-from .models import Post, SP500_Post, UserComment, All_ks  #Retrieve model objects from 'models.py' within the same folder.
+from .models import Post, SP500_Post, UserComment  #Retrieve model objects from 'models.py' within the same folder.
 from .forms import ContactForm
 #from .templatetags import index_table
 import datetime
@@ -43,15 +43,6 @@ with open('SP500_list.csv', 'rb') as file:
 		row_date = row_datetime.date()
 		if row_date > p.Day:
 			SP500_Post.objects.create(**dict(zip(fields, row)))
-p = All_ks.objects.latest('Day')
-fields = ['Day', 'Symbol', 'LastPrice', 'FiftyTwoWkChg', 'FiftyTwoWkLo', 'FiftyTwoWkHi', 'DivYild', 'TrailPE', 'ForwardPE', 'PEG_Ratio', 'PpS', 'PpB', 'Market_Cap', 'Free_Cash_Flow', 'Market_per_CashFlow', 'Enterprise_per_EBITDA', 'Name']
-with open('index_LastComboSet_ks.csv', 'rb') as file:
-	infile = csv.reader(file, delimiter=",", quotechar='"')
-	for row in infile:
-		row_datetime = datetime.datetime.strptime(row[0],'%Y-%m-%d')
-		row_date = row_datetime.date()
-		if row_date > p.Day:
-			All_ks.objects.create(**dict(zip(fields, row)))
 #...end of block.
 '''
 def DailyMovers():
