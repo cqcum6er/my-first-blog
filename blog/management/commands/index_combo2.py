@@ -126,7 +126,7 @@ class Command(BaseCommand):
 			output = csv.writer(ks_file, delimiter=",", quotechar='"')
 			with open('index_LastComboSet.csv', 'rb') as file:
 				infile = csv.reader(file, delimiter=",", quotechar='"')
-				LastRowDate = ""
+				#LastRowDate = ""
 				print list(string.ascii_uppercase)[8:]
 				for row in list(infile):
 					if row[1]:
@@ -175,12 +175,12 @@ class Command(BaseCommand):
 										Name = "N/A"
 								else:  #Return "N/A" if Name isn't retrievable from assigned html.
 									Name = "N/A"
-								print row[0], row[1], LP, _52WkChg, _52WkHi, _52WkLo, Div, tPE, fPE, PEG, PpS, PpB, MktCap, FCF, MpC, EpE, Name
+								#print row[0], row[1], LP, _52WkChg, _52WkHi, _52WkLo, Div, tPE, fPE, PEG, PpS, PpB, MktCap, FCF, MpC, EpE, Name
 								csv_row_list = [row[0], row[1], LP, _52WkChg, _52WkHi, _52WkLo, Div, tPE, fPE, PEG, PpS, PpB, MktCap, FCF, MpC, EpE, Name]
 								output.writerow(csv_row_list)
 							else:
 								output.writerow([row[0], row[1]]+['N/A']*15)  #Output when url is incorrect.
-							LastRowDate = row[0]
+							#LastRowDate = row[0]
 						else:  #Skip a ticker if tick is not retrivable.
 							continue
 					else:  #...continue iterate until the end.
