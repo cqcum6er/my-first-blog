@@ -163,15 +163,18 @@ class Command(BaseCommand):
 								response = requests.get('https://query1.finance.yahoo.com/v10/finance/quoteSummary/'+row[1]+'?formatted=true&crumb=8z9aPzzV3E6&lang=en-US&region=US&modules=price%2CsummaryDetail&corsDomain=finance.yahoo.com')
 								html = response.text  #Converts page request to string variable.
 								if html:
-									longNameToEnd = ""
-									for ch in html.split('"longName":')[1]:  #Retrieve all character containing longName plus everything after.
-										longNameToEnd += ch
-									longNameSplit = longNameToEnd.split(',\"')  #Terminate character retrieval before the next field variable.
-									#print longNameSplit[0], longNameSplit[0].count('"')
-									if longNameSplit[0].count('"') >= 2:  #If longName is contained within '"' mark...
-										longNameInQuote = longNameSplit[0].replace('amp;','').replace('&apos;',"'")  #Replace html escape character for "&" and "'".
-										Name = longNameInQuote.encode('utf-8')  #... convert to byte string from unicode.
-									else:  #...return "N/A" if longName is null.
+									if '"longName":' in html:  #Escape when "longName" isn't present.
+										longNameToEnd = ""
+										for ch in html.split('"longName":')[1]:  #Retrieve all character containing longName plus everything after.
+											longNameToEnd += ch
+										longNameSplit = longNameToEnd.split(',\"')  #Terminate character retrieval before the next field variable.
+										#print longNameSplit[0], longNameSplit[0].count('"')
+										if longNameSplit[0].count('"') >= 2:  #If longName is contained within '"' mark...
+											longNameInQuote = longNameSplit[0].replace('amp;','').replace('&apos;',"'")  #Replace html escape character for "&" and "'".
+											Name = longNameInQuote.encode('utf-8')  #... convert to byte string from unicode.
+										else:  #...return "N/A" if longName is null.
+											Name = "N/A"
+									else:
 										Name = "N/A"
 								else:  #Return "N/A" if Name isn't retrievable from assigned html.
 									Name = "N/A"
