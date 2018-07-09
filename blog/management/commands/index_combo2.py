@@ -1,12 +1,13 @@
 #To run, go to folder containing manage.py with the following command: >python manage.py [script name]
 from django.core.management.base import BaseCommand, CommandError
+from django.http import StreamingHttpResponse  #Use to avoid a load balancer dropping a connection while the server was generating the response.
 import string
 import csv
 import requests
 import random
 import datetime
 import time
-from blog.models import All_ks
+from blog.models import all_ks
 
 class Command(BaseCommand):
 	help = "Combine ticker symbols from DJ and S&P500 indices"
@@ -130,7 +131,7 @@ class Command(BaseCommand):
 				print list(string.ascii_uppercase)[8:]
 				for row in list(infile):
 					if row[1]:
-						if row[1][0] in list(string.ascii_uppercase)[8:]:  #Check if the 1st char of ticker symbol matches any alphabet from I to z.
+						if row[1][0] in list(string.ascii_uppercase)[8:]:  #Check if the 1st char of ticker symbol matches any alphabet from I to Z.
 						#if row[0] == LastRowDate or LastRowDate == "":
 							print row, len(row)
 							time.sleep(random.randint(0,2))
@@ -180,9 +181,9 @@ class Command(BaseCommand):
 									Name = "N/A"
 								#print row[0], row[1], LP, _52WkChg, _52WkHi, _52WkLo, Div, tPE, fPE, PEG, PpS, PpB, MktCap, FCF, MpC, EpE, Name
 								csv_row_list = [row[0], row[1], LP, _52WkChg, _52WkHi, _52WkLo, Div, tPE, fPE, PEG, PpS, PpB, MktCap, FCF, MpC, EpE, Name]
-								output.writerow(csv_row_list)
+								StreamingHttpResponse(output.writerow(csv_row_list))
 							else:
-								output.writerow([row[0], row[1]]+['N/A']*15)  #Output when url is incorrect.
+								StreamingHttpResponse(output.writerow([row[0], row[1]]+['N/A']*15))  #Output when url is incorrect.
 							#LastRowDate = row[0]
 						else:  #Skip a ticker if tick is not retrivable.
 							continue
@@ -190,9 +191,9 @@ class Command(BaseCommand):
 						continue
 
 		fields = ['Day', 'Symbol', 'LastPrice', 'FiftyTwoWkChg', 'FiftyTwoWkLo', 'FiftyTwoWkHi', 'DivYild', 'TrailPE', 'ForwardPE', 'PEG_Ratio', 'PpS', 'PpB', 'Market_Cap', 'Free_Cash_Flow', 'Market_per_CashFlow', 'Enterprise_per_EBITDA', 'Name']  #Must match individual field (column) names in models.py.
-		if All_ks.objects.exists():  #Check if the database is empty...
-			#print "There are existing objects in All_ks db."
-			p = All_ks.objects.latest('Day')  #Check what's the lastest day then append to db from then on.
+		if all_ks.objects.exists():  #Check if the database is empty...
+			#print "There are existing objects in all_ks db."
+			p = all_ks.objects.latest('Day')  #Check what's the lastest day then append to db from then on.
 			with open('index_LastComboSet_ks.csv', 'rb') as file:  # Need to use absolute path when on Pythonanywhere server (i.e. use '/home/cqcum6er/my-first-blog/DJ_list.csv' as file path.)
 				infile = csv.reader(file, delimiter=",", quotechar='"')  #Specify csv item boundary.
 				for row in infile:
@@ -202,9 +203,9 @@ class Command(BaseCommand):
 					#print type(row_date), "converted to 'date' format", p.Day
 					if row_date > p.Day:  #Only append entry if the date of the entry is later than the most recent in db.
 						#print row_date
-						All_ks.objects.create(**dict(zip(fields, row)))
+						all_ks.objects.create(**dict(zip(fields, row)))
 		else:  #...append all rows if the database is empty.
 			with open('index_LastComboSet_ks.csv', 'rb') as file:
 				infile = csv.reader(file, delimiter=",", quotechar='"')
 				for row in infile:
-					All_ks.objects.create(**dict(zip(fields, row)))
+					all_ks.objects.create(**dict(zip(fields, row)))

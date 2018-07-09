@@ -1,6 +1,6 @@
 #Customize display for each model under Django administration.
 from django.contrib import admin
-from .models import Post, NASDAQ_Post, SP500_Post, All_ks, Index_DJ, Index_SP500, UserComment
+from .models import Post, NASDAQ_Post, SP500_Post, Index_DJ, Index_SP500, UserComment, sp500_post_sorted, all_ks_join, all_ks_join_unique, all_ks
 #from .forms import FeedbackForm  #Use if feedback form is linked to model instances.
 
 class PostAdmin(admin.ModelAdmin):  #Create an admin class for customized admin interface.
@@ -33,14 +33,41 @@ class NASDAQ_Admin(admin.ModelAdmin):
 
 admin.site.register(NASDAQ_Post, NASDAQ_Admin)
 
-class All_ks_Admin(admin.ModelAdmin):
+class sp500_post_sorted_Admin(admin.ModelAdmin):
 	list_display = ['Day', 'Symbol', 'LastPrice', 'FiftyTwoWkChg', 'DivYild', 'PEG_Ratio', 'PpS', 'PpB', 'Market_Cap', 'Free_Cash_Flow', 'Market_per_CashFlow', 'Enterprise_per_EBITDA']
 	list_display_links = ['Symbol']
 	list_filter = ['Day', 'Symbol']
 	search_fields = ['Day', 'Symbol', 'LastPrice']
 	list_per_page = 400
 
-admin.site.register(All_ks, All_ks_Admin)
+admin.site.register(sp500_post_sorted, sp500_post_sorted_Admin)
+
+class all_ks_Admin(admin.ModelAdmin):
+	list_display = ['Day', 'Symbol', 'LastPrice', 'FiftyTwoWkChg', 'DivYild', 'PEG_Ratio', 'PpS', 'PpB', 'Market_Cap', 'Free_Cash_Flow', 'Market_per_CashFlow', 'Enterprise_per_EBITDA']
+	list_display_links = ['Symbol']
+	list_filter = ['Day', 'Symbol']
+	search_fields = ['Day', 'Symbol', 'LastPrice']
+	list_per_page = 400
+
+admin.site.register(all_ks, all_ks_Admin)
+
+class all_ks_join_Admin(admin.ModelAdmin):
+	list_display = ['Day', 'Symbol', 'LastPrice', 'FiftyTwoWkChg', 'DivYild', 'PEG_Ratio', 'PpS', 'PpB', 'Market_Cap', 'Free_Cash_Flow', 'Market_per_CashFlow', 'Enterprise_per_EBITDA']
+	list_display_links = ['Symbol']
+	list_filter = ['Day', 'Symbol']
+	search_fields = ['Day', 'Symbol', 'LastPrice']
+	list_per_page = 400
+
+admin.site.register(all_ks_join, all_ks_join_Admin)
+
+class all_ks_join_unique_Admin(admin.ModelAdmin):
+	list_display = ['Day', 'Symbol', 'LastPrice', 'FiftyTwoWkChg', 'DivYild', 'PEG_Ratio', 'PpS', 'PpB', 'Market_Cap', 'Free_Cash_Flow', 'Market_per_CashFlow', 'Enterprise_per_EBITDA']
+	list_display_links = ['Symbol']
+	list_filter = ['Day', 'Symbol']
+	search_fields = ['Day', 'Symbol', 'LastPrice']
+	list_per_page = 400
+
+admin.site.register(all_ks_join_unique, all_ks_join_unique_Admin)
 
 class Index_DJ_Admin(admin.ModelAdmin):
 	list_display = ['Day', 'Symbol']

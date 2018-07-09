@@ -12,39 +12,69 @@ from django.core.mail import EmailMessage, send_mail
 from django.template import Context
 from django.template.loader import get_template
 '''
-from .models import Post, SP500_Post, UserComment  #Retrieve model objects from 'models.py' within the same folder.
+from .models import Post, SP500_Post, UserComment, Index_DJ, Index_SP500, all_ks  #Retrieve model objects from 'models.py' within the same folder.
 from .forms import ContactForm
 #from .templatetags import index_table
 import datetime
+
 '''
 #To update database with the current date, save scheduled csv record from Pythonanywhere, then run local server ONCE to populate local database before commenting out this block; comment out this block before saving views.py to Pythonanywhere to use scheduled csv instead...
 import csv
 #if not Post:  #Check to see if database is empty.  If it's not, do nothing, else empty existing entry to prepare for update. (Remove the 'if' statement if run as a scheduler command on Pythonanywhere.)
 	#pass
 #else:
-#Post.objects.all().delete()  #Clean the database before entry from csv file.
-p = Post.objects.latest('Day')  #Check what's the lastest day then append to db from then on.
+	#all_ks.objects.all().delete()
+all_ks.objects.all().delete()  #Clean the database before entry from csv file (If tables was dropped by SQL command, the table structure must be created 1st).
+#p = all_ks.objects.latest('Day')  #p = Post.objects.latest('Day')  #Check what's the lastest day then append to db from then on.
 fields = ['Day', 'Symbol', 'LastPrice', 'FiftyTwoWkChg', 'FiftyTwoWkLo', 'FiftyTwoWkHi', 'DivYild', 'TrailPE', 'ForwardPE', 'PEG_Ratio', 'PpS', 'PpB', 'Market_Cap', 'Free_Cash_Flow', 'Market_per_CashFlow', 'Enterprise_per_EBITDA', 'Name']  #Must match individual field (column) names in models.py.
 with open('DJ_list.csv', 'rb') as file:  # Need to use absolute path when on Pythonanywhere server (i.e. use '/home/cqcum6er/my-first-blog/DJ_list.csv' as file path.)
 	infile = csv.reader(file, delimiter=",", quotechar='"')  #Specify csv item boundary.
 	for row in infile:
-		row_datetime = datetime.datetime.strptime(row[0],'%Y-%m-%d')  #row[0] is converted from str to datetime format.
+		
+		row_datetime = datetime.datetime.strptime('2017-08-27','%Y-%m-%d')
+		#row_datetime = datetime.datetime.strptime(row[0],'%Y-%m-%d')  #row[0] is converted from str to datetime format.
 		#print row_datetime.date()
 		row_date = row_datetime.date()  #Converting from datetime to date.
-		if row_date > p.Day:  #Only append entry if the date of the entry is later than the most recent in db.
+		if row_date < p.Day:  #if row_date > p.Day:  #Only append entry if the date of the entry is later than the most recent in db.
 			#print row_date
-			Post.objects.create(**dict(zip(fields, row)))
-p = SP500_Post.objects.latest('Day')
-fields = ['Day', 'Symbol', 'LastPrice', 'FiftyTwoWkChg', 'FiftyTwoWkLo', 'FiftyTwoWkHi', 'DivYild', 'TrailPE', 'ForwardPE', 'PEG_Ratio', 'PpS', 'PpB', 'Market_Cap', 'Free_Cash_Flow', 'Market_per_CashFlow', 'Enterprise_per_EBITDA', 'Name']
+			all_ks.objects.create(**dict(zip(fields, row)))  #Post.objects.create(**dict(zip(fields, row)))
+		
+		all_ks.objects.create(**dict(zip(fields, row)))
+
+#p = all_ks.objects.latest('Day')  #p = SP500_Post.objects.latest('Day')
+#fields = ['Day', 'Symbol', 'LastPrice', 'FiftyTwoWkChg', 'FiftyTwoWkLo', 'FiftyTwoWkHi', 'DivYild', 'TrailPE', 'ForwardPE', 'PEG_Ratio', 'PpS', 'PpB', 'Market_Cap', 'Free_Cash_Flow', 'Market_per_CashFlow', 'Enterprise_per_EBITDA', 'Name']
 with open('SP500_list.csv', 'rb') as file:
 	infile = csv.reader(file, delimiter=",", quotechar='"')
 	for row in infile:
-		row_datetime = datetime.datetime.strptime(row[0],'%Y-%m-%d')
+		
+		row_datetime = datetime.datetime.strptime('2017-08-27','%Y-%m-%d')
+		#row_datetime = datetime.datetime.strptime(row[0],'%Y-%m-%d')
 		row_date = row_datetime.date()
-		if row_date > p.Day:
-			SP500_Post.objects.create(**dict(zip(fields, row)))
+		if row_date < p.Day:  #if row_date > p.Day:
+			all_ks.objects.create(**dict(zip(fields, row)))  #SP500_Post.objects.create(**dict(zip(fields, row)))
+		
+		all_ks.objects.create(**dict(zip(fields, row)))
 #...end of block.
 '''
+'''
+#To update index of symbol from a csv list, run the following script once before commenting out...
+import csv
+Index_DJ.objects.all().delete()
+fields = ['Day', 'Symbol',]
+with open('index_DJ.csv', 'rb') as file:
+	infile = csv.reader(file, delimiter=",", quotechar='"')
+	for row in infile:
+		Index_DJ.objects.create(**dict(zip(fields, row)))
+		
+Index_SP500.objects.all().delete()
+fields = ['Day', 'Symbol',]
+with open('index_SP500.csv', 'rb') as file:
+	infile = csv.reader(file, delimiter=",", quotechar='"')
+	for row in infile:
+		Index_SP500.objects.create(**dict(zip(fields, row)))
+#...end of block.
+'''
+		
 def DailyMovers():
 	p = Post.objects.latest('Day')  #Returns an object instance (not iterable); if latest() is empty, it works with attributes defined by 'class Meta' in models.py. Note latest () only retrieve ONE instance; .values() needs to be inserted in front of latest() to make it iterable as dictionary; cache queryset object for quick retrieval in html request.
 	#print p.LastPrice, type(p.LastPrice)
@@ -94,167 +124,255 @@ def iso_to_gregorian(iso_year, iso_week, iso_day):  #Converts ISO week date form
 	return start + datetime.timedelta(weeks=iso_week-1, days=iso_day-1)
 	
 def DJ_LastDay(request):  #"DJ_LastDay" must be requested from urls.py
-	#posts = Post.objects.values()  #values() returns content of database as dictionary rather than model instances, making the database iterable.
-	#posts = Post.objects.filter(Day__lte=timezone.now()).exclude(Day__lte=timezone.now() - datetime.timedelta(days=1))  #Retrieve all dates equal to or older than today but exclude those from yesterday or older; use timezone.now() instead of datetime.datetime.now() to avoid problems with timezones.
-	p = Post.objects.latest('Day')  #Returns an object instance (not iterable); if latest() is empty, it works with attributes defined by 'class Meta' in models.py. Note latest () only retrieve ONE instance; .values() needs to be inserted in front of latest() to make it iterable as dictionary; cache queryset object for quick retrieval in html request.
 	try:
-		posts = Post.objects.filter(Day=p.Day)  #Retrieve all instances with latest day ('p.Day') as QuerySet object.
-		return render(request, 'blog/DJ_LastDay.html', {'DJ_LastDay_posts': posts})  #To serve as a template, 'blog/DJ.html' has to be put in blog\template\blog\
-		#The last parameter, which looks like this: {} is a place to integrate objects in models.py (posts) with html ('posts') in template folder.
-		#return HttpResponse(index_table.DJ_LastDay(context))
-		#return render_to_response('blog/DJ_LastDay.html', {}, context_instance=RequestContext(request))
-	except ObjectDoesNotExist:
-		return render(request, 'blog/NoPeriod.html')
+		#posts = Post.objects.values()  #values() returns content of database as dictionary rather than model instances, making the database iterable.
+		#posts = Post.objects.filter(Day__lte=timezone.now()).exclude(Day__lte=timezone.now() - datetime.timedelta(days=1))  #Retrieve all dates equal to or older than today but exclude those from yesterday or older; use timezone.now() instead of datetime.datetime.now() to avoid problems with timezones.
+		p = Index_DJ.objects.latest('Day') #p = Post.objects.latest('Day') #  #Returns an object instance (not iterable); if latest() is empty, it works with attributes defined by 'class Meta' in models.py. Note latest () only retrieve ONE instance; .values() needs to be inserted in front of latest() to make it iterable as dictionary; cache queryset object for quick retrieval in html request.
+		#print p.Day
+		Latest_DJ_Ind = Index_DJ.objects.filter(Day=p.Day)  #All symbols from the latest days of DJ index.
+		#print Latest_DJ_Ind.count(), type(tuple(Latest_DJ_Ind)), tuple(Latest_DJ_Ind)
+		posts = all_ks.objects.filter(Day=p.Day, Symbol__in=tuple(Latest_DJ_Ind))  #Retrieve all instances from latest day ('p.Day') that have all DJ index symbols.
+		#print posts.count()
+		if posts:  #Check for empty set.
+			return render(request, 'blog/DJ_LastDay.html', {'DJ_LastDay_posts': posts})  #To serve as a template, 'blog/DJ.html' has to be put in blog\template\blog\
+			#The last parameter, which looks like this: {} is a place to integrate objects in models.py (posts) with html ('posts') in template folder.
+			#return HttpResponse(index_table.DJ_LastDay(context))
+			#return render_to_response('blog/DJ_LastDay.html', {}, context_instance=RequestContext(request))
+		else:
+			return render(request, 'blog/NoPeriod.html')
+	except ObjectDoesNotExist:  #Check for nonexistent set.
+			return render(request, 'blog/NoPeriod.html')
 
 def SP_LastDay(request):
-	p = SP500_Post.objects.latest('Day')
 	try:
-		posts = SP500_Post.objects.filter(Day=p.Day)
-		return render(request, 'blog/SP_LastDay.html', {'SP_LastDay_posts': posts})
-	except ObjectDoesNotExist:
-		return render(request, 'blog/NoPeriod_SP.html')
+		p = Index_SP500.objects.latest('Day')
+		Latest_SP500_Ind = Index_SP500.objects.filter(Day=p.Day)
+		posts = all_ks.objects.filter(Day=p.Day, Symbol__in=list(Latest_SP500_Ind))
+		if posts:  #Check for empty set.
+			return render(request, 'blog/SP_LastDay.html', {'SP_LastDay_posts': posts})
+		else:
+			return render(request, 'blog/NoPeriod_SP.html')
+	except ObjectDoesNotExist:  #Check for nonexistent set.
+			return render(request, 'blog/NoPeriod.html')
 
 def DJ_LastWk(request):  #Display value from Wednesday of last week.
-	p = Post.objects.latest('Day')
-	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')  #Convert str to datetime object from datetime module.
-	#print iso_to_gregorian(LastDay.isocalendar()[0], LastDay.isocalendar()[1]-1, 3)  #Show date from last Wednesday.
 	try:
-		posts = Post.objects.filter(Day=iso_to_gregorian(LastDay.isocalendar()[0], LastDay.isocalendar()[1]-1, 3))  #Retrieve all instances from last Wednesday; LastDay.isocalendar()[0] indicates current year, & LastDay.isocalendar()[1] indicates the current ISO week.
-		return render(request, 'blog/DJ_LastWk.html', {'DJ_LastWk_posts': posts})
+		p = Index_DJ.objects.latest('Day')
+		#LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')  #Convert str to datetime object from datetime module (for use with isocalendar()).
+		#print type(p.Day), type(LastDay)
+		#print iso_to_gregorian(LastDay.isocalendar()[0], LastDay.isocalendar()[1]-1, 3)  #Show date from last Wednesday.
+		LastWk_DJ_Ind = Index_DJ.objects.filter(Day=iso_to_gregorian(p.Day.isocalendar()[0], p.Day.isocalendar()[1]-1, 3))  #All symbols from the last Wednesday of DJ index.
+		#print type(list(LastWk_DJ_Ind)), list(LastWk_DJ_Ind)
+		d = iso_to_gregorian(p.Day.isocalendar()[0], p.Day.isocalendar()[1]-1, 3)
+		#print type(d), d
+		posts = all_ks.objects.filter(Day=d, Symbol__in=list(LastWk_DJ_Ind))  #Retrieve all key stats from last Wednesday that are present in DJ index; p.Day.isocalendar()[0] retrieves current year, & p.Day.isocalendar()[1] retrieves the current ISO week, and the last arg "3" retrieves Wed of that week.
+		#print posts
+		if posts:
+			return render(request, 'blog/DJ_LastWk.html', {'DJ_LastWk_posts': posts})
+		else:
+			return render(request, 'blog/NoPeriod.html')
 	except ObjectDoesNotExist:
-		return render(request, 'blog/NoPeriod.html')
+			return render(request, 'blog/NoPeriod.html')
 
 def SP_LastWk(request):
-	p = SP500_Post.objects.latest('Day')
-	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')
 	try:
-		posts = SP500_Post.objects.filter(Day=iso_to_gregorian(LastDay.isocalendar()[0], LastDay.isocalendar()[1]-1, 3))
-		return render(request, 'blog/SP_LastWk.html', {'SP_LastWk_posts': posts})
+		p = Index_SP500.objects.latest('Day')
+		#LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')
+		LastWk_SP_Ind = Index_SP500.objects.filter(Day=iso_to_gregorian(p.Day.isocalendar()[0], p.Day.isocalendar()[1]-1, 3))
+		d = iso_to_gregorian(p.Day.isocalendar()[0], p.Day.isocalendar()[1]-1, 3)
+		posts = all_ks.objects.filter(Day=d, Symbol__in=list(LastWk_SP_Ind))
+		if posts:
+			return render(request, 'blog/SP_LastWk.html', {'SP_LastWk_posts': posts})
+		else:
+			return render(request, 'blog/NoPeriod_SP.html')
 	except ObjectDoesNotExist:
-		return render(request, 'blog/NoPeriod_SP.html')
+			return render(request, 'blog/NoPeriod.html')
 
 def DJ_LastMnth(request):  #Display value from the 1st (trading) day of last month.
-	p = Post.objects.latest('Day')
+	p = Index_DJ.objects.latest('Day')
 	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')
 	CurrYr = LastDay.strftime('%Y')  #Retrieve current year as string from datetime object, LastDay.
 	CurrMnth = LastDay.strftime('%m')  #Retrieve current month as string from datetime object, LastDay.
-	try:
-		if int(CurrMnth) >= 2:  #Check whether last month is still within the same year.
-			p = Post.objects.filter(Day__year=CurrYr, Day__month=str(int(CurrMnth)-1)).earliest('Day')  #Retrieve earliest date available from last month.
+	if int(CurrMnth) >= 2:  #Check whether last month is still within the same year.
+		try:
+			p = Index_DJ.objects.filter(Day__year=CurrYr, Day__month=str(int(CurrMnth)-1)).earliest('Day')  #Retrieve earliest date available from last month.
 			#print p.Day
-			posts = Post.objects.filter(Day=p.Day)
-		else:
-			p = Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+11)).earliest('Day')
+			LastMnth_DJ_Ind = Index_DJ.objects.filter(Day=p.Day)
+			#print type(LastMnth_DJ_Ind), LastMnth_DJ_Ind
+			posts = all_ks.objects.filter(Day=p.Day, Symbol__in=list(LastMnth_DJ_Ind))
+			if posts:
+				return render(request, 'blog/DJ_LastMnth.html', {'DJ_LastMnth_posts': posts})
+			else:
+				return render(request, 'blog/NoPeriod.html')
+		except ObjectDoesNotExist:
+			return render(request, 'blog/NoPeriod.html')
+	else:
+		try:
+			p = Index_DJ.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+11)).earliest('Day')
 			#print p.Day
-			posts = Post.objects.filter(Day=p.Day)
-		return render(request, 'blog/DJ_LastMnth.html', {'DJ_LastMnth_posts': posts})
-	except ObjectDoesNotExist:
-		return render(request, 'blog/NoPeriod.html')
+			LastMnth_DJ_Ind = Index_DJ.objects.filter(Day=p.Day)
+			posts = all_ks.objects.filter(Day=p.Day, Symbol__in=list(LastMnth_DJ_Ind))
+			if posts:
+				return render(request, 'blog/DJ_LastMnth.html', {'DJ_LastMnth_posts': posts})
+			else:
+				return render(request, 'blog/NoPeriod.html')
+		except ObjectDoesNotExist:
+			return render(request, 'blog/NoPeriod.html')
 
 def SP_LastMnth(request):
-	p = SP500_Post.objects.latest('Day')
+	p = Index_SP500.objects.latest('Day')
 	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')
 	CurrYr = LastDay.strftime('%Y')
 	CurrMnth = LastDay.strftime('%m')
-	try:
-		if int(CurrMnth) >= 2:
-			p = SP500_Post.objects.filter(Day__year=CurrYr, Day__month=str(int(CurrMnth)-1)).earliest('Day')
-			posts = SP500_Post.objects.filter(Day=p.Day)
-		else:
-			p = SP500_Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+11)).earliest('Day')
-			posts = SP500_Post.objects.filter(Day=p.Day)
-		return render(request, 'blog/SP_LastMnth.html', {'SP_LastMnth_posts': posts})
-	except ObjectDoesNotExist:
-		return render(request, 'blog/NoPeriod_SP.html')
+	if int(CurrMnth) >= 2:
+		try:
+			p = Index_SP500.objects.filter(Day__year=CurrYr, Day__month=str(int(CurrMnth)-1)).earliest('Day')
+			LastMnth_SP_Ind = Index_SP500.objects.filter(Day=p.Day)
+			posts = all_ks.objects.filter(Day=p.Day, Symbol__in=list(LastMnth_SP_Ind))
+			if posts:
+				return render(request, 'blog/SP_LastMnth.html', {'SP_LastMnth_posts': posts})
+			else:
+				return render(request, 'blog/NoPeriod_SP.html')
+		except ObjectDoesNotExist:
+			return render(request, 'blog/NoPeriod.html')
+	else:
+		try:
+			p = Index_SP500.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+11)).earliest('Day')
+			LastMnth_SP_Ind = Index_SP500.objects.filter(Day=p.Day)
+			posts = all_ks.objects.filter(Day=p.Day, Symbol__in=list(LastMnth_SP_Ind))
+			if posts:
+				return render(request, 'blog/SP_LastMnth.html', {'SP_LastMnth_posts': posts})
+			else:
+				return render(request, 'blog/NoPeriod_SP.html')
+		except ObjectDoesNotExist:
+			return render(request, 'blog/NoPeriod.html')
 
 def DJ_LastQtr(request):  #Display value from the 1st (trading) day of last quarter.
-	p = Post.objects.latest('Day')
+	p = Index_DJ.objects.latest('Day')
 	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')
 	CurrYr = LastDay.strftime('%Y')
 	CurrMnth = LastDay.strftime('%m')
-	try:
-		if int(CurrMnth) >= 4:  #Check whether last quarter is still within the same year.
-			p = Post.objects.filter(Day__year=CurrYr, Day__month=str(int(CurrMnth)-3)).earliest('Day')
-		else:
-			p = Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+9)).earliest('Day')
-		posts = Post.objects.filter(Day=p.Day)
-		#print posts.count()
-		return render(request, 'blog/DJ_LastQtr.html', {'DJ_LastQtr_posts': posts})
-	except ObjectDoesNotExist:
-		return render(request, 'blog/NoPeriod.html')
+	if int(CurrMnth) >= 4:  #Check whether last quarter is still within the same year.
+		try:
+			p = Index_DJ.objects.filter(Day__year=CurrYr, Day__month=str(int(CurrMnth)-3)).earliest('Day')
+			LastQtr_DJ_Ind = Index_DJ.objects.filter(Day=p.Day)
+			posts = all_ks.objects.filter(Day=p.Day, Symbol__in=list(LastQtr_DJ_Ind))
+			#print posts, posts.count()
+			return render(request, 'blog/DJ_LastQtr.html', {'DJ_LastQtr_posts': posts})
+		except ObjectDoesNotExist:
+			return render(request, 'blog/NoPeriod.html')
+	else:
+		try:
+			p = Index_DJ.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+9)).earliest('Day')
+			LastQtr_DJ_Ind = Index_DJ.objects.filter(Day=p.Day)
+			posts = all_ks.objects.filter(Day=p.Day, Symbol__in=list(LastQtr_DJ_Ind))
+			#print posts.count()
+			return render(request, 'blog/DJ_LastQtr.html', {'DJ_LastQtr_posts': posts})
+		except ObjectDoesNotExist:
+			return render(request, 'blog/NoPeriod.html')
 
 def SP_LastQtr(request):
-	p = SP500_Post.objects.latest('Day')
+	p = Index_SP500.objects.latest('Day')
 	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')
 	CurrYr = LastDay.strftime('%Y')
 	CurrMnth = LastDay.strftime('%m')
-	try:
-		if int(CurrMnth) >= 4:
-			p = SP500_Post.objects.filter(Day__year=CurrYr, Day__month=str(int(CurrMnth)-3)).earliest('Day')
-		else:
-			p = SP500_Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+9)).earliest('Day')
-		posts = SP500_Post.objects.filter(Day=p.Day)
-		return render(request, 'blog/SP_LastQtr.html', {'SP_LastQtr_posts': posts})
-	except ObjectDoesNotExist:
-		return render(request, 'blog/NoPeriod_SP.html')
+	if int(CurrMnth) >= 4:
+		try:
+			p = Index_SP500.objects.filter(Day__year=CurrYr, Day__month=str(int(CurrMnth)-3)).earliest('Day')
+			LastQtr_SP_Ind = Index_SP500.objects.filter(Day=p.Day)
+			posts = all_ks.objects.filter(Day=p.Day, Symbol__in=list(LastQtr_SP_Ind))
+			return render(request, 'blog/SP_LastQtr.html', {'SP_LastQtr_posts': posts})
+		except ObjectDoesNotExist:
+			return render(request, 'blog/NoPeriod_SP.html')
+	else:
+		try:
+			p = Index_SP500.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+9)).earliest('Day')
+			LastQtr_SP_Ind = Index_SP500.objects.filter(Day=p.Day)
+			posts = all_ks.objects.filter(Day=p.Day, Symbol__in=list(LastQtr_SP_Ind))
+			return render(request, 'blog/SP_LastQtr.html', {'SP_LastQtr_posts': posts})
+		except ObjectDoesNotExist:
+			return render(request, 'blog/NoPeriod_SP.html')
 
 def DJ_Last6Mnth(request):  #Display value from the 1st (trading) day of last quarter.
-	p = Post.objects.latest('Day')
+	p = Index_DJ.objects.latest('Day')
 	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')
 	CurrYr = LastDay.strftime('%Y')
 	CurrMnth = LastDay.strftime('%m')
-	try:
-		if int(CurrMnth) >= 7:  #Check whether last quarter is still within the same year.
-			p = Post.objects.filter(Day__year=CurrYr, Day__month=str(int(CurrMnth)-6)).earliest('Day')
+	if int(CurrMnth) >= 7:  #Check whether last quarter is still within the same year.
+		try:
+			p = Index_DJ.objects.filter(Day__year=CurrYr, Day__month=str(int(CurrMnth)-6)).earliest('Day')
 			#print p.Day, type(p)#, p.count()
-		else:
-			p = Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+6)).earliest('Day')
+			Last6Mnth_DJ_Ind = Index_DJ.objects.filter(Day=p.Day)
+			posts = all_ks.objects.filter(Day=p.Day, Symbol__in=list(Last6Mnth_DJ_Ind))
+			#print posts.count()
+			return render(request, 'blog/DJ_Last6Mnth.html', {'DJ_Last6Mnth_posts': posts})
+		except ObjectDoesNotExist:
+			return render(request, 'blog/NoPeriod.html')
+	else:
+		try:
+			p = Index_DJ.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+6)).earliest('Day')
 			#print p.Day, type(p)#, p.count()
-		posts = Post.objects.filter(Day=p.Day)
-		#print posts.count()
-		return render(request, 'blog/DJ_Last6Mnth.html', {'DJ_Last6Mnth_posts': posts})
-	except ObjectDoesNotExist:
-		return render(request, 'blog/NoPeriod.html')
+			Last6Mnth_DJ_Ind = Index_DJ.objects.filter(Day=p.Day)
+			posts = all_ks.objects.filter(Day=p.Day, Symbol__in=list(Last6Mnth_DJ_Ind))
+			#print posts.count()
+			return render(request, 'blog/DJ_Last6Mnth.html', {'DJ_Last6Mnth_posts': posts})
+		except ObjectDoesNotExist:
+			return render(request, 'blog/NoPeriod.html')
 
 def SP_Last6Mnth(request):
-	p = SP500_Post.objects.latest('Day')
+	p = Index_SP500.objects.latest('Day')
 	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')
 	CurrYr = LastDay.strftime('%Y')
 	CurrMnth = LastDay.strftime('%m')
-	try:
-		if int(CurrMnth) >= 7:
-			p = SP500_Post.objects.filter(Day__year=CurrYr, Day__month=str(int(CurrMnth)-6)).earliest('Day')
-		else:
-			p = SP500_Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+6)).earliest('Day')
-		posts = SP500_Post.objects.filter(Day=p.Day)
-		return render(request, 'blog/SP_Last6Mnth.html', {'SP_Last6Mnth_posts': posts})
-	except ObjectDoesNotExist:
-		return render(request, 'blog/NoPeriod_SP.html')
+	if int(CurrMnth) >= 7:
+		try:
+			p = Index_SP500.objects.filter(Day__year=CurrYr, Day__month=str(int(CurrMnth)-6)).earliest('Day')
+			Last6Mnth_SP_Ind = Index_SP500.objects.filter(Day=p.Day)
+			posts = all_ks.objects.filter(Day=p.Day, Symbol__in=list(Last6Mnth_SP_Ind))
+			#print posts.count()
+			return render(request, 'blog/SP_Last6Mnth.html', {'SP_Last6Mnth_posts': posts})
+		except ObjectDoesNotExist:
+			return render(request, 'blog/NoPeriod_SP.html')
+	else:
+		try:
+			p = Index_SP500.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=str(int(CurrMnth)+6)).earliest('Day')
+			Last6Mnth_SP_Ind = Index_SP500.objects.filter(Day=p.Day)
+			posts = all_ks.objects.filter(Day=p.Day, Symbol__in=list(Last6Mnth_SP_Ind))
+			return render(request, 'blog/SP_Last6Mnth.html', {'SP_Last6Mnth_posts': posts})
+		except ObjectDoesNotExist:
+			return render(request, 'blog/NoPeriod_SP.html')
 
 def DJ_LastYr(request):  #Display value from the 1st (trading) day of last year.
-	p = Post.objects.latest('Day')
+	p = Index_DJ.objects.latest('Day')
 	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')
 	CurrYr = LastDay.strftime('%Y')
 	CurrMnth = LastDay.strftime('%m')
 	try:
-		p = Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=CurrMnth).earliest('Day')  #Retrieve earliest date available from last year, doesn't matter the month.
+		p = Index_DJ.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=CurrMnth).earliest('Day')  #Retrieve earliest date available from last year, doesn't matter the month.
 		#print p.Day
-		posts = Post.objects.filter(Day=p.Day)
+		LastYr_DJ_Ind = Index_DJ.objects.filter(Day=p.Day)
+		posts = all_ks.objects.filter(Day=p.Day, Symbol__in=list(LastYr_DJ_Ind))
 		#print posts.count()
-		#if posts.count() != 0:
-		return render(request, 'blog/DJ_LastYr.html', {'DJ_LastYr_posts': posts})
+		if posts:
+			return render(request, 'blog/DJ_LastYr.html', {'DJ_LastYr_posts': posts})
+		else:
+			return render(request, 'blog/NoPeriod.html') 
 	except ObjectDoesNotExist:
 		return render(request, 'blog/NoPeriod.html') 
 
 def SP_LastYr(request):
-	p = SP500_Post.objects.latest('Day')
+	p = Index_SP500.objects.latest('Day')
 	LastDay = datetime.datetime.strptime(str(p.Day),'%Y-%m-%d')
 	CurrYr = LastDay.strftime('%Y')
 	CurrMnth = LastDay.strftime('%m')
 	try:
-		p = SP500_Post.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=CurrMnth).earliest('Day')
-		posts = SP500_Post.objects.filter(Day=p.Day)
-		return render(request, 'blog/SP_LastYr.html', {'SP_LastYr_posts': posts})
+		p = Index_SP500.objects.filter(Day__year=str(int(CurrYr)-1), Day__month=CurrMnth).earliest('Day')
+		LastYr_SP_Ind = Index_SP500.objects.filter(Day=p.Day)
+		posts = all_ks.objects.filter(Day=p.Day, Symbol__in=list(LastYr_SP_Ind))
+		if posts:
+			return render(request, 'blog/SP_LastYr.html', {'SP_LastYr_posts': posts})
+		else:
+			return render(request, 'blog/NoPeriod_SP.html') 
 	except ObjectDoesNotExist:
 		return render(request, 'blog/NoPeriod_SP.html') 
 
@@ -262,7 +380,7 @@ def thanks(request):
 	return render(request, 'blog/thanks.html')
 
 def get_query(request):  #Implement logic for query search.
-	master_list = Post.objects.all()  #master_list should be accessible at all lower nested levels to refine filter.
+	master_list = all_ks.objects.all()  #master_list should be accessible at all lower nested levels to refine filter.
 	q = request.GET.get("q")  #"q" is the name of query object in html (under input text).
 	if not q:  #Check if user has entered a search term.
 		#return HttpResponse('Please enter a search term')

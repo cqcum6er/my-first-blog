@@ -2,26 +2,129 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import django.utils.timezone
-from django.conf import settings
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
+            name='Index_DJ',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('Day', models.DateField(default=b'2018-04-22')),
+                ('Symbol', models.CharField(default=b'N/A', max_length=20)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Index_SP500',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('Day', models.DateField(default=b'2018-04-22')),
+                ('Symbol', models.CharField(default=b'N/A', max_length=20)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='NASDAQ_Post',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('Day', models.DateField(default=b'2018-04-22')),
+                ('Symbol', models.CharField(default=b'N/A', max_length=20)),
+                ('LastPrice', models.CharField(default=b'N/A', max_length=30)),
+                ('FiftyTwoWkChg', models.CharField(default=b'N/A', max_length=30)),
+                ('FiftyTwoWkHi', models.CharField(default=b'N/A', max_length=30)),
+                ('FiftyTwoWkLo', models.CharField(default=b'N/A', max_length=30)),
+                ('DivYild', models.CharField(default=b'N/A', max_length=30)),
+                ('TrailPE', models.CharField(default=b'N/A', max_length=30)),
+                ('ForwardPE', models.CharField(default=b'N/A', max_length=30)),
+                ('PEG_Ratio', models.CharField(default=b'N/A', max_length=30)),
+                ('PpS', models.CharField(default=b'N/A', max_length=30)),
+                ('PpB', models.CharField(default=b'N/A', max_length=30)),
+                ('Market_Cap', models.CharField(default=b'N/A', max_length=30)),
+                ('Free_Cash_Flow', models.CharField(default=b'N/A', max_length=30)),
+                ('Market_per_CashFlow', models.CharField(default=b'N/A', max_length=30)),
+                ('Enterprise_per_EBITDA', models.CharField(default=b'N/A', max_length=30)),
+                ('Name', models.CharField(default=b'N/A', max_length=50)),
+            ],
+        ),
+        migrations.CreateModel(
             name='Post',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('title', models.CharField(max_length=200)),
-                ('text', models.TextField()),
-                ('created_date', models.DateTimeField(default=django.utils.timezone.now)),
-                ('published_date', models.DateTimeField(null=True, blank=True)),
-                ('author', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('Day', models.DateField(default=b'2018-04-22')),
+                ('Symbol', models.CharField(default=b'N/A', max_length=20)),
+                ('LastPrice', models.CharField(default=b'N/A', max_length=30)),
+                ('FiftyTwoWkChg', models.CharField(default=b'N/A', max_length=30)),
+                ('FiftyTwoWkHi', models.CharField(default=b'N/A', max_length=30)),
+                ('FiftyTwoWkLo', models.CharField(default=b'N/A', max_length=30)),
+                ('DivYild', models.CharField(default=b'N/A', max_length=30)),
+                ('TrailPE', models.CharField(default=b'N/A', max_length=30)),
+                ('ForwardPE', models.CharField(default=b'N/A', max_length=30)),
+                ('PEG_Ratio', models.CharField(default=b'N/A', max_length=30)),
+                ('PpS', models.CharField(default=b'N/A', max_length=30)),
+                ('PpB', models.CharField(default=b'N/A', max_length=30)),
+                ('Market_Cap', models.CharField(default=b'N/A', max_length=30)),
+                ('Free_Cash_Flow', models.CharField(default=b'N/A', max_length=30)),
+                ('Market_per_CashFlow', models.CharField(default=b'N/A', max_length=30)),
+                ('Enterprise_per_EBITDA', models.CharField(default=b'N/A', max_length=30)),
+                ('Name', models.CharField(default=b'N/A', max_length=50)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='SP500_Post',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('Day', models.DateField(default=b'2018-04-22')),
+                ('Symbol', models.CharField(default=b'N/A', max_length=20)),
+                ('LastPrice', models.CharField(default=b'N/A', max_length=30)),
+                ('FiftyTwoWkChg', models.CharField(default=b'N/A', max_length=30)),
+                ('FiftyTwoWkHi', models.CharField(default=b'N/A', max_length=30)),
+                ('FiftyTwoWkLo', models.CharField(default=b'N/A', max_length=30)),
+                ('DivYild', models.CharField(default=b'N/A', max_length=30)),
+                ('TrailPE', models.CharField(default=b'N/A', max_length=30)),
+                ('ForwardPE', models.CharField(default=b'N/A', max_length=30)),
+                ('PEG_Ratio', models.CharField(default=b'N/A', max_length=30)),
+                ('PpS', models.CharField(default=b'N/A', max_length=30)),
+                ('PpB', models.CharField(default=b'N/A', max_length=30)),
+                ('Market_Cap', models.CharField(default=b'N/A', max_length=30)),
+                ('Free_Cash_Flow', models.CharField(default=b'N/A', max_length=30)),
+                ('Market_per_CashFlow', models.CharField(default=b'N/A', max_length=30)),
+                ('Enterprise_per_EBITDA', models.CharField(default=b'N/A', max_length=30)),
+                ('Name', models.CharField(default=b'N/A', max_length=50)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='sp500_post_NoID_sorted',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('Day', models.DateField(default=b'2018-04-22')),
+                ('Symbol', models.CharField(default=b'N/A', max_length=20)),
+                ('LastPrice', models.CharField(default=b'N/A', max_length=30)),
+                ('FiftyTwoWkChg', models.CharField(default=b'N/A', max_length=30)),
+                ('FiftyTwoWkHi', models.CharField(default=b'N/A', max_length=30)),
+                ('FiftyTwoWkLo', models.CharField(default=b'N/A', max_length=30)),
+                ('DivYild', models.CharField(default=b'N/A', max_length=30)),
+                ('TrailPE', models.CharField(default=b'N/A', max_length=30)),
+                ('ForwardPE', models.CharField(default=b'N/A', max_length=30)),
+                ('PEG_Ratio', models.CharField(default=b'N/A', max_length=30)),
+                ('PpS', models.CharField(default=b'N/A', max_length=30)),
+                ('PpB', models.CharField(default=b'N/A', max_length=30)),
+                ('Market_Cap', models.CharField(default=b'N/A', max_length=30)),
+                ('Free_Cash_Flow', models.CharField(default=b'N/A', max_length=30)),
+                ('Market_per_CashFlow', models.CharField(default=b'N/A', max_length=30)),
+                ('Enterprise_per_EBITDA', models.CharField(default=b'N/A', max_length=30)),
+                ('Name', models.CharField(default=b'N/A', max_length=50)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='UserComment',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=80)),
+                ('email', models.EmailField(max_length=254)),
+                ('message', models.CharField(max_length=1000)),
             ],
         ),
     ]
