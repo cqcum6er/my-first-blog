@@ -107,7 +107,7 @@ def DJ_LastDay(request):  #"DJ_LastDay" must be requested from urls.py
 		#print p.Day
 		Latest_DJ_Ind = Index_DJ.objects.filter(Day=p.Day)  #All symbols from the latest days of DJ index.
 		#print Latest_DJ_Ind.count(), type(tuple(Latest_DJ_Ind)), tuple(Latest_DJ_Ind)
-		posts = all_ks.objects.filter(Day=p.Day, Symbol__in=tuple(Latest_DJ_Ind))  #Retrieve all instances from latest day ('p.Day') that have all DJ index symbols.
+		posts = all_ks.objects.filter(Day=p.Day, Symbol__in=list(Latest_DJ_Ind))  #Retrieve all instances from latest day ('p.Day') that have all DJ index symbols.
 		#print posts.count()
 		if posts:  #Check for empty set.
 			return render(request, 'blog/DJ_LastDay.html', {'DJ_LastDay_posts': posts})  #To serve as a template, 'blog/DJ.html' has to be put in blog\template\blog\
