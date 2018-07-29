@@ -24,57 +24,33 @@ import csv
 	#pass
 #else:
 	#all_ks.objects.all().delete()
-all_ks.objects.all().delete()  #Clean the database before entry from csv file (If tables was dropped by SQL command, the table structure must be created 1st).
-#p = all_ks.objects.latest('Day')  #p = Post.objects.latest('Day')  #Check what's the lastest day then append to db from then on.
+#all_ks.objects.all().delete()  #Clean the database before entry from csv file (If tables was dropped by SQL command, the table structure must be created 1st).
+p = all_ks.objects.latest('Day')  #p = Post.objects.latest('Day')  #Check what's the lastest day then append to db from then on.
 fields = ['Day', 'Symbol', 'LastPrice', 'FiftyTwoWkChg', 'FiftyTwoWkLo', 'FiftyTwoWkHi', 'DivYild', 'TrailPE', 'ForwardPE', 'PEG_Ratio', 'PpS', 'PpB', 'Market_Cap', 'Free_Cash_Flow', 'Market_per_CashFlow', 'Enterprise_per_EBITDA', 'Name']  #Must match individual field (column) names in models.py.
 with open('DJ_list.csv', 'rb') as file:  # Need to use absolute path when on Pythonanywhere server (i.e. use '/home/cqcum6er/my-first-blog/DJ_list.csv' as file path.)
 	infile = csv.reader(file, delimiter=",", quotechar='"')  #Specify csv item boundary.
 	for row in infile:
-		
-		row_datetime = datetime.datetime.strptime('2017-08-27','%Y-%m-%d')
-		#row_datetime = datetime.datetime.strptime(row[0],'%Y-%m-%d')  #row[0] is converted from str to datetime format.
+		#row_datetime = datetime.datetime.strptime('2017-08-27','%Y-%m-%d')
+		row_datetime = datetime.datetime.strptime(row[0],'%Y-%m-%d')  #row[0] is converted from str to datetime format.
 		#print row_datetime.date()
 		row_date = row_datetime.date()  #Converting from datetime to date.
-		if row_date < p.Day:  #if row_date > p.Day:  #Only append entry if the date of the entry is later than the most recent in db.
+		if row_date > p.Day:  #Only append entry if the date of the entry is later than the most recent in db.
 			#print row_date
-			all_ks.objects.create(**dict(zip(fields, row)))  #Post.objects.create(**dict(zip(fields, row)))
-		
-		all_ks.objects.create(**dict(zip(fields, row)))
+			all_ks.objects.create(**dict(zip(fields, row)))
 
 #p = all_ks.objects.latest('Day')  #p = SP500_Post.objects.latest('Day')
 #fields = ['Day', 'Symbol', 'LastPrice', 'FiftyTwoWkChg', 'FiftyTwoWkLo', 'FiftyTwoWkHi', 'DivYild', 'TrailPE', 'ForwardPE', 'PEG_Ratio', 'PpS', 'PpB', 'Market_Cap', 'Free_Cash_Flow', 'Market_per_CashFlow', 'Enterprise_per_EBITDA', 'Name']
 with open('SP500_list.csv', 'rb') as file:
 	infile = csv.reader(file, delimiter=",", quotechar='"')
 	for row in infile:
-		
-		row_datetime = datetime.datetime.strptime('2017-08-27','%Y-%m-%d')
-		#row_datetime = datetime.datetime.strptime(row[0],'%Y-%m-%d')
+		#row_datetime = datetime.datetime.strptime('2017-08-27','%Y-%m-%d')
+		row_datetime = datetime.datetime.strptime(row[0],'%Y-%m-%d')
 		row_date = row_datetime.date()
-		if row_date < p.Day:  #if row_date > p.Day:
-			all_ks.objects.create(**dict(zip(fields, row)))  #SP500_Post.objects.create(**dict(zip(fields, row)))
-		
-		all_ks.objects.create(**dict(zip(fields, row)))
+		if row_date > p.Day:
+			all_ks.objects.create(**dict(zip(fields, row)))
 #...end of block.
 '''
-'''
-#To update index of symbol from a csv list, run the following script once before commenting out...
-import csv
-Index_DJ.objects.all().delete()
-fields = ['Day', 'Symbol',]
-with open('index_DJ.csv', 'rb') as file:
-	infile = csv.reader(file, delimiter=",", quotechar='"')
-	for row in infile:
-		Index_DJ.objects.create(**dict(zip(fields, row)))
-		
-Index_SP500.objects.all().delete()
-fields = ['Day', 'Symbol',]
-with open('index_SP500.csv', 'rb') as file:
-	infile = csv.reader(file, delimiter=",", quotechar='"')
-	for row in infile:
-		Index_SP500.objects.create(**dict(zip(fields, row)))
-#...end of block.
-'''
-		
+
 def DailyMovers():
 	p = Post.objects.latest('Day')  #Returns an object instance (not iterable); if latest() is empty, it works with attributes defined by 'class Meta' in models.py. Note latest () only retrieve ONE instance; .values() needs to be inserted in front of latest() to make it iterable as dictionary; cache queryset object for quick retrieval in html request.
 	#print p.LastPrice, type(p.LastPrice)

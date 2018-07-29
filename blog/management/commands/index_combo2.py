@@ -128,12 +128,12 @@ class Command(BaseCommand):
 			with open('index_LastComboSet.csv', 'rb') as file:
 				infile = csv.reader(file, delimiter=",", quotechar='"')
 				#LastRowDate = ""
-				print list(string.ascii_uppercase)[8:]
+				#print list(string.ascii_uppercase)[8:]
 				for row in list(infile):
-					if row[1]:
-						if row[1][0] in list(string.ascii_uppercase)[8:]:  #Check if the 1st char of ticker symbol matches any alphabet from I to Z.
+					if row[1]:  #Check if a ticker symbol exists in the 2nd column.
+						if row[1][0] in list(string.ascii_uppercase)[8:]:  #Check if the 1st char of the symbol matches any alphabet from I to Z.
 						#if row[0] == LastRowDate or LastRowDate == "":
-							print row, len(row)
+							#print row, len(row)
 							time.sleep(random.randint(0,2))
 							response = requests.get('https://query2.finance.yahoo.com/v10/finance/quoteSummary/'+row[1]+'?formatted=true&crumb=Z3LBeFwaCFt&lang=en-US&region=US&modules=defaultKeyStatistics%2CfinancialData%2CsummaryDetail%2CcalendarEvents&corsDomain=finance.yahoo.com')
 							html = response.text  #Convert requests object to string.
@@ -193,7 +193,7 @@ class Command(BaseCommand):
 		fields = ['Day', 'Symbol', 'LastPrice', 'FiftyTwoWkChg', 'FiftyTwoWkLo', 'FiftyTwoWkHi', 'DivYild', 'TrailPE', 'ForwardPE', 'PEG_Ratio', 'PpS', 'PpB', 'Market_Cap', 'Free_Cash_Flow', 'Market_per_CashFlow', 'Enterprise_per_EBITDA', 'Name']  #Must match individual field (column) names in models.py.
 		if all_ks.objects.exists():  #Check if the database is empty...
 			#print "There are existing objects in all_ks db."
-			p = all_ks.objects.latest('Day')  #Check what's the lastest day then append to db from then on.
+			p = all_ks.objects.latest('Day')  #Check what's the lastest day in existing db before appending to db.
 			with open('index_LastComboSet_ks.csv', 'rb') as file:  # Need to use absolute path when on Pythonanywhere server (i.e. use '/home/cqcum6er/my-first-blog/DJ_list.csv' as file path.)
 				infile = csv.reader(file, delimiter=",", quotechar='"')  #Specify csv item boundary.
 				for row in infile:

@@ -356,7 +356,7 @@
 				{% url 'blog:ResCenter_link' as rc %}
 				{% url 'blog:ResCenter_Links_link' as rc_l %}
 				{% url 'blog:results' as res %}
-				{% load make_list %}  <!--Load the custom template tags to prepare an url list (usage: collect 'html' as 'shortcut').-->
+				{% load make_list %}  <!--Load the custom template tags to prepare shortcut for an url list (usage: collect 'html' as 'shortcut').-->
 				{% collect DJLD DJLW DJLM DJL6M DJLQ DJLY as all_DJ_link %}
 				{% url 'blog:SP_LastDay' as SPLD %}
 				{% url 'blog:SP_LastWk' as SPLW %}
@@ -376,7 +376,7 @@
 				<!--<li>{{request.path}}</li>  Check for active path; must be activated with Django simple tag.-->
 				<li><a {% if request.path in all_ind_link %}class="actlink"{% endif %} href="{% url 'blog:home_link' %}">Home</a></li>
 				<li><a {% if request.path in all_ResCent_link %}class="actlink"{% endif %} href="{% url 'blog:ResCenter_link' %}">Resources</a></li>
-				<li><a {% if request.path in all_DJ_link or request.path in all_SP_link or request.path == res %}class="actlink"{% endif %} href="{% url 'blog:DJ_LastDay' %}">Database</a></li>
+				<li><a {% if request.path in all_DJ_link or request.path in all_SP_link or request.path == res %}class="actlink"{% endif %} href="{% url 'blog:DJ_LastDay' %}">Database</a></li>  <!--'Database' nav link must be highlighted when any period in an index is selected or when a search result is found.-->
 				<li><a {% if request.path == About %}class="actlink"{% endif %} href="{% url 'blog:AboutMe_link' %}">About</a></li>
 				<li><a {% if request.path == cont %}class="actlink"{% endif %} href="{% url 'blog:contact_link' %}">Contact</a></li>
 				<li id="date_time" style="background:#EADCAE; padding:10px 0 15px;"></li>
