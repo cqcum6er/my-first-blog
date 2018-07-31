@@ -18,7 +18,7 @@ from .forms import ContactForm
 import datetime
 
 '''
-#To update database with the current date, save scheduled csv record from Pythonanywhere, then run local server ONCE to populate local database before commenting out this block; comment out this block before saving views.py to Pythonanywhere to use scheduled csv instead...
+#To update database with the current date, save scheduled csv record from Pythonanywhere, then run local server ONCE to populate local database before commenting out this block; will need to remove duplicate rows with sqlite command afterward; comment out this block before uploading views.py to Pythonanywhere to use scheduled csv instead...
 import csv
 #if not Post:  #Check to see if database is empty.  If it's not, do nothing, else empty existing entry to prepare for update. (Remove the 'if' statement if run as a scheduler command on Pythonanywhere.)
 	#pass
@@ -30,20 +30,15 @@ fields = ['Day', 'Symbol', 'LastPrice', 'FiftyTwoWkChg', 'FiftyTwoWkLo', 'FiftyT
 with open('DJ_list.csv', 'rb') as file:  # Need to use absolute path when on Pythonanywhere server (i.e. use '/home/cqcum6er/my-first-blog/DJ_list.csv' as file path.)
 	infile = csv.reader(file, delimiter=",", quotechar='"')  #Specify csv item boundary.
 	for row in infile:
-		#row_datetime = datetime.datetime.strptime('2017-08-27','%Y-%m-%d')
-		row_datetime = datetime.datetime.strptime(row[0],'%Y-%m-%d')  #row[0] is converted from str to datetime format.
+		row_datetime = datetime.datetime.strptime(row[0],'%Y-%m-%d')  #row[0] is converted from str to datetime format (i.e. '2017-08-27').
 		#print row_datetime.date()
 		row_date = row_datetime.date()  #Converting from datetime to date.
 		if row_date > p.Day:  #Only append entry if the date of the entry is later than the most recent in db.
 			#print row_date
 			all_ks.objects.create(**dict(zip(fields, row)))
-
-#p = all_ks.objects.latest('Day')  #p = SP500_Post.objects.latest('Day')
-#fields = ['Day', 'Symbol', 'LastPrice', 'FiftyTwoWkChg', 'FiftyTwoWkLo', 'FiftyTwoWkHi', 'DivYild', 'TrailPE', 'ForwardPE', 'PEG_Ratio', 'PpS', 'PpB', 'Market_Cap', 'Free_Cash_Flow', 'Market_per_CashFlow', 'Enterprise_per_EBITDA', 'Name']
 with open('SP500_list.csv', 'rb') as file:
 	infile = csv.reader(file, delimiter=",", quotechar='"')
 	for row in infile:
-		#row_datetime = datetime.datetime.strptime('2017-08-27','%Y-%m-%d')
 		row_datetime = datetime.datetime.strptime(row[0],'%Y-%m-%d')
 		row_date = row_datetime.date()
 		if row_date > p.Day:

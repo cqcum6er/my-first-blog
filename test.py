@@ -1,4 +1,4 @@
-#Test whether csv entry is entered correctly into database thru python command prompt:>python test.py
+#Test whether scheduled csv entry is entered correctly into database thru python command prompt:>python test.py
 import csv
 '''
 def handle(self, *args, **options):

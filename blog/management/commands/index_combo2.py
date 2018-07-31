@@ -1,6 +1,7 @@
 #To run, go to folder containing manage.py with the following command: >python manage.py [script name]
+#Scrape from Yahoo Finance the key statistics of the remaining symbol set from I to Z and write them to a file ('index_LastComboSet_ks.csv').
 from django.core.management.base import BaseCommand, CommandError
-from django.http import StreamingHttpResponse  #Use to avoid a load balancer dropping a connection while the server was generating the response.
+#from django.http import StreamingHttpResponse  #Use to avoid a load balancer dropping a connection while the server was generating the response.
 import string
 import csv
 import requests
@@ -181,9 +182,11 @@ class Command(BaseCommand):
 									Name = "N/A"
 								#print row[0], row[1], LP, _52WkChg, _52WkHi, _52WkLo, Div, tPE, fPE, PEG, PpS, PpB, MktCap, FCF, MpC, EpE, Name
 								csv_row_list = [row[0], row[1], LP, _52WkChg, _52WkHi, _52WkLo, Div, tPE, fPE, PEG, PpS, PpB, MktCap, FCF, MpC, EpE, Name]
-								StreamingHttpResponse(output.writerow(csv_row_list))
+								output.writerow(csv_row_list)
+								#StreamingHttpResponse(output.writerow(csv_row_list))
 							else:
-								StreamingHttpResponse(output.writerow([row[0], row[1]]+['N/A']*15))  #Output when url is incorrect.
+								output.writerow([row[0], row[1]]+['N/A']*15)  #Output when url is incorrect.
+								StreamingHttpResponse(output.writerow([row[0], row[1]]+['N/A']*15))
 							#LastRowDate = row[0]
 						else:  #Skip a ticker if tick is not retrivable.
 							continue
