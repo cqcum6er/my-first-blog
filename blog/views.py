@@ -430,6 +430,7 @@ def contact_form(request):
 			obj.name = form.cleaned_data['name']  #'cleaned_data' is used with 'is_valid' form method and normalizes input data to a consistent format.
 			obj.email = form.cleaned_data['email']
 			obj.message = form.cleaned_data['message']
+			#obj.created_at = form.cleaned_data['message']
 			obj.save()  #Save the object to db.
 			return render(request, 'blog/thanks.html')
 	else:  #If a GET (such as first time the form is displayed), a blank form is created.

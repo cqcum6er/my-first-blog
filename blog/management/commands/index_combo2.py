@@ -186,7 +186,7 @@ class Command(BaseCommand):
 								#StreamingHttpResponse(output.writerow(csv_row_list))
 							else:
 								output.writerow([row[0], row[1]]+['N/A']*15)  #Output when url is incorrect.
-								StreamingHttpResponse(output.writerow([row[0], row[1]]+['N/A']*15))
+								#StreamingHttpResponse(output.writerow([row[0], row[1]]+['N/A']*15))
 							#LastRowDate = row[0]
 						else:  #Skip a ticker if tick is not retrivable.
 							continue

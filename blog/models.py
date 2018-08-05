@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib import admin
-from django.core.urlresolvers import reverse
+#from django.core.urlresolvers import reverse
 import datetime
 
 class Post(models.Model):  #Defines our model ('models' is a python class; 'Post' is an object; 'models.Model' corresponds to a table in a database, a subclass of django.db.)
@@ -192,6 +192,7 @@ class UserComment(models.Model):
 	name = models.CharField(max_length=80)
 	email = models.EmailField()
 	message = models.CharField(max_length=1000)
-	
+	created_at = models.DateTimeField(auto_now_add=True)
+
 	def __str__(self):
 		return self.name

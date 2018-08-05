@@ -87,6 +87,9 @@ class Index_SP500_Admin(admin.ModelAdmin):
 admin.site.register(Index_SP500, Index_SP500_Admin)
 
 class CommentAdmin(admin.ModelAdmin):  #Create an admin class for customized admin interface.
-	list_display = ('name', 'email')
+	list_display = ['created_at', 'name', 'email']
+	readonly_fields = ['created_at']
+	list_display_links = ['name']
+	list_filter = ['created_at', 'name', 'email']
 
 admin.site.register(UserComment, CommentAdmin)
