@@ -1,6 +1,7 @@
 *.pyc
 __pycache__
 myvenv
+db.sqlite3
 .DS_Store
 DJ_list.csv
 SP500_list.csv

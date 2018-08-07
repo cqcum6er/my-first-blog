@@ -47,13 +47,33 @@ with open('SP500_list.csv', 'rb') as file:
 '''
 
 def DailyMovers():
+	p = Index_DJ.objects.latest('Day')  #Returns an object instance (not iterable); if latest() is empty, it works with attributes defined by 'class Meta' in models.py. Note latest () only retrieve ONE instance; .values() needs to be inserted in front of latest() to make it iterable as dictionary; cache queryset object for quick retrieval in html request.
+	Latest_DJ_Ind = Index_DJ.objects.filter(Day=p.Day)
+	posts = all_ks.objects.filter(Day=p.Day, Symbol__in=list(Latest_DJ_Ind))  #Filter with both conditions in paranthesis for AND operation instead of OR; use '__in=list()' format to retrieve all instance of DJ index.
+	Yesterday = p.Day - datetime.timedelta(days=1)  #Get datetime for yesterday.
+	Movers = []
+	#print posts
+	for post in posts:
+		ypost = all_ks.objects.filter(Day=Yesterday, Symbol=post.Symbol).first()  #Use .first() or '[0]' with filter to ensure only the first AND only entry in queryset is retrieved.
+		#print post.Symbol, post.LastPrice, type(post.LastPrice), ypost.LastPrice, type(ypost.LastPrice),
+		if post.LastPrice == "N/A" or ypost.LastPrice == "N/A":  #Return 0.0 if no price is reported (or invalid) today or yesterday.
+			PercDayMov = 0.0
+		else:
+			PercDayMov = ((float(post.LastPrice) - float(ypost.LastPrice))/float(ypost.LastPrice))*100
+		#print PercDayMov
+		Movers.append(tuple((post.Symbol, post.Name, PercDayMov)))  #Add each symbol and it daily % movement as a tuple to a list ('Movers').
+	Movers.sort(key=lambda tup: tup[2])  #Sort the tuple based on daily % movement (or 3rd element of each tuple entry) using an anonymous function, lambda.
+	#print Movers, type(Movers)
+	return Movers
+	
+	'''
 	p = Post.objects.latest('Day')  #Returns an object instance (not iterable); if latest() is empty, it works with attributes defined by 'class Meta' in models.py. Note latest () only retrieve ONE instance; .values() needs to be inserted in front of latest() to make it iterable as dictionary; cache queryset object for quick retrieval in html request.
 	#print p.LastPrice, type(p.LastPrice)
 	posts = Post.objects.filter(Day=p.Day)
 	Yesterday = p.Day - datetime.timedelta(days=1)  #Get datetime for yesterday.
 	Movers = []
 	for post in posts:
-		ypost = Post.objects.filter(Day=Yesterday).filter(Symbol=post.Symbol).first()  #Use .first() or '[0]' with filter to get the first entry in queryset.
+		ypost = Post.objects.filter(Day=Yesterday).filter(Symbol=post.Symbol).first()  #Use .first() or '[0]' with filter to get the first entry in queryset, which always returns a single query.
 		#print post.Symbol, post.LastPrice, type(post.LastPrice), ypost.LastPrice, type(ypost.LastPrice),
 		if post.LastPrice == "N/A" or ypost.LastPrice == "N/A":
 			PercDayMov = 0.0
@@ -64,6 +84,7 @@ def DailyMovers():
 	Movers.sort(key=lambda tup: tup[2])  #Sort based on daily % movement (or 3rd element of each tuple).
 	#print Movers, type(Movers)
 	return Movers
+	'''
 
 def home(request):
 	return render(request, 'blog/home.html', {'DailyMovers': DailyMovers()})
