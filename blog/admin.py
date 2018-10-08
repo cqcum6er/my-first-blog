@@ -1,5 +1,7 @@
 #Customize display for each model under Django administration.
 from django.contrib import admin
+from django.forms import Textarea  #To implement widget modification of message area.
+from django.db import models  #To implement widget modification of message area.
 from .models import Post, NASDAQ_Post, SP500_Post, Index_DJ, Index_SP500, UserComment, sp500_post_sorted, all_ks_join, all_ks_join_unique, all_ks
 #from .forms import FeedbackForm  #Use if feedback form is linked to model instances.
 
@@ -47,6 +49,7 @@ class all_ks_Admin(admin.ModelAdmin):
 	list_display_links = ['Symbol']
 	list_filter = ['Day', 'Symbol']
 	search_fields = ['Symbol', 'Name']
+	date_hierarchy = 'Day'  #Filter data by years and months (see https://medium.com/@hakibenita/scaling-django-admin-date-hierarchy-85c8e441dd4c)
 	list_per_page = 400
 
 admin.site.register(all_ks, all_ks_Admin)
@@ -88,9 +91,12 @@ admin.site.register(Index_SP500, Index_SP500_Admin)
 
 class CommentAdmin(admin.ModelAdmin):  #Create an admin class for customized admin interface.
 	list_display = ['created_at', 'name', 'email']
-	readonly_fields = ['created_at']
+	readonly_fields = ['created_at']  #For use with models.DateTimeField(auto_now_add=True) to display the hidden field.
 	list_display_links = ['name']
 	list_filter = ['created_at', 'name', 'email']
 	search_fields = ['name', 'email', 'message']
+	formfield_overrides = {
+		models.TextField: {'widget': Textarea(attrs={'rows':16, 'cols':80})},
+	}  #Increase viewable area with widget.
 
 admin.site.register(UserComment, CommentAdmin)

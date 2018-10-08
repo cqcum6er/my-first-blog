@@ -1,10 +1,10 @@
-{% extends "blog/home.html" %}
+{% extends "blog/home.html" %}  <!--Must include 'blog/' before html name for Django to look up-->
 
 {% block title %} Fundamental Trader-SP500 Index-Last Day {% endblock %}
 
 {% block content %}
 {% include "blog/aside_database.html" %}  <!--Display left-hand column.-->
 {% include "blog/PeriodToDisplay_SP.html" %}  <!--Display Period selection for index table.-->
-{% load index_table %}
-{% SP_LastDay %}
+{% load index_table %}  <!--Load inclusion tag script (see "templatetags" folder).-->
+{% SP_LastDay %}  <!--Execute inclusion tag function.-->
 {% endblock %}

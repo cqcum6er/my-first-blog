@@ -26,6 +26,7 @@
 		  if (i < 10) {i = "0" + i}  //add zero in front of numbers < 10
 		  return i;
 		}
+
 		</script>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 		<style type="text/css">
@@ -41,6 +42,10 @@
 			font-family:arial;
 		}
 
+		.highlight {
+			color:#993366;
+		}
+		
 		/*.main {  /*.class*/
 			padding:16px;
 			margin-top:0;
@@ -147,6 +152,11 @@
 		#mover_cont {
 			margin-left:175px;
 			white-space:nowrap;
+			width:850px;  /*Defines boundary for fig_cont title, which is text-align to center.*/
+		}
+		
+		#mover_cont h2 {/*Figure title*/
+			text-align:center;
 		}
 
 		.mover {
@@ -328,8 +338,8 @@
 		<div style="position:absolute; height:85px; width:1500px; background:#fff; z-index:-1;"></div>  <!--Spacer between title and search bar-->
 		<div style="float:right; background:#fff; white-space:nowrap; margin-right:10px;">  <!--Define elements float to the right side of the screen regardless of screen size.-->
 			<p>Start search for a company:</p>
-			<form method="GET" action="{% url 'blog:results' %}">
-				<input type="text" name="q" placeholder="Enter Symbol or Name" value="{{ request.GET.q }}" />  <!--include 'name' for search to show up in url; include 'value' to display query while typing.-->
+			<form method="GET" action="{% url 'blog:results' %}">  <!--Direct url to "action" once user submits search.-->
+				<input type="text" name="q" placeholder="Enter Symbol or Name" value="{{ request.GET.q }}" />  <!--include 'name' variable for views.py [i.e. request.GET.get('q')]; include 'value' to display query url.-->
 				<input type="submit" value="Search" />
 			</form>
 			<div id="social">
@@ -387,50 +397,82 @@
 		<div class="main">
 		{% block content %}
 			<div id="aside">  <!--Margin added to keep element to the right of aside bar-->
-			<p>Show index movement <br> since:</p>
-			<ul>
+			<form method="GET" action="">  <!--Bind multiple forms to one submit button to keep current user GET state-->
+			<p><b>Index Sum</b></p>
+			<p>Sum of index<br>components from:</p>
+			<!--<form method="GET" action="">-->
+				<!--<input type="hidden" name="form_id" value="index_sub" />-->
+				<span>Last</span> {{ind_form.Ind_Date}}<br>
+				<!--<input type="submit" name="index_sub" value="Submit" style="width:80px;" />-->
+			<!--</form>-->
+			<!--<ul>
 				<li><a {% if request.path == home %}class="aside_act"{% endif %} href="{% url 'blog:home_link' %}">Last Trading Day</a></li>
 				<li><a {% if request.path == IndLW %}class="aside_act"{% endif %} href="{% url 'blog:Ind_LastWk' %}">Last Week</a></li>
 				<li><a {% if request.path == IndLQ %}class="aside_act"{% endif %} href="{% url 'blog:Ind_LastQtr' %}">Last Quarter</a></li>
 				<li><a {% if request.path == IndL6M %}class="aside_act"{% endif %} href="{% url 'blog:Ind_Last6Mnth' %}">Last 6 Months</a></li>
 				<li><a {% if request.path == IndLY %}class="aside_act"{% endif %} href="{% url 'blog:Ind_LastYr' %}">Last Year</a></li>
 				<li><a {% if request.path == IndL5Y %}class="aside_act"{% endif %} href="{% url 'blog:Ind_Last5Yr' %}">Last 5 Years</a></li>
-			</ul>
+			</ul>-->
+			<p><b>Top/Bottom<br>Performers</b></p>
+			<p>Choose which index<br>and period to display:</p>
+			<!--<form method="GET" action="">  Leave action empty to return to the same page; use "GET" method to allow url to reflect current selection. value="{{ form.name.value|default_if_none:'' }}"-->
+				<!--<input type="hidden" name="form_id" value="perform_sub" />-->
+				<!--{% csrf_token %}-->
+				{{move_form.Ind_Mov}} <span>index</span><br>
+				{{move_form.Period_Mov}} <span>ago</span><br>
+				<p>Top/bottom:</p>
+				{{move_form.Dis_num}} <span>companies</span> <br><br>
+				<!--
+				<select name="Ind_Mov">
+					<option value="DJ" {% if Ind_Mov == "DJ" %}selected="selected"{% endif %}>Dow Jones</option>
+					<option value="SP500" {% if Ind_Mov == "SP500" %}selected="selected"{% endif %}>S&ampP 500</option>
+				</select>
+				<br>
+				<select name="Period_Mov">
+					<option value="OneDay" {% if Period_Mov == "OneDay" %}selected="selected"{% endif %}>One day</option>
+					<option value="OneWk" {% if Period_Mov == "OneWk" %}selected="selected"{% endif %}>One Week</option>
+					<option value="OneMnth" {% if Period_Mov == "OneMnth" %}selected="selected"{% endif %}>One Month</option>
+				</select>
+				<br>-->
+				<input type="submit" value="Submit" style="width:80px;" />
+				<!--<input type="submit" name="perform_sub" value="Submit" style="width:80px;" />-->
+			</form>
 			</div>
 			{% block index_fig %}
 			<div id="fig_cont">
-				<h2>Last Trading Day</h2>
+				<h2>Sum of index components from <span class="highlight">Last {{Index_Sum}}</span></h2>  <!--Use <span> to modify text without breaking up paragraph.-->
 				<figure>
-					<figcaption>Dow Jones Industrial Average</figcaption>
-					<img width="423" height="201.75" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=WN6SR"/>
+					<figcaption>Dow Jones Index</figcaption>
+					<!--<img width="423" height="201.75" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=WN6SR"/>-->
 				</figure>
 				<figure>
 					<figcaption>S&P 500 Index</figcaption>
-					<img width="423" height="201.75" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=L5M39"/>
+					<!--<img width="423" height="201.75" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=L5M39"/>-->
 				</figure>
 				<br>  <!--Break for 2nd row of figures.-->
-				<figure>
+				<!--<figure>
 					<figcaption>NASDAQ Composite</figcaption>
 					<img width="423" height="201.75" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=T8J69"/>
 				</figure>
 				<figure>
 					<figcaption>NYSE Composite</figcaption>
 					<img width="423" height="201.75" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=FB2VK"/>
-				</figure>
+				</figure>-->
 			</div>
 			{% endblock %}
 		<div id="mover_cont">
+			<h2>Top/Bottom performers in <span class="highlight">{{Performer_Index}}</span> compared to <span class="highlight">{{Performer_Period}}</span> ago</h2>
 			<div class="mover">
 				<table align=center>
-				<caption><h2 style="text-align:center;">Daily Bottom Performers - Dow Jones</h2></caption>
+				<!--<caption><h3 style="text-align:center; color:green;">Top</h3></caption>-->
 				<thead>
 				<tr>
-					<th>Company (Symbol)</th>
+					<th>Top companies</th>
 					<th>% Change*</th>
 				</tr>
 				</thead>
 				<tbody>
-				{% for tick in DailyMovers|slice:":5" %}  <!--Iterate the 1st 5 items from the list of tuples ('DailyMovers').-->
+				{% for tick in TopMovers %}  <!--Iterate in reverse order the last 5 items from the list of tuples ('Movers' from views.py).-->
 				<tr style="background-color:white">
 					<td style="background-color: #ffcc66;"><a href="/results/?q={{ tick.0 }}"> {{ tick.1 }} ({{ tick.0 }}) </a></td>  <!--tick.0 = post.Symbol, tick.1 = post.Name, tick.2 = PercDayMov-->
 					<td style="text-align:center;
@@ -449,15 +491,15 @@
 			</div>
 			<div class="mover">
 			<table align=center>
-			<caption><h2 style="text-align:center;">Daily Top Performers - Dow Jones</h2></caption>
+			<!--<caption><h3 style="text-align:center; color:red;">Bottom</h3></caption>-->
 			<thead>
 			<tr>
-				<th>Company (Symbol)</th>
+				<th>Bottom companies</th>
 				<th>% Change*</th>
 			</tr>
 			</thead>
 			<tbody>
-			{% for tick in DailyMovers|slice:"-5:" reversed %}  <!--Iterate in reverse order the last 5 items from the list of tuples.-->
+			{% for tick in BottomMovers %}  <!--Iterate the 1st 5 items from the list of tuples ('Movers' from views.py).-->
 			<tr style="background-color:white">
 				<td style="background-color: #ffcc66;"><a href="/results/?q={{ tick.0 }}"> {{ tick.1 }} ({{ tick.0 }}) </a></td>
 				<td style="text-align:center;
@@ -499,13 +541,13 @@
 		<div style="clear:both; color:grey; padding:10px;">  <!-- position:absolute; bottom:20px; margin-bottom:-1000px;-->
 		<p>The information and data on this website are provided for informational purposes only. We ("Fundamental Trader") cannot guarantee the accuracy or completeness of information and data presented on our website. Any information presented should not be taken as recommendation for any company, investment vehicle, or investment advice and should only be used at the user's discretion.</br>All contact information provided to us will solely be used for communication purpose and will not be disclosed to a third party without explicit user consent.
 		</p>
-		<p>Copyright&copy;
+		<p>Copyright&copy;2017-
 			<script>  //Insert current year.
 			var timeNow = new Date()
 			var year = timeNow.getFullYear()
 			document.write(year)
 			</script>
-			www.fundamentaltrader.net. All rights reserved.</p>
+			, www.fundamentaltrader.net. All rights reserved.</p>
 		</div>
 	</body>
 </html>

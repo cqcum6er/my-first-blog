@@ -188,10 +188,10 @@ class Index_SP500(models.Model):
 	def __str__(self):
 		return self.Symbol
 
-class UserComment(models.Model):
+class UserComment(models.Model):  #A model object for user input data on form object, ContactForm (see 'forms.py').
 	name = models.CharField(max_length=80)
 	email = models.EmailField()
-	message = models.CharField(max_length=1000)
+	message = models.TextField(max_length=2000)  #Use "TextField" to avoid limits imposed to string length by Django or SQL.
 	created_at = models.DateTimeField(auto_now_add=True)
 
 	def __str__(self):
