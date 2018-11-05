@@ -12,11 +12,13 @@ from django.core.mail import EmailMessage, send_mail
 from django.template import Context
 from django.template.loader import get_template
 '''
-from .models import UserComment, Index_DJ, Index_SP500, all_ks  #Retrieve model objects from 'models.py' within the same folder.
+from .models import UserComment, Index_DJ, Index_SP500, all_ks, all_ks_DatePriceDiff  #Retrieve model objects from 'models.py' within the same folder.
 from .forms import ContactForm, MoverForm, IndexForm
 #from .templatetags import index_table
 import datetime
+import time
 from django.db import connection  #Check sqlite connection speed with "connection.queries".
+import csv
 
 '''
 #To update database with the current date, save scheduled csv record from Pythonanywhere (Export "all_ks" table as csv file [i.e.'all_ks_export.csv'] and save to the same directory as views.py), then run local server ONCE to populate local database before commenting out this block (may need to remove duplicate rows with sqlite command afterward); comment out this block before uploading views.py to Pythonanywhere to use scheduled csv instead...
@@ -58,6 +60,146 @@ with open('blog_index_SP500.csv', 'rb') as file:
 '''
 
 def Movers(Ind, User_Date, Dis_num):  #Sorts index components into top/bottom performers based during user-specified period; 'Ind' must be db object, & User_Date a string object.
+	'''
+	ts = time.time()  #Record current time; see <http://stackoverflow.com/questions/13890935/timestamp-python>
+	st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')  #Convert current time to a readable format.
+	print "Start time: "+st
+	'''
+	#Asynchronous calculation of % price diff based on user input; store % price diff as a model object that is refreshed daily (format of model = date, company name, symbol, % price diff for yesterday, one week, & one month).
+	p = Ind.objects.latest('Day')  #Returns an object instance (not iterable) from latest date; if latest() is empty, it works with attributes defined by 'class Meta' in models.py. Note latest () only retrieve ONE instance; .values() needs to be inserted in front of latest() to make it iterable as dictionary; cache queryset object for quick retrieval in html request.
+	#print p, type(p)
+	Latest_Ind = Ind.objects.filter(Day=p.Day)  #Return all index symbols from latest date.
+	#print Latest_Ind, type(Latest_Ind)
+	posts = all_ks.objects.filter(Day=p.Day, Symbol__in=list(Latest_Ind))  #Filter with both conditions in paranthesis for AND operation instead of OR; use '__in=list()' format to retrieve all instance of DJ index.
+	Movers = []
+	#print posts, type(posts)
+	User_Date_dict = {'Price_1': 1, 'Price_7': 7, 'Price_30': 30}
+	for key, value in User_Date_dict.iteritems():
+		if User_Date == value:
+			for post in posts:
+				all_ks_DPD = all_ks_DatePriceDiff.objects.filter(Symbol=post.Symbol).first()  #Select an instance (one company) from db object "all_ks_DatePriceDiff" if it is present in the latest index entry; use .first() to ensure only one instance is selected.
+				#print all_ks_DPD, type(all_ks_DPD),
+				if not all_ks_DPD:  #Skip % diff calculation if an instance (one company) doesn't exist. Note: "if not ypost.LastPrice:" OR "if type(ypost.LastPrice) is None:" doesn't work since ypost.LastPrice is an unicode object.
+					continue #break
+				if getattr(all_ks_DPD, key) == "N/A":  #if all_ks_DPD.key == "N/A" or all_ks_DPD.key == "N/A":#Return 0.0 if no price is reported (or invalid) today or user-specified date.
+					continue  #Don't append to Movers list if the user-requested date doesn't exist; move on to the next instance (company).
+					#Movers.append(tuple((all_ks_DPD.Symbol, all_ks_DPD.Name, '0')))
+				else:
+					Movers.append(tuple((all_ks_DPD.Symbol, all_ks_DPD.Name, float(getattr(all_ks_DPD, key)))))  #Add each symbol and it daily % movement as a tuple to a list ('Movers'); convert % price diff to float to sort correctly.
+		else:
+			continue  #Continue to check if user entered another date.
+	'''
+	if User_Date == 1:
+		#print 'user date is one'
+		for post in posts:
+			all_ks_DPD = all_ks_DatePriceDiff.objects.filter(Symbol=post.Symbol).first()  #Select an instance (one company) from db object "all_ks_DatePriceDiff" if it is present in the latest index entry; use .first() to ensure only one instance is selected.
+			#print all_ks_DPD, type(all_ks_DPD),
+			if not all_ks_DPD:  #Skip % diff calculation if an instance (one company) doesn't exist. Note: "if not ypost.LastPrice:" OR "if type(ypost.LastPrice) is None:" doesn't work since ypost.LastPrice is an unicode object.
+				continue #break
+			if all_ks_DPD.Price_1 == "N/A" or all_ks_DPD.Price_1 == "N/A":  #Return 0.0 if no price is reported (or invalid) today or user-specified date.
+				continue  #Don't append to Movers list if the user-requested date doesn't exist; move on to the next instance (company).
+				#Movers.append(tuple((all_ks_DPD.Symbol, all_ks_DPD.Name, '0')))
+			else:
+				Movers.append(tuple((all_ks_DPD.Symbol, all_ks_DPD.Name, float(all_ks_DPD.Price_1))))  #Add each symbol and it daily % movement as a tuple to a list ('Movers'); convert % price diff to float to sort correctly.
+	elif User_Date == 7:
+		for post in posts:
+			all_ks_DPD = all_ks_DatePriceDiff.objects.filter(Symbol=post.Symbol).first()
+			if not all_ks_DPD:
+				continue
+			if all_ks_DPD.Price_7 == "N/A" or all_ks_DPD.Price_7 == "N/A":
+				continue
+			else:
+				Movers.append(tuple((all_ks_DPD.Symbol, all_ks_DPD.Name, float(all_ks_DPD.Price_7))))
+	elif User_Date == 30:
+		for post in posts:
+			all_ks_DPD = all_ks_DatePriceDiff.objects.filter(Symbol=post.Symbol).first()
+			if not all_ks_DPD:
+				continue
+			if all_ks_DPD.Price_30 == "N/A" or all_ks_DPD.Price_30 == "N/A":
+				continue
+			else:
+				Movers.append(tuple((all_ks_DPD.Symbol, all_ks_DPD.Name, float(all_ks_DPD.Price_30))))
+	'''
+	Movers.sort(key=lambda tup: tup[2])  #Sort the tuple based on daily % movement (3rd element of each tuple entry) using the anonymous function, lambda.
+	#print Movers, type(Movers)
+	print Movers
+	Top_disp = list(reversed(Movers[-Dis_num:]))  #'reversed' returns a 'listreverseiterator' type instead of a list type.
+	Bottom_disp = Movers[:Dis_num]
+	#print type(Top_disp), type(Bottom_disp)
+	'''
+	ts = time.time()
+	st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+	print "End time: "+st
+	'''
+	return (Top_disp, Bottom_disp)  #Return a tuple of top/bottom performers, accessible via Movers(...)[0] or Movers(...)[1].
+	
+	'''
+	#Retrieve the results of % price diff for diff dates from a csv file for asynchronous operation (format of csv = date, company name, symbol, % price diff for yesterday, one week, & one month).
+	with open('Period_performers.csv', 'rb') as file:
+		infile = csv.reader(file, delimiter=",", quotechar='"')
+		p = Ind.objects.latest('Day')  #Returns an object instance (a Symbol) from latest date.
+		Latest_Ind = Ind.objects.filter(Day=p.Day)  #Return all index symbols from latest date.
+		#print Latest_Ind, type(Latest_Ind)
+		Mover_ind = []
+		for row in list(infile):  #Convert csv reader object ("infile") to a list format before iteration.
+			#print row[1], type(row[1])
+			if Latest_Ind.filter(Symbol=row[2]).exists():  #Check if Symbol (row[2]) exists in queryset Latest_Ind.
+				if User_Date == 1 and row[3]: #Check user-specified date & if % price diff (row[3]) exists for that date.
+					#print row[2], row[3]
+					Mover_ind.append(tuple((row[2], row[1], float(row[3]))))  #Add each symbol and it daily % movement as a tuple to a list ('Mover_ind').
+				elif User_Date == 7 and row[4]:
+					#print row[2], row[4]
+					Mover_ind.append(tuple((row[2], row[1], float(row[4]))))
+				elif User_Date == 30 and row[5]:
+					#print row[2], row[5]
+					Mover_ind.append(tuple((row[2], row[1], float(row[5]))))
+				else:
+					continue  #Skip to next symbol if % price diff doesn't exists.
+			else:
+				continue  #Skip to next symbol if none exists.
+		Mover_ind.sort(key=lambda tup: tup[2])  #Sort the list of tuples based on % price diff between today and user-specified date; must convert from str to float for correct sorting.
+		#print Mover_ind
+		Top_disp = list(reversed(Mover_ind[-Dis_num:]))  #'reversed' returns a 'listreverseiterator' type instead of a list type.
+		Bottom_disp = Mover_ind[:Dis_num]
+		#print type(Top_disp), type(Bottom_disp)
+		ts = time.time()
+		st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+		print "End time: "+st
+		return (Top_disp, Bottom_disp)  #Return a tuple of top/bottom performers, accessible via Movers(arg1,2,3)[0] or Movers(arg1,2,3)[1].
+	'''
+	'''
+	#Synchronous calculation of % price diff based on user input.
+	p = Ind.objects.latest('Day')  #Returns an object instance (not iterable) from latest date; if latest() is empty, it works with attributes defined by 'class Meta' in models.py. Note latest () only retrieve ONE instance; .values() needs to be inserted in front of latest() to make it iterable as dictionary; cache queryset object for quick retrieval in html request.
+	#print p, type(p)
+	Latest_Ind = Ind.objects.filter(Day=p.Day)  #Return all index symbols from latest date.
+	#print Latest_Ind, type(Latest_Ind)
+	posts = all_ks.objects.filter(Day=p.Day, Symbol__in=list(Latest_Ind))  #Filter with both conditions in paranthesis for AND operation instead of OR; use '__in=list()' format to retrieve all instance of DJ index.
+	Day_Delta = p.Day - datetime.timedelta(days=User_Date)  #Get datetime for user specified range.
+	Movers = []
+	#print posts, type(posts)
+	for post in posts:
+		ypost = all_ks.objects.filter(Day=Day_Delta, Symbol=post.Symbol).first()  #Use .first() or '[0]' with filter to ensure only the first AND only entry in queryset is retrieved.
+		#print post.Symbol, post.LastPrice, type(post.LastPrice), ypost.LastPrice, type(ypost.LastPrice),
+		if not ypost:  #Skip % diff calculation if a date doesn't exist. Note: "if not ypost.LastPrice:" OR "if type(ypost.LastPrice) is None:" doesn't work since ypost.LastPrice is an unicode object.
+			continue #break
+		if post.LastPrice == "N/A" or ypost.LastPrice == "N/A":  #Return 0.0 if no price is reported (or invalid) today or user-specified date.
+			PercDayMov = 0.0
+		else:
+			PercDayMov = ((float(post.LastPrice) - float(ypost.LastPrice))/float(ypost.LastPrice))*100
+		#print PercDayMov
+		Movers.append(tuple((post.Symbol, post.Name, PercDayMov)))  #Add each symbol and it daily % movement as a tuple to a list ('Movers').
+	Movers.sort(key=lambda tup: tup[2])  #Sort the tuple based on daily % movement (3rd element of each tuple entry) using the anonymous function, lambda.
+	#print Movers, type(Movers)
+	Top_disp = list(reversed(Movers[-Dis_num:]))  #'reversed' returns a 'listreverseiterator' type instead of a list type.
+	Bottom_disp = Movers[:Dis_num]
+	#print type(Top_disp), type(Bottom_disp)
+	ts = time.time()
+	st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+	print "End time: "+st
+	return (Top_disp, Bottom_disp)  #Return a tuple of top/bottom performers, accessible via Movers(...)[0] or Movers(...)[1].
+	'''
+	'''
+	#Synchronous caculation of % price diff based on user input.
 	#Ind = str(Ind)
 	p = Ind.objects.latest('Day')  #Returns an object instance (not iterable) from latest date; if latest() is empty, it works with attributes defined by 'class Meta' in models.py. Note latest () only retrieve ONE instance; .values() needs to be inserted in front of latest() to make it iterable as dictionary; cache queryset object for quick retrieval in html request.
 	Latest_Ind = Ind.objects.filter(Day=p.Day)  #Return all index symbols from latest date.
@@ -68,6 +210,8 @@ def Movers(Ind, User_Date, Dis_num):  #Sorts index components into top/bottom pe
 	for post in posts:
 		ypost = all_ks.objects.filter(Day=Day_Delta, Symbol=post.Symbol).first()  #Use .first() or '[0]' with filter to ensure only the first AND only entry in queryset is retrieved.
 		#print post.Symbol, post.LastPrice, type(post.LastPrice), ypost.LastPrice, type(ypost.LastPrice),
+		if not ypost:  #Skip % diff calculation if a date doesn't exist. Note: "if not ypost.LastPrice:" OR "if type(ypost.LastPrice) is None:" doesn't work since ypost.LastPrice is an unicode object.
+			continue #break
 		if post.LastPrice == "N/A" or ypost.LastPrice == "N/A":  #Return 0.0 if no price is reported (or invalid) today or user-specified date.
 			PercDayMov = 0.0
 		else:
@@ -76,11 +220,12 @@ def Movers(Ind, User_Date, Dis_num):  #Sorts index components into top/bottom pe
 		Movers.append(tuple((post.Symbol, post.Name, PercDayMov)))  #Add each symbol and it daily % movement as a tuple to a list ('Movers').
 	Movers.sort(key=lambda tup: tup[2])  #Sort the tuple based on daily % movement (3rd element of each tuple entry) using the anonymous function, lambda.
 	#print Movers, type(Movers)
-	First_show = list(reversed(Movers[-Dis_num:]))  #'reversed' returns a 'listreverseiterator' type instead of a list type.
-	Last_show = Movers[:Dis_num]
-	#print type(First_show), type(Last_show)
-	return (First_show, Last_show)  #Return a tuple of top/bottom performers, accessible via Movers(...)[0] or Movers(...)[1].
-'''
+	Top_disp = list(reversed(Movers[-Dis_num:]))  #'reversed' returns a 'listreverseiterator' type instead of a list type.
+	Bottom_disp = Movers[:Dis_num]
+	#print type(Top_disp), type(Bottom_disp)
+	return (Top_disp, Bottom_disp)  #Return a tuple of top/bottom performers, accessible via Movers(...)[0] or Movers(...)[1].
+	'''
+	'''
 	p = Post.objects.latest('Day')  #Returns an object instance (not iterable); if latest() is empty, it works with attributes defined by 'class Meta' in models.py. Note latest () only retrieve ONE instance; .values() needs to be inserted in front of latest() to make it iterable as dictionary; cache queryset object for quick retrieval in html request.
 	#print p.LastPrice, type(p.LastPrice)
 	posts = Post.objects.filter(Day=p.Day)
@@ -98,13 +243,13 @@ def Movers(Ind, User_Date, Dis_num):  #Sorts index components into top/bottom pe
 	Movers.sort(key=lambda tup: tup[2])  #Sort based on daily % movement (or 3rd element of each tuple).
 	#print Movers, type(Movers)
 	return Movers
-'''
+	'''
 
 def home(request):
 	move_form = MoverForm()  #MoverForm(initial={'Ind_Mov': 'Index_DJ', 'Period_Mov': '1' 'Dis_num': '5'})  #Load empty form when the page is loaded the 1st time without user input; needed to initiate multiple forms on one page before checking user submission for each form.
 	ind_form = IndexForm()
-	Performer_Index = "Dow Jones"  #Populate the initial empty form with default values.
-	Performer_Period = "One Day"
+	Ind_Mov_label = "Dow Jones"  #Populate the initial empty form with default values.
+	Period_Mov_label = "One Day"
 	Ind = Index_DJ
 	Period_Mov_val = 1
 	Dis_num = 5
@@ -161,7 +306,7 @@ def home(request):
 			#Ind_Mov = request.GET.get('Ind_Mov')
 			#Ind_Mov = str(Ind_Mov)
 			print Ind_Mov, type(Ind_Mov)  #Show cleaned user index selection.
-			Ind_Mov_label = dict(move_form.fields['Ind_Mov'].choices).get(str(Ind_Mov))  #Get label (not key) of chosen ChoiceField.
+			Ind_Mov_label = dict(move_form.fields['Ind_Mov'].choices).get(str(Ind_Mov))  #Get label (not key) of selected ChoiceField.
 			print Ind_Mov_label, type(Ind_Mov_label)  #Show user index selection as label.
 			Period_Mov_val = move_form.cleaned_data['Period_Mov']  #Retrieve cleaned data (value) of 'Period_Mov'  selection in home.html.
 			#Period_Mov = request.GET.get('Period_Mov')
@@ -172,8 +317,8 @@ def home(request):
 			Dis_num = move_form.cleaned_data['Dis_num']
 			Dis_num = int(Dis_num)
 			#print Dis_num, type(Dis_num)
-			Performer_Index = str(Ind_Mov_label)  #Get the index title for output table.
-			Performer_Period = str(Period_Mov_label)  #Get the period title for output table.
+			#Performer_Index = str(Ind_Mov_label)  #Get the index title for output table.
+			#Performer_Period = str(Period_Mov_label)  #Get the period title for output table.
 			if Ind_Mov_label == "Dow Jones":
 				Ind = Index_DJ
 			elif Ind_Mov_label == "S&P500":
@@ -226,8 +371,8 @@ def home(request):
 	'move_form': move_form,
 	'TopMovers': Movers(Ind, Period_Mov_val, Dis_num)[0],
 	'BottomMovers': Movers(Ind, Period_Mov_val, Dis_num)[1],
-	'Performer_Index': Performer_Index,
-	'Performer_Period': Performer_Period,
+	'Performer_Index': Ind_Mov_label,
+	'Performer_Period': Period_Mov_label,
 	'Index_Sum':Ind_Date_label
 	})
 	#Movers(Ind, Period_Mov_val, Dis_num)
@@ -597,7 +742,7 @@ def contact_form(request):
 	if request.method == "POST":
 		form = ContactForm(request.POST)  #Populate the form with 'request.POST' aka "binding data to the form" (ContactForm is a form object in forms.py).
 		if form.is_valid():  #runs validation checks for all fields entered by user; if user input is invalid, user input is still kept on the current page for further user editing.
-			obj = UserComment()  #Generate new UserComment object (see models.py).
+			obj = UserComment()  #Generate new UserComment object instance (see models.py).
 			obj.name = form.cleaned_data['name']  #'cleaned_data' is used after confirmation with 'is_valid' form method and normalizes input data to a consistent format. Use "form.cleaned_data.get('name', 'default')" if a none value is expected ('deafult' will be printed in the case on none value).
 			obj.email = form.cleaned_data['email']
 			obj.message = form.cleaned_data['message']

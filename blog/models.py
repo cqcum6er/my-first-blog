@@ -129,6 +129,16 @@ class all_ks(models.Model):
 
 	def __str__(self):
 		return self.Symbol
+class all_ks_DatePriceDiff(models.Model):
+	Day = models.DateField(blank=False, default=datetime.date.today().strftime('%Y-%m-%d'))
+	Name = models.CharField(max_length=50, default='N/A')
+	Symbol = models.CharField(max_length=20, default='N/A')
+	Price_1 = models.CharField(max_length=50, default='N/A')
+	Price_7 = models.CharField(max_length=50, default='N/A')
+	Price_30 = models.CharField(max_length=50, default='N/A')
+
+	def __str__(self):
+		return self.Symbol
 
 class all_ks_join(models.Model):
 	Day = models.DateField(blank=False, default=datetime.date.today().strftime('%Y-%m-%d'))

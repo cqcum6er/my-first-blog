@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django.forms import Textarea  #To implement widget modification of message area.
 from django.db import models  #To implement widget modification of message area.
-from .models import Post, NASDAQ_Post, SP500_Post, Index_DJ, Index_SP500, UserComment, sp500_post_sorted, all_ks_join, all_ks_join_unique, all_ks
+from .models import Post, NASDAQ_Post, SP500_Post, Index_DJ, Index_SP500, UserComment, sp500_post_sorted, all_ks_join, all_ks_join_unique, all_ks, all_ks_DatePriceDiff
 #from .forms import FeedbackForm  #Use if feedback form is linked to model instances.
 
 class PostAdmin(admin.ModelAdmin):  #Create an admin class for customized admin interface.
@@ -53,6 +53,15 @@ class all_ks_Admin(admin.ModelAdmin):
 	list_per_page = 400
 
 admin.site.register(all_ks, all_ks_Admin)
+
+class all_ks_DatePriceDiff_Admin(admin.ModelAdmin):
+	list_display = ['Day', 'Name', 'Symbol', 'Price_1', 'Price_7', 'Price_30']
+	list_display_links = ['Symbol']
+	list_filter = ['Day', 'Symbol']
+	search_fields = ['Symbol', 'Name']
+	list_per_page = 400
+
+admin.site.register(all_ks_DatePriceDiff, all_ks_DatePriceDiff_Admin)
 
 class all_ks_join_Admin(admin.ModelAdmin):
 	list_display = ['Day', 'Symbol', 'LastPrice', 'FiftyTwoWkChg', 'DivYild', 'PEG_Ratio', 'PpS', 'PpB', 'Market_Cap', 'Free_Cash_Flow', 'Market_per_CashFlow', 'Enterprise_per_EBITDA']

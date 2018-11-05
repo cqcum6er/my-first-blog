@@ -178,11 +178,12 @@
 		}
 
 		#aside {	<!--Left vertical navigation bar format; define a different style for a different element identified by id="aside".-->
-			width:125px;
+			width:150px;
 			float:left;
 			margin-bottom:-2000px;  /*Clear space to the right for table.*/
 			padding-left:10px;	<!--padding defines the space between element and element border-->
 			padding-bottom:2000px;
+			background-color: #ffcc66;
 		}
 		#aside ul {
 			background-color:#ffcc66;
@@ -399,10 +400,12 @@
 			<div id="aside">  <!--Margin added to keep element to the right of aside bar-->
 			<form method="GET" action="">  <!--Bind multiple forms to one submit button to keep current user GET state-->
 			<p><b>Index Sum</b></p>
-			<p>Sum of index<br>components from:</p>
+			Sum of index<br>
+			components<br>
+			from last<br>
 			<!--<form method="GET" action="">-->
 				<!--<input type="hidden" name="form_id" value="index_sub" />-->
-				<span>Last</span> {{ind_form.Ind_Date}}<br>
+				{{ind_form.Ind_Date}}<br>
 				<!--<input type="submit" name="index_sub" value="Submit" style="width:80px;" />-->
 			<!--</form>-->
 			<!--<ul>
@@ -414,13 +417,14 @@
 				<li><a {% if request.path == IndL5Y %}class="aside_act"{% endif %} href="{% url 'blog:Ind_Last5Yr' %}">Last 5 Years</a></li>
 			</ul>-->
 			<p><b>Top/Bottom<br>Performers</b></p>
-			<p>Choose which index<br>and period to display:</p>
+			<!--<p>Choose which index<br>and period to display:</p>-->
 			<!--<form method="GET" action="">  Leave action empty to return to the same page; use "GET" method to allow url to reflect current selection. value="{{ form.name.value|default_if_none:'' }}"-->
 				<!--<input type="hidden" name="form_id" value="perform_sub" />-->
 				<!--{% csrf_token %}-->
 				{{move_form.Ind_Mov}} <span>index</span><br>
+				from<br>
 				{{move_form.Period_Mov}} <span>ago</span><br>
-				<p>Top/bottom:</p>
+				for the top/bottom<br>
 				{{move_form.Dis_num}} <span>companies</span> <br><br>
 				<!--
 				<select name="Ind_Mov">
@@ -434,7 +438,7 @@
 					<option value="OneMnth" {% if Period_Mov == "OneMnth" %}selected="selected"{% endif %}>One Month</option>
 				</select>
 				<br>-->
-				<input type="submit" value="Submit" style="width:80px;" />
+				<input type="submit" value="Submit" style="width:120px; height:30px;"><br><span style="color: #ffcc66;">end</span> 
 				<!--<input type="submit" name="perform_sub" value="Submit" style="width:80px;" />-->
 			</form>
 			</div>
@@ -476,12 +480,12 @@
 				<tr style="background-color:white">
 					<td style="background-color: #ffcc66;"><a href="/results/?q={{ tick.0 }}"> {{ tick.1 }} ({{ tick.0 }}) </a></td>  <!--tick.0 = post.Symbol, tick.1 = post.Name, tick.2 = PercDayMov-->
 					<td style="text-align:center;
-					{% if tick.2 == 0 %}
-						color:black
+					{% if tick.2 > 0 %}
+						color:green
 					{% elif tick.2 < 0 %}
 						color:red
 					{% else %}
-						color:green
+						color:black
 					{% endif %}
 					;"> {{ tick.2|floatformat:2 }}% </td>
 				</tr>
@@ -490,31 +494,31 @@
 				</table>
 			</div>
 			<div class="mover">
-			<table align=center>
-			<!--<caption><h3 style="text-align:center; color:red;">Bottom</h3></caption>-->
-			<thead>
-			<tr>
-				<th>Bottom companies</th>
-				<th>% Change*</th>
-			</tr>
-			</thead>
-			<tbody>
-			{% for tick in BottomMovers %}  <!--Iterate the 1st 5 items from the list of tuples ('Movers' from views.py).-->
-			<tr style="background-color:white">
-				<td style="background-color: #ffcc66;"><a href="/results/?q={{ tick.0 }}"> {{ tick.1 }} ({{ tick.0 }}) </a></td>
-				<td style="text-align:center;
-				{% if tick.2 == 0 %}
-					color:black
-				{% elif tick.2 < 0 %}
-					color:red
-				{% else %}
-					color:green
-				{% endif %}
-				;"> {{ tick.2|floatformat:2 }}% </td>
-			</tr>
-			{% endfor %}
-			</tbody>
-			</table>
+				<table align=center>
+				<!--<caption><h3 style="text-align:center; color:red;">Bottom</h3></caption>-->
+				<thead>
+				<tr>
+					<th>Bottom companies</th>
+					<th>% Change*</th>
+				</tr>
+				</thead>
+				<tbody>
+				{% for tick in BottomMovers %}  <!--Iterate the 1st 5 items from the list of tuples ('Movers' from views.py; ordered by % price diff; tick.2 must be converted to float type 1st).-->
+				<tr style="background-color:white">
+					<td style="background-color: #ffcc66;"><a href="/results/?q={{ tick.0 }}"> {{ tick.1 }} ({{ tick.0 }}) </a></td>
+					<td style="text-align:center;
+					{% if tick.2 > 0 %}
+						color:green
+					{% elif tick.2 < 0 %}
+						color:red
+					{% else %}
+						color:black
+					{% endif %}
+					;"> {{ tick.2|floatformat:2 }}% </td>
+				</tr>
+				{% endfor %}
+				</tbody>
+				</table>
 			</div>
 			<p style="color:grey;"><i>*% Changes are calculated at the end of previously open market.</i></p>
 		</div>

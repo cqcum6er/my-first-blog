@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '2)z6gao=dn=csifbos_a&8sr5h6#%%imru@l=y*elf)e+c*3ta'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True  #Check "User comment" error before turning off.
+DEBUG = False  #Check "User comment" error before turning off.
 
-ALLOWED_HOSTS = ['127.0.0.1', 'cqcum6er.pythonanywhere.com', 'www.fundamentaltrader.net']  #Set to ['127.0.0.1', 'cqcum6er.pythonanywhere.com', 'www.fundamentaltrader.net'] when DEBUG is set to False, otherwise leave empty.
+ALLOWED_HOSTS = []  #Set to ['127.0.0.1', 'cqcum6er.pythonanywhere.com', 'www.fundamentaltrader.net'] when DEBUG is set to False, otherwise leave empty.
 
 
 # Application definition
