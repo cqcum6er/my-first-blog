@@ -11,6 +11,9 @@ import os
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mysite.settings')  #Configure Python to access database object (from blog.models) outside of manage.py directory.
 import datetime
 from blog.models import all_ks, all_ks_DatePriceDiff
+from django.core.exceptions import ObjectDoesNotExist
+import django
+django.setup()  #Required for "standalone" Django usage
 
 #def handle(self, *args, **options):
 	#global html  #Makes html accessible to all functions (StrFet and handle).
@@ -32,7 +35,8 @@ Latest_all_ks = all_ks.objects.filter(Day=p.Day)  #Return all index symbols from
 posts = all_ks.objects.filter(Day=p.Day, Symbol__in=list(Latest_all_ks))  #Filter with both conditions in paranthesis for AND operation instead of OR; use '__in=list()' format to retrieve all instance of DJ index.
 #Movers = []
 #print posts, type(posts)
-for post in posts:  #for post in posts[400:]:
+all_ks_DatePriceDiff.objects.all().delete()  #Remove all % price diff calculation from the previous date.
+for post in posts:  #for post in posts:
 	'''
 	if post.Symbol == "AAPL":
 		break  #Break out of posts for-loop before AAPL.
@@ -58,8 +62,8 @@ for post in posts:  #for post in posts[400:]:
 		#print post.Symbol, post.LastPrice, type(post.LastPrice), ypost.LastPrice, type(ypost.LastPrice),
 		#if not ypost:  #Skip % diff calculation if a date doesn't exist. Note: "if not ypost.LastPrice:" OR "if type(ypost.LastPrice) is None:" doesn't work since ypost.LastPrice is an unicode object.
 			#continue #Skip input for User_date if none exists.
-		
-		if (post is None) or (post.LastPrice == "N/A") or (ypost is None) or ypost.LastPrice == "N/A":  #Return "N/A" if no price is reported (or invalid) for today or user-specified date.
+		#try:
+		if (post is None) or (post.LastPrice == "N/A") or (ypost is None) or (ypost.LastPrice == "N/A"):  #Return "N/A" if no price is reported (or invalid) for today or user-specified date.
 			setattr(row, key, 'N/A')
 		else:
 		
@@ -70,6 +74,9 @@ for post in posts:  #for post in posts[400:]:
 			#row.key = 'test'
 			#print row.key, type(row.key)
 			#row.save()
+			print getattr(row, key, str(PercDayMov))
+		#except ObjectDoesNotExist:  #If post doesn't exist.
+			#setattr(row, key, 'N/A')
 		
 	row.save()  #Save all stats for each symbol before iterating to the next symbol.
 
