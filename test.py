@@ -1,4 +1,5 @@
-#Test whether new csv or model entry can be generated correctly by accessing database object:>python Period_performers.py
+#Generate a model for price differences for 3 speicifc period (a day, a week, & a month) for quick access upon form submission:>python test.py
+#Old: Test whether new csv or model entry can be generated correctly by accessing database object:>python Period_performers.py
 '''
 import sys
 sys.path.append('C:\Python27\djangogirls\mysite\blog')
@@ -13,7 +14,7 @@ import datetime
 from blog.models import all_ks, all_ks_DatePriceDiff
 from django.core.exceptions import ObjectDoesNotExist
 import django
-django.setup()  #Required for "standalone" Django usage
+django.setup()  #Required for "standalone" Django usage; remove if running as part of ORM.
 
 #def handle(self, *args, **options):
 	#global html  #Makes html accessible to all functions (StrFet and handle).
@@ -36,7 +37,7 @@ posts = all_ks.objects.filter(Day=p.Day, Symbol__in=list(Latest_all_ks))  #Filte
 #Movers = []
 #print posts, type(posts)
 all_ks_DatePriceDiff.objects.all().delete()  #Remove all % price diff calculation from the previous date.
-for post in posts:  #for post in posts:
+for post in posts:  #for post in posts[400:]:
 	'''
 	if post.Symbol == "AAPL":
 		break  #Break out of posts for-loop before AAPL.
@@ -58,13 +59,16 @@ for post in posts:  #for post in posts:
 		Day_Delta = p.Day - datetime.timedelta(days=value)  #Get datetime for user specified range.
 		print Day_Delta
 		#print key, type(key), value, type(value)
-		ypost = all_ks.objects.filter(Day=Day_Delta, Symbol=post.Symbol).first()  #Use .first() or '[0]' with filter to ensure only the first AND only entry in queryset is retrieved for the past date.
+		try:
+			ypost = all_ks.objects.filter(Day=Day_Delta, Symbol=post.Symbol)[0]  #Use .first() or '[0]' with filter to ensure only the first AND only entry in queryset is retrieved for the past date.
+		except IndexError:  #Return None in case the list is empty.
+			ypost = None
 		#print post.Symbol, post.LastPrice, type(post.LastPrice), ypost.LastPrice, type(ypost.LastPrice),
 		#if not ypost:  #Skip % diff calculation if a date doesn't exist. Note: "if not ypost.LastPrice:" OR "if type(ypost.LastPrice) is None:" doesn't work since ypost.LastPrice is an unicode object.
 			#continue #Skip input for User_date if none exists.
 		#try:
 		if (post is None) or (post.LastPrice == "N/A") or (ypost is None) or (ypost.LastPrice == "N/A"):  #Return "N/A" if no price is reported (or invalid) for today or user-specified date.
-			setattr(row, key, 'N/A')
+			setattr(row, key, None)
 		else:
 		
 			PercDayMov = ((float(post.LastPrice) - float(ypost.LastPrice))/float(ypost.LastPrice))*100

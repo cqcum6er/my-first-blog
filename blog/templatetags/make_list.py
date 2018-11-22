@@ -1,9 +1,9 @@
-#Collect a bunch of url's as a shortcut list (usage: collect 'html' as 'shortcut').
+#Collect a bunch of url's as a shortcut list (usage: collect html1 html2 ... as shortcut).
 from django import template
 
 register = template.Library()
 
-@register.tag
+@register.tag  #Use tag syntax {% collect html1 html2 ... as shortcut %}
 def collect(parser, token):
     bits = list(token.split_contents())
     if len(bits) > 3 and bits[-2] == 'as':  #Define syntax for positional argument.

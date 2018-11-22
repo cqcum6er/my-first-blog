@@ -19,6 +19,7 @@ import datetime
 import time
 from django.db import connection  #Check sqlite connection speed with "connection.queries".
 import csv
+#import itertools
 
 '''
 #To update database with the current date, save scheduled csv record from Pythonanywhere (Export "all_ks" table as csv file [i.e.'all_ks_export.csv'] and save to the same directory as views.py), then run local server ONCE to populate local database before commenting out this block (may need to remove duplicate rows with sqlite command afterward); comment out this block before uploading views.py to Pythonanywhere to use scheduled csv instead...
@@ -65,6 +66,54 @@ def Movers(Ind, User_Date, Dis_num):  #Sorts index components into top/bottom pe
 	st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')  #Convert current time to a readable format.
 	print "Start time: "+st
 	'''
+	#Asynchronous calculation of % price diff based on user input; use stored % price diff as a model object that is refreshed daily (format of model = date, company name, symbol, % price diff for yesterday, one week, & one month); USE .order_by() DB OPERATION INSTEAD OF PYTHON .sort() TO SPEED UP ACCESS.
+	p = Ind.objects.latest('Day')  #Returns an object instance (not iterable) from latest date; if latest() is empty, it works with attributes defined by 'class Meta' in models.py. Note latest () only retrieve ONE instance; .values() needs to be inserted in front of latest() to make it iterable as dictionary; cache queryset object for quick retrieval in html request.
+	#print p, type(p)
+	Latest_Ind = Ind.objects.filter(Day=p.Day)  #Return all index symbols from latest date.
+	#print Latest_Ind, type(Latest_Ind)
+	posts = all_ks.objects.filter(Day=p.Day, Symbol__in=list(Latest_Ind))  #Filter with both conditions in paranthesis for AND operation instead of OR; use '__in=list()' format to retrieve all symbol in the index.
+	#print posts, type(posts)
+	User_Date_dict = {'Price_1': 1, 'Price_7': 7, 'Price_30': 30}
+	User_filter = [(key, val) for (key, val) in User_Date_dict.iteritems() if User_Date == val]  #List comprehension to determine user input; in Python 2.x .items() returns a list with tuple, not an iterator (.iteritems() is removed in Python 3.x).
+	#print next(User_filter, None), type(next(User_filter, None))  #Retrieve the next item from the iterator. If default (2nd arg) is given, it is returned if the iterator is exhausted, otherwise StopIteration is raised.
+	#print User_filter, type(User_filter)
+	#print User_filter.next(), type(User_filter.next())
+	#results = itertools.islice(User_filter, 0)
+	#print results, type(results)
+	key = User_filter[0][0]  #Return field with user-specified date within the tuple of the list.
+	#key = next(User_filter, None)[0]
+	#key = User_filter.next()[0]  #Get key from generator dict.
+	#print key
+	rev_key = '-' + key
+	#val = User_filter.next()[1]  #Get val from generator dict.
+	variable_column = key
+	search_type = 'isnull'
+	filter = variable_column + '__' + search_type  #Use kwarg 'filter' for variable column name for .exclude() (removing instance where the value is null for user-specified period).
+	Top_disp = all_ks_DatePriceDiff.objects.filter(Symbol__in=list(Latest_Ind)).order_by(rev_key).values('Name', 'Symbol', key).exclude(**{ filter: True })[:Dis_num]  #.exclude(key='')  #Use .only() to select fields to display (for faster access, use .values() to return a list of dict instead of queryset object); .exclude() excludes instance where price for a date doesn't exist.
+	#Top_disp = all_ks_DatePriceDiff.objects.filter(Symbol__in=list(Latest_Ind), key__icontains='').order_by(key)#[:Dis_num]
+	#Top_disp = all_ks_DatePriceDiff.objects.extra(select={key: 'CAST(all_ks_DatePriceDiff.key AS INTEGER)'}, order_by=[key])
+	#print Top_disp, type(Top_disp)
+	Bottom_disp = all_ks_DatePriceDiff.objects.filter(Symbol__in=list(Latest_Ind)).order_by(key).values('Name', 'Symbol', key).exclude(**{ filter: True })[:Dis_num]
+		
+	'''
+	for key, val in User_Date_dict.iteritems():  #In Python 2.x .items() returns a list with tuple, not an iterator (.iteritems() is removed in Python 3.x).
+		if User_Date == val:
+			Top_disp = all_ks_DatePriceDiff.objects.filter(Symbol__in=list(Latest_Ind)).exclude(key='').order_by(key)#[:Dis_num]
+			#Top_disp = all_ks_DatePriceDiff.objects.filter(Symbol__in=list(Latest_Ind), key__icontains='').order_by(key)#[:Dis_num]
+			#Top_disp = all_ks_DatePriceDiff.objects.extra(select={key: 'CAST(all_ks_DatePriceDiff.key AS INTEGER)'}, order_by=[key])
+			#Bottom_disp = all_ks_DatePriceDiff.objects.filter(Symbol__in=list(Latest_Ind)).order_by(-key)[:Dis_num]
+			#print type(Top_disp), type(Bottom_disp)
+		else:
+			continue  #Continue to check if user entered another date.
+	'''
+	'''
+	ts = time.time()
+	st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+	print "End time: "+st
+	'''
+	return (Top_disp, Bottom_disp, key)  #Return a tuple of top/bottom performers (as queryset instead of list to speed up access), accessible via Movers(...)[0] or Movers(...)[1].
+	
+	'''
 	#Asynchronous calculation of % price diff based on user input; store % price diff as a model object that is refreshed daily (format of model = date, company name, symbol, % price diff for yesterday, one week, & one month).
 	p = Ind.objects.latest('Day')  #Returns an object instance (not iterable) from latest date; if latest() is empty, it works with attributes defined by 'class Meta' in models.py. Note latest () only retrieve ONE instance; .values() needs to be inserted in front of latest() to make it iterable as dictionary; cache queryset object for quick retrieval in html request.
 	#print p, type(p)
@@ -79,60 +128,22 @@ def Movers(Ind, User_Date, Dis_num):  #Sorts index components into top/bottom pe
 			for post in posts:
 				all_ks_DPD = all_ks_DatePriceDiff.objects.filter(Symbol=post.Symbol).first()  #Select an instance (one company) from db object "all_ks_DatePriceDiff" if it is present in the latest index entry; use .first() to ensure only one instance is selected.
 				#print all_ks_DPD, type(all_ks_DPD),
-				if not all_ks_DPD:  #Skip % diff calculation if an instance (one company) doesn't exist. Note: "if not ypost.LastPrice:" OR "if type(ypost.LastPrice) is None:" doesn't work since ypost.LastPrice is an unicode object.
-					continue #break
-				if getattr(all_ks_DPD, key) == "N/A":  #if all_ks_DPD.key == "N/A" or all_ks_DPD.key == "N/A":#Return 0.0 if no price is reported (or invalid) today or user-specified date.
+				if not all_ks_DPD:  #Skip to the next symbol for % diff calculation if an instance (one company) doesn't exist.
+					continue
+				if getattr(all_ks_DPD, key) == "N/A":  #all_ks_DPD.key may not function in a for-loop; skip to the next symbol for % diff calculation if no price is reported (or invalid) for user-specified date.
 					continue  #Don't append to Movers list if the user-requested date doesn't exist; move on to the next instance (company).
 					#Movers.append(tuple((all_ks_DPD.Symbol, all_ks_DPD.Name, '0')))
 				else:
 					Movers.append(tuple((all_ks_DPD.Symbol, all_ks_DPD.Name, float(getattr(all_ks_DPD, key)))))  #Add each symbol and it daily % movement as a tuple to a list ('Movers'); convert % price diff to float to sort correctly.
 		else:
 			continue  #Continue to check if user entered another date.
-	'''
-	if User_Date == 1:
-		#print 'user date is one'
-		for post in posts:
-			all_ks_DPD = all_ks_DatePriceDiff.objects.filter(Symbol=post.Symbol).first()  #Select an instance (one company) from db object "all_ks_DatePriceDiff" if it is present in the latest index entry; use .first() to ensure only one instance is selected.
-			#print all_ks_DPD, type(all_ks_DPD),
-			if not all_ks_DPD:  #Skip % diff calculation if an instance (one company) doesn't exist. Note: "if not ypost.LastPrice:" OR "if type(ypost.LastPrice) is None:" doesn't work since ypost.LastPrice is an unicode object.
-				continue #break
-			if all_ks_DPD.Price_1 == "N/A" or all_ks_DPD.Price_1 == "N/A":  #Return 0.0 if no price is reported (or invalid) today or user-specified date.
-				continue  #Don't append to Movers list if the user-requested date doesn't exist; move on to the next instance (company).
-				#Movers.append(tuple((all_ks_DPD.Symbol, all_ks_DPD.Name, '0')))
-			else:
-				Movers.append(tuple((all_ks_DPD.Symbol, all_ks_DPD.Name, float(all_ks_DPD.Price_1))))  #Add each symbol and it daily % movement as a tuple to a list ('Movers'); convert % price diff to float to sort correctly.
-	elif User_Date == 7:
-		for post in posts:
-			all_ks_DPD = all_ks_DatePriceDiff.objects.filter(Symbol=post.Symbol).first()
-			if not all_ks_DPD:
-				continue
-			if all_ks_DPD.Price_7 == "N/A" or all_ks_DPD.Price_7 == "N/A":
-				continue
-			else:
-				Movers.append(tuple((all_ks_DPD.Symbol, all_ks_DPD.Name, float(all_ks_DPD.Price_7))))
-	elif User_Date == 30:
-		for post in posts:
-			all_ks_DPD = all_ks_DatePriceDiff.objects.filter(Symbol=post.Symbol).first()
-			if not all_ks_DPD:
-				continue
-			if all_ks_DPD.Price_30 == "N/A" or all_ks_DPD.Price_30 == "N/A":
-				continue
-			else:
-				Movers.append(tuple((all_ks_DPD.Symbol, all_ks_DPD.Name, float(all_ks_DPD.Price_30))))
-	'''
 	Movers.sort(key=lambda tup: tup[2])  #Sort the tuple based on daily % movement (3rd element of each tuple entry) using the anonymous function, lambda.
 	#print Movers, type(Movers)
-	print Movers
 	Top_disp = list(reversed(Movers[-Dis_num:]))  #'reversed' returns a 'listreverseiterator' type instead of a list type.
 	Bottom_disp = Movers[:Dis_num]
 	#print type(Top_disp), type(Bottom_disp)
-	'''
-	ts = time.time()
-	st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-	print "End time: "+st
-	'''
 	return (Top_disp, Bottom_disp)  #Return a tuple of top/bottom performers, accessible via Movers(...)[0] or Movers(...)[1].
-	
+	'''
 	'''
 	#Retrieve the results of % price diff for diff dates from a csv file for asynchronous operation (format of csv = date, company name, symbol, % price diff for yesterday, one week, & one month).
 	with open('Period_performers.csv', 'rb') as file:
@@ -248,7 +259,7 @@ def Movers(Ind, User_Date, Dis_num):  #Sorts index components into top/bottom pe
 def home(request):
 	move_form = MoverForm()  #MoverForm(initial={'Ind_Mov': 'Index_DJ', 'Period_Mov': '1' 'Dis_num': '5'})  #Load empty form when the page is loaded the 1st time without user input; needed to initiate multiple forms on one page before checking user submission for each form.
 	ind_form = IndexForm()
-	Ind_Mov_label = "Dow Jones"  #Populate the initial empty form with default values.
+	Ind_Mov_label = "Dow Jones"  #Populate the initial empty form with default values; must be visible to the context dict.
 	Period_Mov_label = "One Day"
 	Ind = Index_DJ
 	Period_Mov_val = 1
@@ -305,15 +316,15 @@ def home(request):
 			Ind_Mov = move_form.cleaned_data['Ind_Mov']  #Retrieve cleaned data (value) of 'Ind_Mov' selection in home.html (only usable after validation).
 			#Ind_Mov = request.GET.get('Ind_Mov')
 			#Ind_Mov = str(Ind_Mov)
-			print Ind_Mov, type(Ind_Mov)  #Show cleaned user index selection.
+			#print Ind_Mov, type(Ind_Mov)  #Show cleaned user index selection.
 			Ind_Mov_label = dict(move_form.fields['Ind_Mov'].choices).get(str(Ind_Mov))  #Get label (not key) of selected ChoiceField.
-			print Ind_Mov_label, type(Ind_Mov_label)  #Show user index selection as label.
+			#print Ind_Mov_label, type(Ind_Mov_label)  #Show user index selection as label.
 			Period_Mov_val = move_form.cleaned_data['Period_Mov']  #Retrieve cleaned data (value) of 'Period_Mov'  selection in home.html.
 			#Period_Mov = request.GET.get('Period_Mov')
 			Period_Mov_val = int(Period_Mov_val)
 			#print Period_Mov_val, type(Period_Mov_val)
 			Period_Mov_label = dict(move_form.fields['Period_Mov'].choices).get(str(Period_Mov_val))  #Get label (not value or key) of chosen ChoiceField to display in template (applicable to form object).
-			print Period_Mov_label, type(Period_Mov_label)  #Show user period selection for form display.
+			#print Period_Mov_label, type(Period_Mov_label)  #Show user period selection for form display.
 			Dis_num = move_form.cleaned_data['Dis_num']
 			Dis_num = int(Dis_num)
 			#print Dis_num, type(Dis_num)
@@ -325,9 +336,9 @@ def home(request):
 				Ind = Index_SP500
 
 			Ind_Date = ind_form.cleaned_data['Ind_Date']
-			print Ind_Date, type(Ind_Date)  #Show user submission key.
+			#print Ind_Date, type(Ind_Date)  #Show user submission key.
 			Ind_Date_label = dict(ind_form.fields['Ind_Date'].choices).get(str(Ind_Date))  #Get label (not key) of chosen ChoiceField.
-			print Ind_Date_label, type(Ind_Date_label)  #Show user submission label.
+			#print Ind_Date_label, type(Ind_Date_label)  #Show user submission label.
 	'''
 	if "perform_sub" in request.GET:  #For single form in one page, use request.method == "GET" for condition test; for multiple forms in one page, check if the name of the submit button is included in the user QueryDict.
 		#print request.GET, type(request.GET)
@@ -369,10 +380,11 @@ def home(request):
 	return render(request, 'blog/home.html', {
 	'ind_form': ind_form,
 	'move_form': move_form,
-	'TopMovers': Movers(Ind, Period_Mov_val, Dis_num)[0],
-	'BottomMovers': Movers(Ind, Period_Mov_val, Dis_num)[1],
-	'Performer_Index': Ind_Mov_label,
-	'Performer_Period': Period_Mov_label,
+	'TopMovers': Movers(Ind, Period_Mov_val, Dis_num)[0],  #Collect 1st part of tuple as top movers.
+	'BottomMovers': Movers(Ind, Period_Mov_val, Dis_num)[1],  #Collect 2nd part of tuple as bottom movers.
+	'key': Movers(Ind, Period_Mov_val, Dis_num)[2],  #Collect 3rd part of tuple for custom dict filter.
+	'Performer_Index': Ind_Mov_label,  #Flavor text for title.
+	'Performer_Period': Period_Mov_label,  #Flavor text for title.
 	'Index_Sum':Ind_Date_label
 	})
 	#Movers(Ind, Period_Mov_val, Dis_num)

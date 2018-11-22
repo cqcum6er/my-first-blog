@@ -2,6 +2,13 @@
 <html lang="en">
 	<head>
 		<title>{% block title %}Fundamental Trader-Home{% endblock %}</title>
+		<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-5457204966421525",
+            enable_page_level_ads: true
+          });
+        </script>
 		<script>
 		document.getElementById("demo").innerHTML = Date.getTime();
 		function startTime() {
@@ -367,7 +374,7 @@
 				{% url 'blog:ResCenter_link' as rc %}
 				{% url 'blog:ResCenter_Links_link' as rc_l %}
 				{% url 'blog:results' as res %}
-				{% load make_list %}  <!--Load the custom template tags to prepare shortcut for an url list (usage: collect 'html' as 'shortcut').-->
+				{% load make_list dict_vari_key_lookup%}  <!--Load the custom template tags to prepare shortcut for an url list (usage: collect 'html' as 'shortcut').-->
 				{% collect DJLD DJLW DJLM DJL6M DJLQ DJLY as all_DJ_link %}
 				{% url 'blog:SP_LastDay' as SPLD %}
 				{% url 'blog:SP_LastWk' as SPLW %}
@@ -478,16 +485,16 @@
 				<tbody>
 				{% for tick in TopMovers %}  <!--Iterate in reverse order the last 5 items from the list of tuples ('Movers' from views.py).-->
 				<tr style="background-color:white">
-					<td style="background-color: #ffcc66;"><a href="/results/?q={{ tick.0 }}"> {{ tick.1 }} ({{ tick.0 }}) </a></td>  <!--tick.0 = post.Symbol, tick.1 = post.Name, tick.2 = PercDayMov-->
+					<td style="background-color: #ffcc66;"><a href="/results/?q={{ tick.Symbol }}"> {{ tick.Name }} ({{ tick.Symbol }}) </a></td>  <!--Use tick.# if for-loop item is a list object, otherwise use tick.FieldName for queryset object-->
 					<td style="text-align:center;
-					{% if tick.2 > 0 %}
+					{% if tick|keyval:key > 0 %}
 						color:green
-					{% elif tick.2 < 0 %}
+					{% elif tick|keyval:key < 0 %}
 						color:red
 					{% else %}
 						color:black
 					{% endif %}
-					;"> {{ tick.2|floatformat:2 }}% </td>
+					;"> {{ tick|keyval:key|floatformat:2 }}% </td>  <!--key inside filter needs to be passed from views.py as context dict.-->
 				</tr>
 				{% endfor %}
 				</tbody>
@@ -505,16 +512,16 @@
 				<tbody>
 				{% for tick in BottomMovers %}  <!--Iterate the 1st 5 items from the list of tuples ('Movers' from views.py; ordered by % price diff; tick.2 must be converted to float type 1st).-->
 				<tr style="background-color:white">
-					<td style="background-color: #ffcc66;"><a href="/results/?q={{ tick.0 }}"> {{ tick.1 }} ({{ tick.0 }}) </a></td>
+					<td style="background-color: #ffcc66;"><a href="/results/?q={{ tick.Symbol }}"> {{ tick.Name }} ({{ tick.Symbol }}) </a></td>
 					<td style="text-align:center;
-					{% if tick.2 > 0 %}
+					{% if tick|keyval:key > 0 %}
 						color:green
-					{% elif tick.2 < 0 %}
+					{% elif tick|keyval:key < 0 %}
 						color:red
 					{% else %}
 						color:black
 					{% endif %}
-					;"> {{ tick.2|floatformat:2 }}% </td>
+					;"> {{ tick|keyval:key|floatformat:2 }}% </td>
 				</tr>
 				{% endfor %}
 				</tbody>

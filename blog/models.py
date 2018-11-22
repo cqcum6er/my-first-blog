@@ -133,9 +133,9 @@ class all_ks_DatePriceDiff(models.Model):
 	Day = models.DateField(blank=False, default=datetime.date.today().strftime('%Y-%m-%d'))
 	Name = models.CharField(max_length=50, default='N/A')
 	Symbol = models.CharField(max_length=20, default='N/A')
-	Price_1 = models.CharField(max_length=50, default='N/A')
-	Price_7 = models.CharField(max_length=50, default='N/A')
-	Price_30 = models.CharField(max_length=50, default='N/A')
+	Price_1 = models.DecimalField(blank=True, null=True, decimal_places=3, max_digits=10)
+	Price_7 = models.DecimalField(blank=True, null=True, decimal_places=3, max_digits=10)
+	Price_30 = models.DecimalField(blank=True, null=True, decimal_places=3, max_digits=10)
 
 	def __str__(self):
 		return self.Symbol

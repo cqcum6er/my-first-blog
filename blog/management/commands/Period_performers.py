@@ -3,8 +3,6 @@ from django.core.management.base import BaseCommand, CommandError
 #import csv
 import datetime
 from blog.models import all_ks, all_ks_DatePriceDiff
-import django
-django.setup()  #Required for "standalone" Django usage
 
 class Command(BaseCommand):
 	help = "Asynchronous calculation of % price diff for diff dates from all_ks model object, & calcuation is done daily (format of model = date, company name, symbol, % price diff for yesterday, one week, & one month)."
@@ -31,13 +29,16 @@ class Command(BaseCommand):
 				Day_Delta = p.Day - datetime.timedelta(days=value)  #Get datetime for user specified range.
 				print Day_Delta
 				#print key, type(key), value, type(value)
-				ypost = all_ks.objects.filter(Day=Day_Delta, Symbol=post.Symbol).first()  #Use .first() or '[0]' with filter to ensure only the first AND only entry in queryset is retrieved for the past date.
+				try:
+					ypost = all_ks.objects.filter(Day=Day_Delta, Symbol=post.Symbol)[0]  #Use .first() or '[0]' with filter to ensure only the first AND only entry in queryset is retrieved for the past date.
+				except IndexError:  #Return None in case the list is empty.
+					ypost = None
 				#print post.Symbol, post.LastPrice, type(post.LastPrice), ypost.LastPrice, type(ypost.LastPrice),
 				#if not ypost:  #Skip % diff calculation if a date doesn't exist. Note: "if not ypost.LastPrice:" OR "if type(ypost.LastPrice) is None:" doesn't work since ypost.LastPrice is an unicode object.
 					#continue #Skip input for User_date if none exists.
 				
 				if (post is None) or (post.LastPrice == "N/A") or (ypost is None) or (ypost.LastPrice == "N/A"):  #Return "N/A" if no price is reported (or invalid) for today or user-specified date.
-					setattr(row, key, 'N/A')
+					setattr(row, key, None)  #row.key (object instance.field) syntax may not function in a for-loop; use None as null value for DecimalFields.
 				else:
 				
 					PercDayMov = ((float(post.LastPrice) - float(ypost.LastPrice))/float(ypost.LastPrice))*100

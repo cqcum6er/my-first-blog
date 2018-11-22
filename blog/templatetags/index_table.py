@@ -12,7 +12,7 @@ from django import template
 register = template.Library()
 
 @register.inclusion_tag('blog/index_table.html', takes_context=True)
-def DJ_LastDay(context):
+def DJ_LastDay(context):  #DJ_LastDay defined by a function in views.py.
 	return {'posts':context['DJ_LastDay_posts'], 'request':context['request']}  #Arg inside context[] are taken from views.py; arg in front of context[] are found in HTML.
 
 @register.inclusion_tag('blog/index_table.html', takes_context=True)
