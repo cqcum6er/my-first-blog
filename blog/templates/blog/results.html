@@ -12,9 +12,15 @@
 		<li><button onclick="goBack()">&lt; Back</button></li>  <!--&lt; = <-->
 	</ul>
 </div>
-<table id="myTable" border="8" style="border-collapse: collapse; width:1000px;">
-	<caption><b>{{ last_element.Name }} ({{ last_element.Symbol }}) ({{ posts|length }} days found) <!--Get "Symbol" field value from the last item in the QuerySet.-->
-	</b></caption>
+
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/theme.default.css' %}" type="text/css" />
+<script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/jquery.tablesorter.js' %}"></script>
+
+<table id="myTable" class="tablesorter" border="8" style="border-collapse: collapse; width:1000px;">
+	<caption><b><span class="highlight">{{ last_element.Name }} ({{ last_element.Symbol }}) ({{ posts|length }} days found) <!--Get "Symbol" field value from the last item in the QuerySet.-->
+	</span></b></caption>
 	<thead>
 	<tr style="color:white;background:black;">
 		<th onclick="sortTable(0)">Date</th>
@@ -86,115 +92,38 @@
 	{% endfor %}
 	</tbody>
 </table>
-
 <script>
 function goBack() {
   window.history.back();  //Back button
 }
-function sortTable(n) {  //See <https://www.w3schools.com/howto/howto_js_sort_table.asp> for source code.
-  var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-  //var reTest = /[A-Za-z]/
-  table = document.getElementById("myTable");
-  switching = true;
-  //Set the sorting direction to ascending:
-  dir = "asc"; 
-  /*Make a loop that will continue until
-  no switching has been done:*/
-  while (switching) {
-    //start by saying: no switching is done:
-    switching = false;
-    rows = table.getElementsByTagName("TR");
-	//Convert all raw data with the value "infinity" to 0 for sorting.
-    for (i = 1; i < (rows.length - 1); i++) {
-		if (rows[i].getElementsByTagName("TD")[n] != '"Infinity"') { continue; }
-			rows[i].getElementsByTagName("TD")[n] = 0;
-	}
-	/*Loop through all table rows (except the
-    first, which contains table headers):*/
-	for (i = 1; i < (rows.length - 1); i++) {
-      //start by saying there should be no switching:
-      shouldSwitch = false;
-      /*Get the two elements you want to compare,
-      one from current row and one from the next:*/
-      x = rows[i].getElementsByTagName("TD")[n];
-      y = rows[i + 1].getElementsByTagName("TD")[n];
-	  console.log(x.innerHTML.slice(0,1));  //".innerHTML" displays str nested inside html decorator <></>.
-	  /*check if the two rows should switch place,
-      based on the direction, asc or desc:*/
-	  if (/[a-z]/i.test(x.innerHTML.slice(0,1)) || /[a-z]/i.test(y.innerHTML.slice(0,1))) {  //If the 1st char is a letter for current or next rows, sort as str.
-		if (dir == "asc") {
-          if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-            //if so, mark as a switch and break the loop:
-            shouldSwitch= true;
-            break;
-          }
-        } else if (dir == "desc") {
-          if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-            //if so, mark as a switch and break the loop:
-            shouldSwitch= true;
-            break;
-          }
-        }
-	  } else if (/[0-9]/.test(x.innerHTML.slice(-1)) || /[0-9]/.test(y.innerHTML.slice(-1))) {  //If the last char is a num for current or next rows, sort according to num values.
-		if (dir == "asc") {
-          if (Number(x.innerHTML) > Number(y.innerHTML)) {
-            //if so, mark as a switch and break the loop:
-            shouldSwitch= true;
-            break;
-          }
-        } else if (dir == "desc") {
-          if (Number(x.innerHTML) < Number(y.innerHTML)) {
-            //if so, mark as a switch and break the loop:
-            shouldSwitch= true;
-            break;
-          }
-        }
-	  } else if (x.innerHTML.slice(-1) == "%" || y.innerHTML.slice(-1) == "%") {  //If the last char is '%' for current or next rows, sort according to numeric values.
-		if (dir == "asc") {
-          if (Number(x.innerHTML.slice(0,-1)) > Number(y.innerHTML.slice(0,-1))) {
-            //if so, mark as a switch and break the loop:
-            shouldSwitch= true;
-            break;
-          }
-        } else if (dir == "desc") {
-          if (Number(x.innerHTML.slice(0,-1)) < Number(y.innerHTML.slice(0,-1))) {
-            //if so, mark as a switch and break the loop:
-            shouldSwitch= true;
-            break;
-          }
-        }
-	  } else if (x.innerHTML.slice(-1).toLowerCase() == "b" || y.innerHTML.slice(-1).toLowerCase() == "b") {  //If the last char is 'B' or 'b' for current or next rows, sort according to numeric values.
-		if (dir == "asc") {
-          if (Number(x.innerHTML.slice(0,-1)) > Number(y.innerHTML.slice(0,-1))) {
-            //if so, mark as a switch and break the loop:
-            shouldSwitch= true;
-            break;
-          }
-        } else if (dir == "desc") {
-          if (Number(x.innerHTML.slice(0,-1)) < Number(y.innerHTML.slice(0,-1))) {
-            //if so, mark as a switch and break the loop:
-            shouldSwitch= true;
-            break;
-          }
-        }
-	  }
-    }
-    if (shouldSwitch) {
-      /*If a switch has been marked, make the switch
-      and mark that a switch has been done:*/
-      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-      switching = true;
-      //Each time a switch is done, increase this count by 1:
-      switchcount ++;      
-    } else {
-      /*If no switching has been done AND the direction is "asc",
-      set the direction to "desc" and run the while loop again.*/
-      if (switchcount == 0 && dir == "asc") {
-        dir = "desc";
-        switching = true;
-      }
-    }
-  }
-}
+$.tablesorter.addParser({ //Bypass tablesorter default behavior with a parser function.
+    // Set a unique id 
+    id: 'billions',
+    is: function(s) { 
+        // Return false so this parser is not auto detected 
+        return false; 
+    }, 
+    format: function(s) {
+        // Remove last character 'B' and sort as numbers.
+        return s.replace('B','');
+    }, 
+    // set type, either numeric or text 
+    type: 'numeric' 
+});
+$(document).ready(function(){
+		$('#myTable').tablesorter({
+			sortList: [[0,1]],  //Place most recent date on top.
+			widgets: ['zebra'],
+			headers: {
+				11: {//zero-based column index; Market Cap
+					sorter: 'billions'
+				},
+				12: {//Operating Cash Flow
+					sorter: 'billions'
+				}
+			}
+	});
+});
 </script>
+
 {% endblock %}

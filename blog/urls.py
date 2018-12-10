@@ -20,6 +20,7 @@ urlpatterns = [
 	url(r'^Thanks/', views.thanks, name='thanks'),
 	url(r'^Resources_Definitions/', views.ResCenter_Def, name='ResCenter_link'),
 	url(r'^Resources_Links/', views.ResCenter_Links, name='ResCenter_Links_link'),
+	url(r'^Resources_Plugs/', views.ResCenter_Plugs, name='ResCenter_Plugs_link'),
 	#url(r'^movers/', views.get_query, name='movers'),
 	url(r'^results/', views.get_query, name='results'),
 	#url(r'^results/(?P<Symbol>\d+)/', views.get_query, name='results'),  #(?P<name>pattern), where name is the name of the group and pattern is some pattern to match. The captured values are passed to view functions as keyword arguments rather than positional arguments. For example, the pk argument will be passed to views.get_query as a string object.

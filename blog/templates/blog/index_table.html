@@ -1,11 +1,19 @@
-<table id="myTable" border="8" style="border-collapse:collapse; width:1000px;">
+<!--{% load staticfiles %}-->
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/theme.default.css' %}" type="text/css" />
+<script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/jquery.tablesorter.js' %}"></script>
+
+<table id="myTable" class="tablesorter" border="8" style="border-collapse:collapse; width:1000px;">
 	<caption><b>
+	<span class="highlight">
 	{% if 'DJ' in request.path %}
 		Dow Jones
 	{% elif 'SP' in request.path %}
 		S&amp;P500
 	{% endif %}
-		Index ({{ posts|length }} symbols returned) - 
+		</span>Index (<span class="highlight">{{ posts|length }}</span> symbols returned) - 
+	<span class="highlight">
 	{% if 'LastDay' in request.path %}
 		Last Trading Day
 	{% elif 'LastWeek' in request.path %}
@@ -17,26 +25,27 @@
 	{% elif 'LastYear' in request.path %}
 		Last Year
 	{% endif %}
-	({% with posts.0 as 1st %} {{ 1st.Day }} {% endwith %})  <!--Get "Day" field value from first item in QuerySet "posts."-->
+	({% with posts.0 as 1st %} {{ 1st.Day }} {% endwith %})
+	</span>  <!--Get "Day" field value from first item in QuerySet "posts."-->
 	</b></caption>
 	<thead>
 	<tr style="color:white;background:black;">
-		<th onclick="sortTable(0)">Symbol</th>
-		<th onclick="sortTable(1)">Price</th>
-		<th onclick="sortTable(2)">52-week Change</th>
-		<th onclick="sortTable(3)">52-week Low</th>
-		<th onclick="sortTable(4)">52-week High</th>
-		<th onclick="sortTable(5)">Trailing Annual Dividend Yield</th>
-		<th onclick="sortTable(6)">Trailing P/E</th>
-		<th onclick="sortTable(7)">Forward P/E</th>
-		<th onclick="sortTable(8)">PEG Ratio</th>
-		<th onclick="sortTable(9)">Price/Sales</th>
-		<th onclick="sortTable(10)">Price/Book</th>
-		<th onclick="sortTable(11)">Market Cap</th>
-		<th onclick="sortTable(12)">Operating Cash Flow</th>
-		<th onclick="sortTable(13)">Market Per Cash Flow</th>
-		<th onclick="sortTable(14)">Enterprise Value/EBITDA</th>
-		<th onclick="sortTable(15)">Name</th>
+		<th>Symbol</th>
+		<th>Price</th>
+		<th>52-week Change</th>
+		<th>52-week Low</th>
+		<th>52-week High</th>
+		<th>Trailing Annual Dividend Yield</th>
+		<th>Trailing P/E</th>
+		<th>Forward P/E</th>
+		<th>PEG Ratio</th>
+		<th>Price/Sales</th>
+		<th>Price/Book</th>
+		<th>Market Cap</th>
+		<th>Operating Cash Flow</th>
+		<th>Market Per Cash Flow</th>
+		<th>Enterprise Value/EBITDA</th>
+		<th>Name</th>
 	</tr>
 	</thead>
 	<tbody>
@@ -83,36 +92,71 @@
 	</tbody>
 </table>
 <script>
-function sortTable(n) {  //See <https://www.w3schools.com/howto/howto_js_sort_table.asp> for source code.
+$.tablesorter.addParser({ //Bypass tablesorter default behavior with a parser function.
+    // Set a unique id 
+    id: 'billions',
+    is: function(s) { 
+        // Return false so this parser is not auto detected 
+        return false; 
+    }, 
+    format: function(s) {
+        // Remove last character 'B' and sort as numbers.
+        return s.replace('B','');
+    }, 
+    // set type, either numeric or text 
+    type: 'numeric' 
+});
+$(document).ready(function(){
+		$('#myTable').tablesorter({
+			sortList: [[0,0], [1,0]],  //Sort both Symbol and Last Price in ascending order.
+			widgets: ['zebra'],
+			headers: {
+				11: {//zero-based column index; Market Cap
+					sorter: 'billions'
+				},
+				12: {//Operating Cash Flow
+					sorter: 'billions'
+				}
+			}
+	});
+});
+
+</script>
+<script>
+//Bubble sort, see <https://www.w3schools.com/howto/howto_js_sort_table.asp> for source code.
+//Get the number of rows in the table; only counting rows within <tbody>.
+//var rows = document.getElementById('myTable').getElementsByTagName("tbody")[0].rows.length;
+/*var rows = document.getElementById("myTable").getElementsByTagName("TR").length;
+console.log(rows);
+*/
+/*
+function sortTable(n) {
   var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
   //var reTest = /[A-Za-z]/
   table = document.getElementById("myTable");
   switching = true;
-  //Set the sorting direction to ascending:
+  //Initialize the sorting direction to ascending:
   dir = "asc"; 
-  /*Make a loop that will continue until
-  no switching has been done:*/
+  //Make a loop that will continue until no switching has been done:
   while (switching) {
     //start by saying: no switching is done:
     switching = false;
+	//Get a count of total # of rows (including <thead>)
     rows = table.getElementsByTagName("TR");
 	//Convert all raw data with the value "infinity" to 0 for sorting.
     for (i = 1; i < (rows.length - 1); i++) {
 		if (rows[i].getElementsByTagName("TD")[n] != '"Infinity"') { continue; }
 			rows[i].getElementsByTagName("TD")[n] = 0;
 	}
-	/*Loop through all table rows (except the
-    first, which contains table headers):*/
+	//Loop through all table rows (except the first, which contains table headers):
 	for (i = 1; i < (rows.length - 1); i++) {
-      //start by saying there should be no switching:
+      //start without doing any switching:
       shouldSwitch = false;
-      /*Get the two elements you want to compare,
-      one from current row and one from the next:*/
+      //Get the two elements you want to compare, one from current row and one from the next:
       x = rows[i].getElementsByTagName("TD")[n];
       y = rows[i + 1].getElementsByTagName("TD")[n];
 	  console.log(x.innerHTML.slice(0,1));  //".innerHTML" displays str nested inside html decorator <></>.
-	  /*check if the two rows should switch place,
-      based on the direction, asc or desc:*/
+	  //check if the two rows should switch place, based on the direction, asc or desc:
 	  if (/[a-z]/i.test(x.innerHTML.slice(0,1)) || /[a-z]/i.test(y.innerHTML.slice(0,1))) {  //If the 1st char is a letter for current or next rows, sort as str.
 		if (dir == "asc") {
           if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
@@ -172,15 +216,13 @@ function sortTable(n) {  //See <https://www.w3schools.com/howto/howto_js_sort_ta
 	  }
     }
     if (shouldSwitch) {
-      /*If a switch has been marked, make the switch
-      and mark that a switch has been done:*/
+      //If a switch has been marked, make the switch and mark that a switch has been done:
       rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
       switching = true;
       //Each time a switch is done, increase this count by 1:
       switchcount ++;      
     } else {
-      /*If no switching has been done AND the direction is "asc",
-      set the direction to "desc" and run the while loop again.*/
+      //If no switching has been done AND the direction is "asc", set the direction to "desc" and run the while loop again.
       if (switchcount == 0 && dir == "asc") {
         dir = "desc";
         switching = true;
@@ -188,4 +230,5 @@ function sortTable(n) {  //See <https://www.w3schools.com/howto/howto_js_sort_ta
     }
   }
 }
+*/
 </script>

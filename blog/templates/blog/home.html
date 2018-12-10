@@ -373,8 +373,9 @@
 				{% url 'blog:contact_link' as cont %}
 				{% url 'blog:ResCenter_link' as rc %}
 				{% url 'blog:ResCenter_Links_link' as rc_l %}
+				{% url 'blog:ResCenter_Plugs_link' as rc_p %}
 				{% url 'blog:results' as res %}
-				{% load make_list dict_vari_key_lookup%}  <!--Load the custom template tags to prepare shortcut for an url list (usage: collect 'html' as 'shortcut').-->
+				{% load make_list dict_vari_key_lookup static %}  <!--Load the custom template tags to prepare shortcut for an url list (usage: collect 'html' as 'shortcut').-->
 				{% collect DJLD DJLW DJLM DJL6M DJLQ DJLY as all_DJ_link %}
 				{% url 'blog:SP_LastDay' as SPLD %}
 				{% url 'blog:SP_LastWk' as SPLW %}
@@ -389,7 +390,7 @@
 				{% url 'blog:Ind_LastYr' as IndLY %}
 				{% url 'blog:Ind_Last5Yr' as IndL5Y %}
 				{% collect home IndLW IndLQ IndL6M IndLY IndL5Y as all_ind_link %}
-				{% collect rc rc_l as all_ResCent_link %}
+				{% collect rc rc_l rc_p as all_ResCent_link %}
 				<!--{% if request.path == home %}<li>active</li>{% endif %}-->
 				<!--<li>{{request.path}}</li>  Check for active path; must be activated with Django simple tag.-->
 				<li><a {% if request.path in all_ind_link %}class="actlink"{% endif %} href="{% url 'blog:home_link' %}">Home</a></li>
@@ -398,7 +399,7 @@
 				<li><a {% if request.path == About %}class="actlink"{% endif %} href="{% url 'blog:AboutMe_link' %}">About</a></li>
 				<li><a {% if request.path == cont %}class="actlink"{% endif %} href="{% url 'blog:contact_link' %}">Contact</a></li>
 				<li id="date_time" style="background:#EADCAE; padding:10px 0 15px;"></li>
-				<li id="demo"></li>
+				<li id="demo"></li>  <!--Show current time.-->
 			</ul>
 		</div>
 		<!--</div>  top nav bar ends-->

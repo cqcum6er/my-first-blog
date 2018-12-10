@@ -89,7 +89,7 @@ def Movers(Ind, User_Date, Dis_num):  #Sorts index components into top/bottom pe
 	variable_column = key
 	search_type = 'isnull'
 	filter = variable_column + '__' + search_type  #Use kwarg 'filter' for variable column name for .exclude() (removing instance where the value is null for user-specified period).
-	Top_disp = all_ks_DatePriceDiff.objects.filter(Symbol__in=list(Latest_Ind)).order_by(rev_key).values('Name', 'Symbol', key).exclude(**{ filter: True })[:Dis_num]  #.exclude(key='')  #Use .only() to select fields to display (for faster access, use .values() to return a list of dict instead of queryset object); .exclude() excludes instance where price for a date doesn't exist.
+	Top_disp = all_ks_DatePriceDiff.objects.filter(Symbol__in=list(Latest_Ind)).order_by(rev_key).values('Name', 'Symbol', key).exclude(**{ filter: True })[:Dis_num]  #Use .only() to select fields to display (for faster access, use .values() to return a list of dict instead of queryset object); .exclude() excludes instance where price for a date doesn't exist.
 	#Top_disp = all_ks_DatePriceDiff.objects.filter(Symbol__in=list(Latest_Ind), key__icontains='').order_by(key)#[:Dis_num]
 	#Top_disp = all_ks_DatePriceDiff.objects.extra(select={key: 'CAST(all_ks_DatePriceDiff.key AS INTEGER)'}, order_by=[key])
 	#print Top_disp, type(Top_disp)
@@ -416,6 +416,9 @@ def ResCenter_Def(request):
 
 def	ResCenter_Links(request):
 	return render(request, 'blog/ResCenter_Links.html')
+
+def	ResCenter_Plugs(request):
+	return render(request, 'blog/ResCenter_Plugs.html')
 
 def iso_to_gregorian(iso_year, iso_week, iso_day):  #Converts ISO week date format to Gregorian calendar date format.
 	jan4 = datetime.date(iso_year, 1, 4)  #1st week ('Week 01') of new year always contains Jan 4th.

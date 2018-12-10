@@ -78,7 +78,7 @@ for post in posts:  #for post in posts[400:]:
 			#row.key = 'test'
 			#print row.key, type(row.key)
 			#row.save()
-			print getattr(row, key, str(PercDayMov))
+			#print getattr(row, key, str(PercDayMov))
 		#except ObjectDoesNotExist:  #If post doesn't exist.
 			#setattr(row, key, 'N/A')
 		
