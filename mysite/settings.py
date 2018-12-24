@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '2)z6gao=dn=csifbos_a&8sr5h6#%%imru@l=y*elf)e+c*3ta'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True  #Check "User comment" error before turning off.
+DEBUG = False  #Check "User comment" error before turning off.
 
-ALLOWED_HOSTS = []  #Set to ['127.0.0.1', 'cqcum6er.pythonanywhere.com', 'www.fundamentaltrader.net'] when DEBUG is set to False, otherwise leave empty.
+ALLOWED_HOSTS = ['127.0.0.1', 'cqcum6er.pythonanywhere.com', 'www.fundamentaltrader.net']  #Set to ['127.0.0.1', 'cqcum6er.pythonanywhere.com', 'www.fundamentaltrader.net'] when DEBUG is set to False, otherwise leave empty.
 
 
 # Application definition
@@ -98,16 +98,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
-STATIC_URL = '/static/' #'/mysite/static/'
+STATIC_URL = '/static/' #Specify URL to the static folder when deploying on server.
 
-STATIC_ROOT = [  #Define path after using "manage.py collectstatic".
-	os.path.join(BASE_DIR, 'static')
-	#'C://Python27/djangogirls/mysite/static/'  #Additional path for serving static files.
-]
+#STATIC_ROOT = os.path.join(BASE_DIR, 'static')  #Define path after using "manage.py collectstatic" for collection into one folder.
 
-STATICFILES_DIRS = [  #Needed during development to specify path of static folder.
-	os.path.join(BASE_DIR, 'static')
-]
+STATICFILES_DIRS = [
+	os.path.join(BASE_DIR, 'static')  #Needed during development to specify paths of static folder(s).
+	]
 
 
 #Enable email capability below.

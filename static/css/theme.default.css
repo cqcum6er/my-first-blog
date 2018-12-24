@@ -192,3 +192,10 @@ Default Theme
 	cursor: pointer;
 	background-color: #e6bf99;
 }
+
+.myTableContainer {
+    position: relative;
+    padding: 0 5px;
+    height: 250px;
+    overflow-y: auto;
+}

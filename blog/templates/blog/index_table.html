@@ -3,56 +3,56 @@
 <link rel="stylesheet" href="{% static 'css/theme.default.css' %}" type="text/css" />
 <script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/jquery.tablesorter.js' %}"></script>
-
-<table id="myTable" class="tablesorter" border="8" style="border-collapse:collapse; width:1000px;">
-	<caption><b>
-	<span class="highlight">
-	{% if 'DJ' in request.path %}
-		Dow Jones
-	{% elif 'SP' in request.path %}
-		S&amp;P500
-	{% endif %}
-		</span>Index (<span class="highlight">{{ posts|length }}</span> symbols returned) - 
-	<span class="highlight">
-	{% if 'LastDay' in request.path %}
-		Last Trading Day
-	{% elif 'LastWeek' in request.path %}
-		Last Week
-	{% elif 'LastMonth' in request.path %}
-		Last Month
-	{% elif 'LastQuarter' in request.path %}
-		Last Quarter
-	{% elif 'LastYear' in request.path %}
-		Last Year
-	{% endif %}
-	({% with posts.0 as 1st %} {{ 1st.Day }} {% endwith %})
-	</span>  <!--Get "Day" field value from first item in QuerySet "posts."-->
-	</b></caption>
-	<thead>
-	<tr style="color:white;background:black;">
-		<th>Symbol</th>
-		<th>Price</th>
-		<th>52-week Change</th>
-		<th>52-week Low</th>
-		<th>52-week High</th>
-		<th>Trailing Annual Dividend Yield</th>
-		<th>Trailing P/E</th>
-		<th>Forward P/E</th>
-		<th>PEG Ratio</th>
-		<th>Price/Sales</th>
-		<th>Price/Book</th>
-		<th>Market Cap</th>
-		<th>Operating Cash Flow</th>
-		<th>Market Per Cash Flow</th>
-		<th>Enterprise Value/EBITDA</th>
-		<th>Name</th>
-	</tr>
-	</thead>
+<script type="text/javascript" src="{% static 'js/jquery.tablesorter.widgets.js' %}"></script>  <!--Required for stickyHeaders, filter, etc....-->
+<!--<div class="tableWrap" style="position:relative;">-->
+<table id="myTable" class="tablesorter" border="4" style="border-collapse:collapse; width:1000px;">
+	<!--<div id="myHeader">-->
+		<caption id="myCap"><b>
+		<span class="highlight">
+		{% if 'DJ' in request.path %}
+			Dow Jones
+		{% elif 'SP' in request.path %}
+			S&amp;P500
+		{% endif %}
+			</span>Index (<span class="highlight">{{ posts|length }}</span> symbols returned) - 
+		<span class="highlight">
+		{% if 'LastDay' in request.path %}
+			Last Trading Day
+		{% elif 'LastWeek' in request.path %}
+			Last Week
+		{% elif 'LastMonth' in request.path %}
+			Last Month
+		{% elif 'LastQuarter' in request.path %}
+			Last Quarter
+		{% elif 'LastYear' in request.path %}
+			Last Year
+		{% endif %}
+		({% with posts.0 as 1st %} {{ 1st.Day }} {% endwith %})
+		</span>  <!--Get "Day" field value from first item in QuerySet "posts."-->
+		</b></caption>
+		<thead>
+		<tr style="text-align:center;">
+			<th title="Ticker Symbol">Sym</th>
+			<th title="Last Price">Price</th>
+			<th title="52-week Price Change">52-wk Chng</th>
+			<th title="52-week Low">52-wk Low</th>
+			<th title="52-week High">52-wk Hi</th>
+			<th title="Trailing Annual Dividend Yield">Div Yild</th>
+			<th title="Trailing Price-To-Earnings">Trail P/E</th>
+			<th title="Forward Price-To-Earnings">For P/E</th>
+			<th title="Price/Earnings-To-Growth">PEG Ratio</th>
+			<th title="Price-To-Sales Ratio">P/S</th>
+			<th title="Price-To-Book Ratio">P/B</th>
+			<th title="Market Capitalization">Market Cap</th>
+			<th title="Operating Cash Flow">OCF</th>
+			<th title="Price-To-Cash-Flow Ratio">Market/OCF</th>
+			<th title="Enterprise Value/EBITDA">EV/EBITDA</th>
+			<th title="Company Name">Name</th>
+		</tr>
+		</thead>
+	<!--</div>-->
 	<tbody>
-	{% for post in posts %}  <!--see views.py for 'posts' list-->
-		<!--<p>published: {{ post.published_date }}</p>
-		<h1><a href="/">{{ post.title }}</a></h1>
-		<p>{{ post.text|linebreaks }}</p>-->
+	{% for post in posts %}
 	<tr align="center">
 		<td id="table-link"><a href="/results/?q={{ post.Symbol }}">{{ post.Symbol }}</a></td>
 		<td>{% firstof post.LastPrice "N/A" %}</td>  <!--Print out value OR "N/A" in case value doesn't exist.-->
@@ -91,7 +91,26 @@
 	{% endfor %}
 	</tbody>
 </table>
+<!--</div>-->
+
 <script>
+/*
+window.onscroll = function() {myFunction()};  //When the user scrolls the page, execute myFunction; may be replaced with onscroll="myFunction()" in <body>.
+
+var header = document.getElementById("myHeader");
+var sticky = header.offsetTop;  //Get the y-ccord of offset pos for header.
+
+function myFunction() {
+  if (window.pageYOffset > sticky) {
+	//console.log(sticky, window.pageYOffset, header.offsetHeight)
+	//header.style.paddingTop = header.offsetHeight + 'px';  //Prevent sudden jump of the table body due to fixed table header by reserving a padding for header height.
+    header.classList.add("sticky");
+  } else {
+    //header.style.paddingTop = 0;
+	header.classList.remove("sticky");
+  }
+}
+*/
 $.tablesorter.addParser({ //Bypass tablesorter default behavior with a parser function.
     // Set a unique id 
     id: 'billions',
@@ -107,22 +126,26 @@ $.tablesorter.addParser({ //Bypass tablesorter default behavior with a parser fu
     type: 'numeric' 
 });
 $(document).ready(function(){
-		$('#myTable').tablesorter({
-			sortList: [[0,0], [1,0]],  //Sort both Symbol and Last Price in ascending order.
-			widgets: ['zebra'],
-			headers: {
-				11: {//zero-based column index; Market Cap
-					sorter: 'billions'
-				},
-				12: {//Operating Cash Flow
-					sorter: 'billions'
-				}
+	$('#myTable').tablesorter({
+		//theme: 'blue',
+		sortList: [[0,0], [1,0]],  //Sort both Symbol and Last Price in ascending order.
+		widgets: ['zebra'],  //'stickyHeaders'
+		widgetOptions: {
+			//stickyHeaders_attachTo: null,
+			//stickyHeaders_appendTo: '#tableWrap',
+			//stickyHeaders_cloneId : '-sticky',
+		},
+		headers: {
+			11: {//zero-based column index; Market Cap
+				sorter: 'billions'
+			},
+			12: {//Operating Cash Flow
+				sorter: 'billions'
 			}
+		}
 	});
 });
 
-</script>
-<script>
 //Bubble sort, see <https://www.w3schools.com/howto/howto_js_sort_table.asp> for source code.
 //Get the number of rows in the table; only counting rows within <tbody>.
 //var rows = document.getElementById('myTable').getElementsByTagName("tbody")[0].rows.length;

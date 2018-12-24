@@ -10,7 +10,7 @@
           });
         </script>
 		<script>
-		document.getElementById("demo").innerHTML = Date.getTime();
+		document.getElementById('demo').innerHTML = Date.getTime();
 		function startTime() {
 		  var timeNow = new Date();
 		  //timeNow = timeNow.toISOString()
@@ -53,13 +53,13 @@
 			color:#993366;
 		}
 		
-		/*.main {  /*.class*/
+		/*.main {
 			padding:16px;
 			margin-top:0;
-			height:50px; /* Used to enable scrolling */
+			height:50px; // Used to enable scrolling
 		}*/
 		
-		body a:hover, a:active {	<!--Change link color when cursor hovers over and when clicked.-->
+		body a:hover, a:active { //Change link color when cursor hovers over and when clicked.
 			display:block;
 			background-color:#66991c;
 			color:white;
@@ -75,7 +75,7 @@
 		}
 		
 		#nav li {  /*matches all list item (li) in selector ul#nav*/
-			display: inline;  <!--Display an element as an inline element (like <span>); applies to <li>.-->
+			display: inline;  //Display an element as an inline element (like <span>); applies to <li>.
 			margin:10px;
 		}
 
@@ -184,11 +184,11 @@
 			color:white;
 		}
 
-		#aside {	<!--Left vertical navigation bar format; define a different style for a different element identified by id="aside".-->
+		#aside { //Left vertical navigation bar format; define a different style for a different element identified by id="aside".
 			width:150px;
 			float:left;
 			margin-bottom:-2000px;  /*Clear space to the right for table.*/
-			padding-left:10px;	<!--padding defines the space between element and element border-->
+			padding-left:10px;	//padding defines the space between element and element border
 			padding-bottom:2000px;
 			background-color: #ffcc66;
 		}
@@ -215,13 +215,14 @@
 			background-color:orange;
 		}
 		
-		#aside a:hover, a:active {	<!--Change link color when cursor hovers over and when clicked.-->
+		#aside a:hover, a:active {	//Change link color when cursor hovers over and when clicked.
 			display:block;
 			background-color:#66991c;
 			color:white;
 		}
 		
 		#section {
+			position: relative;
 			margin-left:175px;  /*Save space for lefthand column*/
 			background-color: #fff;
 			white-space:nowrap;  /*Prevents element shifting due to changing screen size.*/
@@ -247,12 +248,12 @@
 			background-color:orange;
 		}
 		
-		#section a:hover, a:active {	<!--Change link color when cursor hovers over and when clicked.-->
+		#section a:hover, a:active { //Change link color when cursor hovers over and when clicked.
 			display:block;
 			background-color:#66991c;
 			color:white;
 		}
-		
+
 		#myTable {
 			float:left;
 			width:75%;
@@ -261,22 +262,36 @@
 			margin-left:175px;	/*Margin added to keep element to the right of aside bar*/
 		}
 
-		#myTable th {
-			cursor:pointer;  <!--Indicate clickable table header-->
-		}
-		
 		#myTable th:hover {
 			background-color:#66991c;
 			color:white;
 		}
+
+		#myTable th {
+			cursor:pointer;  /*Indicate clickable table header*/
+			position: sticky;
+			top: 14px;
+		}
 		
+		#myCap {
+			position: sticky;
+			top: 0;
+			z-index: 5;
+		}
+		/*
+		.sticky {
+		  position: fixed;
+		  top: 0;
+		  width: 100%;
+		}
+		*/
 		#myTable tr:nth-child(even) {
 			background-color:#eee;
-		}  <!--Set alternating table row background color (even row).-->
+		}  //Set alternating table row background color (even row).
 		
 		#myTable tr:nth-child(odd) {
 			background-color:#fff;
-		}  <!--Set alternating table row background color (odd row).-->
+		}  //Set alternating table row background color (odd row).
 
 		#table-link {
 			display:block;
