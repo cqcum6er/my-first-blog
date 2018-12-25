@@ -20,7 +20,7 @@
 <script type="text/javascript" src="{% static 'js/jquery.tablesorter.widgets.js' %}"></script>  <!--Required for stickyHeaders, filter, etc....-->
 
 <table id="myTable" class="tablesorter" border="4" style="border-collapse: collapse; width:1000px;">
-	<caption id="myCap"><b><span class="highlight">{{ last_element.Name }} ({{ last_element.Symbol }}) ({{ posts|length }} days found) <!--Get "Symbol" field value from the last item in the QuerySet.-->
+	<caption id="myCap"><b><span class="highlight">{{ last_element.Name }} ({{ last_element.Symbol }}) ({{ posts|length }} days found; sector: {{ last_element.Sector }}) <!--Get "Symbol" field value from the last item in the QuerySet.-->
 	</span></b></caption>
 	<thead>
 	<tr style="text-align:center;">

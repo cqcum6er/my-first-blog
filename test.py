@@ -26,8 +26,8 @@ if __name__ == '__main__':
 	#django.setup()
 	print "test"
 '''
-#def Movers(Ind, User_Date, Dis_num):  #Sorts index components into top/bottom performers based during user-specified period; 'Ind' must be db object, & User_Date a string object.
 
+'''
 #Asynchronous calculation of % price diff for diff dates from all_ks model object, & calcuation is done daily (format of model = date, company name, symbol, % price diff for yesterday, one week, & one month).
 p = all_ks.objects.latest('Day')  #Returns an object instance (not iterable) from latest date; if latest() is empty, it works with attributes defined by 'class Meta' in models.py. Note latest () only retrieve ONE instance; .values() needs to be inserted in front of latest() to make it iterable as dictionary; cache queryset object for quick retrieval in html request.
 #print p, type(p)
@@ -38,10 +38,10 @@ posts = all_ks.objects.filter(Day=p.Day, Symbol__in=list(Latest_all_ks))  #Filte
 #print posts, type(posts)
 all_ks_DatePriceDiff.objects.all().delete()  #Remove all % price diff calculation from the previous date.
 for post in posts:  #for post in posts[400:]:
-	'''
-	if post.Symbol == "AAPL":
-		break  #Break out of posts for-loop before AAPL.
-	'''
+	
+	#if post.Symbol == "AAPL":
+		#break  #Break out of posts for-loop before AAPL.
+	
 	if post.Day is None:  #Don't need to calculate % difference between different dates if today's date doesn't even exist.
 		continue
 	row = all_ks_DatePriceDiff.objects.create()  #Create an object instance to populate with.
@@ -50,11 +50,11 @@ for post in posts:  #for post in posts[400:]:
 	row.Symbol = post.Symbol
 	print row.Symbol
 	User_Date = {'Price_1': 1, 'Price_7': 7, 'Price_30': 30}
-	'''
-	row.Price_1 = 'test1'
-	row.Price_7 = 'test2'
-	row.Price_30 = 'test3'
-	'''
+	
+	#row.Price_1 = 'test1'
+	#row.Price_7 = 'test2'
+	#row.Price_30 = 'test3'
+	
 	for key, value in User_Date.iteritems():  #User_Date.items():
 		Day_Delta = p.Day - datetime.timedelta(days=value)  #Get datetime for user specified range.
 		print Day_Delta
@@ -83,7 +83,7 @@ for post in posts:  #for post in posts[400:]:
 			#setattr(row, key, 'N/A')
 		
 	row.save()  #Save all stats for each symbol before iterating to the next symbol.
-
+'''
 '''
 #Calculate % price diff for diff dates from all_ks model object to create a csv file for asynchronous operation (format of csv = date, company name, symbol, % price diff for yesterday, one week, & one month).
 with open('Period_performers.csv', 'wb') as file:  #Use 'wb' to write in binary mode to existing csv file and replace whole content each time the operation is executed.

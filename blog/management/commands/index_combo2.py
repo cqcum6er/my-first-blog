@@ -167,9 +167,9 @@ class Command(BaseCommand):
 								if html:
 									if '"longName":' in html:  #Escape when "longName" isn't present.
 										longNameToEnd = ""
-										for ch in html.split('"longName":')[1]:  #Retrieve all character containing longName plus everything after.
+										for ch in html.split('"longName":')[1]:  #Retrieve all character containing longName plus everything after; CANNOT use StrFet since a comma may be present in the company name, resulting in early loop termination.
 											longNameToEnd += ch
-										longNameSplit = longNameToEnd.split(',\"')  #Terminate character retrieval before the next field variable.
+										longNameSplit = longNameToEnd.split(',\"')  #Terminate character retrieval for company name before the next field variable.
 										#print longNameSplit[0], longNameSplit[0].count('"')
 										if longNameSplit[0].count('"') >= 2:  #If longName is contained within '"' mark...
 											longNameInQuote = longNameSplit[0].replace('amp;','').replace('&apos;',"'")  #Replace html escape character for "&" and "'".
@@ -180,12 +180,19 @@ class Command(BaseCommand):
 										Name = "N/A"
 								else:  #Return "N/A" if Name isn't retrievable from assigned html.
 									Name = "N/A"
-								#print row[0], row[1], LP, _52WkChg, _52WkHi, _52WkLo, Div, tPE, fPE, PEG, PpS, PpB, MktCap, FCF, MpC, EpE, Name
-								csv_row_list = [row[0], row[1], LP, _52WkChg, _52WkHi, _52WkLo, Div, tPE, fPE, PEG, PpS, PpB, MktCap, FCF, MpC, EpE, Name]
+								response = requests.get('https://query1.finance.yahoo.com/v10/finance/quoteSummary/'+row[1]+'?formatted=true&crumb=fHNmbuf4JOf&lang=en-US&region=US&modules=summaryProfile%2CfinancialData%2CrecommendationTrend%2CupgradeDowngradeHistory%2Cearnings%2CdefaultKeyStatistics%2CcalendarEvents%2CesgScores%2Cdetails&corsDomain=finance.yahoo.com')
+								html = response.text  #Convert requests object to string.
+								#print html
+								if html:
+									Sector = self.StrFet('"sector":', 1, ",")
+								else:
+									Sector = "N/A"
+								#print row[0], row[1], LP, _52WkChg, _52WkHi, _52WkLo, Div, tPE, fPE, PEG, PpS, PpB, MktCap, FCF, MpC, EpE, Name, Sector
+								csv_row_list = [row[0], row[1], LP, _52WkChg, _52WkHi, _52WkLo, Div, tPE, fPE, PEG, PpS, PpB, MktCap, FCF, MpC, EpE, Name, Sector]
 								output.writerow(csv_row_list)
 								#StreamingHttpResponse(output.writerow(csv_row_list))
 							else:
-								output.writerow([row[0], row[1]]+['N/A']*15)  #Output when url is incorrect.
+								output.writerow([row[0], row[1]]+['N/A']*16)  #Output when url is incorrect.
 								#StreamingHttpResponse(output.writerow([row[0], row[1]]+['N/A']*15))
 							#LastRowDate = row[0]
 						else:  #Skip a ticker if tick is not retrivable.
@@ -193,7 +200,7 @@ class Command(BaseCommand):
 					else:  #...continue iterate until the end.
 						continue
 
-		fields = ['Day', 'Symbol', 'LastPrice', 'FiftyTwoWkChg', 'FiftyTwoWkLo', 'FiftyTwoWkHi', 'DivYild', 'TrailPE', 'ForwardPE', 'PEG_Ratio', 'PpS', 'PpB', 'Market_Cap', 'Free_Cash_Flow', 'Market_per_CashFlow', 'Enterprise_per_EBITDA', 'Name']  #Must match individual field (column) names in models.py.
+		fields = ['Day', 'Symbol', 'LastPrice', 'FiftyTwoWkChg', 'FiftyTwoWkLo', 'FiftyTwoWkHi', 'DivYild', 'TrailPE', 'ForwardPE', 'PEG_Ratio', 'PpS', 'PpB', 'Market_Cap', 'Free_Cash_Flow', 'Market_per_CashFlow', 'Enterprise_per_EBITDA', 'Name', 'Sector']  #Must match individual field (column) names in models.py.
 		if all_ks.objects.exists():  #Check if the database is empty...
 			#print "There are existing objects in all_ks db."
 			p = all_ks.objects.latest('Day')  #Check what's the lastest day in existing db before appending to db.

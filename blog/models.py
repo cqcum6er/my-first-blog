@@ -126,9 +126,26 @@ class all_ks(models.Model):
 	Market_per_CashFlow = models.CharField(max_length=30, default='N/A')
 	Enterprise_per_EBITDA = models.CharField(max_length=30, default='N/A')
 	Name = models.CharField(max_length=50, default='N/A')
+	'''
+	SECTORS = (
+		('BM', 'Basic Materials'),
+		('CS', 'Communication Services'),
+		('CC', 'Consumer Cyclical'),
+		('CD', 'Consumer Defensive'),
+		('E', 'Energy'),
+		('FS', 'Financial Services'),
+		('H', 'Healthcare'),
+		('I', 'Industrials'),
+		('RE', 'Real Estate'),
+		('T', 'Technology'),
+		('U', 'Utilities'),
+	)
+	'''
+	Sector = models.CharField(max_length=50, default='N/A')  #choices=SECTORS
 
 	def __str__(self):
 		return self.Symbol
+
 class all_ks_DatePriceDiff(models.Model):
 	Day = models.DateField(blank=False, default=datetime.date.today().strftime('%Y-%m-%d'))
 	Name = models.CharField(max_length=50, default='N/A')

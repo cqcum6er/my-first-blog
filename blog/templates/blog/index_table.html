@@ -48,6 +48,7 @@
 			<th title="Price-To-Cash-Flow Ratio">Market/OCF</th>
 			<th title="Enterprise Value/EBITDA">EV/EBITDA</th>
 			<th title="Company Name">Name</th>
+			<th title="Company Service Sector">Sector</th>
 		</tr>
 		</thead>
 	<!--</div>-->
@@ -87,6 +88,7 @@
 		<td>{% firstof post.Market_per_CashFlow|floatformat:2 "N/A" %}</td>
 		<td>{% firstof post.Enterprise_per_EBITDA|floatformat:2 "N/A" %}</td>
 		<td>{% firstof post.Name "N/A" %}</td>
+		<td>{% firstof post.Sector "N/A" %}</td>
 	</tr>
 	{% endfor %}
 	</tbody>
