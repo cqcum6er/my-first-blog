@@ -15,11 +15,26 @@ from django.template.loader import get_template
 from .models import UserComment, Index_DJ, Index_SP500, all_ks, all_ks_DatePriceDiff  #Retrieve model objects from 'models.py' within the same folder.
 from .forms import ContactForm, MoverForm, IndexForm
 #from .templatetags import index_table
-import datetime
+from datetime import timedelta
+import datetime  #Not the same as "from datetime import datetime"
 import time
 from django.db import connection  #Check sqlite connection speed with "connection.queries".
 import csv
 #import itertools
+import pygal
+import pandas as pd
+'''
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+import numpy as np
+import matplotlib.pyplot as plt
+import base64
+from io import BytesIO
+'''
+from django.views.generic import TemplateView
+#from django.views import generic
+#from pygal.style import DarkStyle
+from .charts import FundGraph
 
 '''
 #To update database with the current date, save scheduled csv record from Pythonanywhere (Export "all_ks" table as csv file [i.e.'all_ks_export.csv'] and save to the same directory as views.py), then run local server ONCE to populate local database before commenting out this block (may need to remove duplicate rows with sqlite command afterward); comment out this block before uploading views.py to Pythonanywhere to use scheduled csv instead...
@@ -89,7 +104,7 @@ def Movers(Ind, User_Date, Dis_num):  #Sorts index components into top/bottom pe
 	variable_column = key
 	search_type = 'isnull'
 	filter = variable_column + '__' + search_type  #Use kwarg 'filter' for variable column name for .exclude() (removing instance where the value is null for user-specified period).
-	Top_disp = all_ks_DatePriceDiff.objects.filter(Symbol__in=list(Latest_Ind)).order_by(rev_key).values('Name', 'Symbol', key).exclude(**{ filter: True })[:Dis_num]  #Use .only() to select fields to display (for faster access, use .values() to return a list of dict instead of queryset object); .exclude() excludes instance where price for a date doesn't exist.
+	Top_disp = all_ks_DatePriceDiff.objects.filter(Symbol__in=list(Latest_Ind)).order_by(rev_key).values('Name', 'Symbol', key).exclude(**{ filter: True })[:Dis_num]  #Use .only() to select fields to display (for faster access, use .values() to return a list of dict instead of queryset object); .exclude() excludes instance where price for a date doesn't exist from the orderd list.
 	#Top_disp = all_ks_DatePriceDiff.objects.filter(Symbol__in=list(Latest_Ind), key__icontains='').order_by(key)#[:Dis_num]
 	#Top_disp = all_ks_DatePriceDiff.objects.extra(select={key: 'CAST(all_ks_DatePriceDiff.key AS INTEGER)'}, order_by=[key])
 	#print Top_disp, type(Top_disp)
@@ -255,8 +270,50 @@ def Movers(Ind, User_Date, Dis_num):  #Sorts index components into top/bottom pe
 	#print Movers, type(Movers)
 	return Movers
 	'''
+def perdelta(start, end, delta):
+	curr = start
+	while curr < end:
+		yield curr
+		curr += delta
 
 def home(request):
+	'''
+	chart = pygal.Line(x_label_rotation=20)
+	chart.title = 'Single Stock History'
+	
+	chart.add('IE', 19.5)
+	chart.add('Firefox', 36.6)
+	chart.add('Chrome', 36.3)
+	chart.add('Safari', 4.5)
+	chart.add('Opera', 2.3)
+	
+	df = pd.DataFrame(list(all_ks.objects.filter(Symbol__iexact='AAPL').values()))
+	df.set_index('Day', inplace=True)
+	firstDayStr = str(df.index[0]).replace('-', '')
+	lastDayStr = str(df.index[-1]).replace('-', '')
+	print list(df.index[0:-1])
+	print firstDayStr, lastDayStr, type(str(lastDayStr))
+	total_row = []
+	for row in df.itertuples(): #Prepare an iterable for df (more efficient than iterrows() or iteritems()).
+		#print row.DivYild
+		total_row.append(float(row.DivYild.encode('utf-8')))  #Add y values for each x ('Day').
+	#for row in range(355):
+		#total_row.append(row)
+	print total_row, len(total_row)
+	#coords = [(xval, yval) for xval, yval in zip(list(df.index[0:-1]), total_row)]
+	chart.add('DivYild', total_row, dots_size=0)
+	#chart.add('', coords)
+	#print df
+	#chart.x_labels = map(str, range(int(firstDayStr), int(lastDayStr)))
+	#chart.x_labels = map(lambda d: d.strftime('%Y-%m-%d'), range(df.index[0], df.index[-1]))
+	print min(df.index), max(df.index)
+	date_list = [n for n in perdelta(min(df.index), max(df.index), timedelta(days=1))]
+	#date_list = [n for n in range(min(df.index), max(df.index))]
+	print date_list
+	chart.x_labels = date_list
+	chart_data = chart.render_data_uri()  #Allows direct embedding of SVG image into html instead of from an external image file.
+	#return render_template("home.html", chart_data = chart_data)
+	'''
 	move_form = MoverForm()  #MoverForm(initial={'Ind_Mov': 'Index_DJ', 'Period_Mov': '1' 'Dis_num': '5'})  #Load empty form when the page is loaded the 1st time without user input; needed to initiate multiple forms on one page before checking user submission for each form.
 	ind_form = IndexForm()
 	Ind_Mov_label = "Dow Jones"  #Populate the initial empty form with default values; must be visible to the context dict.
@@ -385,8 +442,9 @@ def home(request):
 	'key': Movers(Ind, Period_Mov_val, Dis_num)[2],  #Collect 3rd part of tuple for custom dict filter.
 	'Performer_Index': Ind_Mov_label,  #Flavor text for title.
 	'Performer_Period': Period_Mov_label,  #Flavor text for title.
-	'Index_Sum':Ind_Date_label
+	'Index_Sum': Ind_Date_label,
 	})
+	#return render_to_response(request, 'blog/home.html', {'chart_data': chart_data})
 	#Movers(Ind, Period_Mov_val, Dis_num)
 	#return render(request, 'blog/home.html', {'ind_form': ind_form, 'form': form, 'TopMovers': Movers(Index_DJ, 1, 5)[0], 'BottomMovers': Movers(Index_DJ, 1, 5)[1],'Performer_Index':'Dow Jones', 'Performer_Period':'one day'})  #Load home page default values where there is no user input.
 	#print connection.queries
@@ -682,6 +740,17 @@ def thanks(request):
 	return render(request, 'blog/thanks.html')
 
 def get_query(request):  #Implement logic for query search.
+	'''
+	#Pygal display test:
+	chart = pygal.Bar()
+	chart.title = 'Fundamental History'
+	chart.add('IE', 19.5)
+	chart.add('Firefox', 36.6)
+	chart.add('Chrome', 36.3)
+	chart.add('Safari', 4.5)
+	chart.add('Opera', 2.3)
+	chart_data = chart.render_data_uri()  #Allows direct embedding of SVG image into html instead of from an external image file.
+	'''
 	master_list = all_ks.objects.all()  #master_list should be accessible at all lower nested levels to refine filter.
 	q = request.GET.get('q')  #Get raw query object "q" (NAME of input text) from html.
 	if not q:  #Check if user has entered a search term.
@@ -697,38 +766,94 @@ def get_query(request):  #Implement logic for query search.
 		#print byte_list, type(byte_list)
 		byte_list = list(set(byte_list))  #Eliminate redundancy in the list.
 		#print "Symbol list from 'Symbol' field EXACTLY matching user query:", byte_list, type(byte_list), len(byte_list)
-		if len(byte_list) == 1:  #One EXACT match is found in 'Symbol' field of the database.
+		'''
+		One EXACT match is found in 'Symbol' field of the database.
+		'''
+		if len(byte_list) == 1:
 			#return HttpResponse('One symbol found.')
 			#print "One result found with EXACT match to user query:", byte_list, type(byte_list)
 			last_element = queryset_list.last()  #Get the last entry in the queryset to display latest company name as table caption in html.
-			return render(request, 'blog/results.html', {'posts': queryset_list, 'last_element': last_element})
+			chart = pygal.Line(x_label_rotation=20, show_minor_x_labels=False, x_labels_major_every=28) 
+			chart.title = last_element.Name + ' (' + last_element.Symbol + ') Fundamental History'
+			df = pd.DataFrame(list(all_ks.objects.filter(Symbol__iexact=last_element).values()))  #Convert queryset object to Pandas dataframe.
+			df.set_index('Day', inplace=True)
+			'''
+			firstDayStr = str(df.index[0]).replace('-', '')
+			lastDayStr = str(df.index[-1]).replace('-', '')
+			print list(df.index[0:-1])
+			print firstDayStr, lastDayStr, type(str(lastDayStr))
+			'''
+			total_row = []
+			for row in df.itertuples(): #Prepare an iterable for df (more efficient than iterrows() or iteritems()).
+				try:
+					#print row.DivYild
+					if float(row.DivYild.encode('utf-8')):
+						total_row.append(float(row.DivYild.encode('utf-8')))  #Add y values for each x ('Day').
+					else:
+						total_row.append(0)
+				except ValueError, e:  #Output error message when the field cannot be converted to float format.
+					print "error", e, "on line", row
+			'''
+			for row in range(355):  #y val test datapoint
+				total_row.append(row)
+			'''
+			#print total_row, len(total_row)
+			#coords = [(xval, yval) for xval, yval in zip(list(df.index[0:-1]), total_row)]
+			chart.add('DivYild', total_row, dots_size=0)
+			#chart.add('', coords)
+			#print df
+			#chart.x_labels = map(str, range(int(firstDayStr), int(lastDayStr)))
+			#chart.x_labels = map(lambda d: d.strftime('%Y-%m-%d'), range(df.index[0], df.index[-1]))
+			#print min(df.index), max(df.index)
+			date_list = [n for n in perdelta(min(df.index), max(df.index), timedelta(days=1))]  #Get all dates between oldest and most recent with interval specified.
+			#date_list = [n for n in range(min(df.index), max(df.index))]
+			#print date_list
+			chart.x_labels = date_list
+			chart_data = chart.render_data_uri()  #Allows direct embedding of SVG image into html instead of from an external image file.
+			#return render_template("home.html", chart_data = chart_data)
+			return render(request, 'blog/table_history.html', {'posts': queryset_list, 'last_element': last_element, 'chart_data': chart_data})
 		else:  #0 or more than 1 match is found in 'Symbol' field of the database.
 			#print "Look for 'Symbol' CONTAINING user query."
-			queryset_list = master_list.filter(Symbol__icontains=query)  #If no exact match of symbol search is found, apply 'icontains' lookuptype to apply case-insensitive filter with SUBSTRING match in a given field, "Symbol".
+			'''
+			If no exact match of symbol search is found, apply 'icontains' lookuptype to apply case-insensitive filter with SUBSTRING match in "Symbol" field.
+			'''
+			queryset_list = master_list.filter(Symbol__icontains=query)
 			#print queryset_list
 			SymList = queryset_list.values_list('Symbol', flat=True).order_by('Symbol')
 			byte_list = [i.encode('utf-8') for i in SymList]
 			byte_list = list(set(byte_list))
 			#print "'Symbol' CONTAINING user query:", byte_list, type(byte_list), len(byte_list)
-			if len(byte_list) >= 1:  #At least one 'Symbol' in the database CONTAINS the query.
+			'''
+			At least one 'Symbol' in the database CONTAINS the query, return a table with potential user match.
+			'''
+			if len(byte_list) >= 1:
 				#print "At least one 'Symbol(s)' CONTAINS user query:", byte_list, type(byte_list), len(byte_list)
 				#print type(queryset_list)
-				queryset_list = queryset_list.values('Symbol', 'Name').distinct()  #Use .values() to include all fields to display in results table; add .distinct() to retrieve all unique field combination; queryset_list is converted from QuerySet object to ValuesQuerySet object.
+				queryset_list = queryset_list.values('Symbol', 'Name').distinct()  #Use .values() to include all fields to display in history table; add .distinct() to retrieve all unique field combination; queryset_list is converted from QuerySet object to ValuesQuerySet object.
 				#print queryset_list, type(queryset_list)
 				return render(request, 'blog/NoMatch.html', {'posts': queryset_list})
 			else:  #User query doesn't match any symbol in the database (exact or partial).
 				#print "None of the 'Symbols' in the database matches user query. Try searching 'Name' field."
-				queryset_list = master_list.filter(Name__icontains=query)  #If no exact or substring match is found in the "Symbol" field, check if query substring is CONTAINED within 'Name' field using 'icontains' (disregarding case).
+				'''
+				If no exact or substring match is found in the "Symbol" field, check if query substring is CONTAINED within 'Name' field using 'icontains' (disregarding case).
+				'''
+				queryset_list = master_list.filter(Name__icontains=query)
 				SymList = queryset_list.values_list('Symbol', flat=True).order_by('Symbol')
 				byte_list = [i.encode('utf-8').upper() for i in SymList]
 				byte_list = list(set(byte_list))
 				#print "Symbol(s) found containing user query under 'Name' field:", byte_list, type(byte_list), len(byte_list)
-				if len(byte_list) >= 1:  #At least one 'Name' in the database CONTAINS the query.
+				'''
+				At least one 'Name' in the database CONTAINS the query, return a table with potential user match.
+				'''
+				if len(byte_list) >= 1:
 					#print type(queryset_list)
 					queryset_list = queryset_list.values('Symbol', 'Name').distinct()
 					#print queryset_list, type(queryset_list)
 					return render(request, 'blog/NoMatch.html', {'posts': queryset_list})
-				else:  #Try approximate matching of query string; assemble a unique word list from 'Name' field 1st.
+				else:
+					'''
+					Try approximate matching of query string from user query with get_close_matches() from difflib; assemble a unique word list from 'Name' field 1st.
+					'''
 					Name_words = master_list.values('Name').distinct()
 					#print "Distinct 'Name' field:", Name_words, type(Name_words), len(Name_words)
 					Name_words = Name_words.values_list('Name', flat=True).order_by('Symbol')  #Convert distionary ('Name' field only) to ValuesQuerySet format.
@@ -780,3 +905,43 @@ def contact_form(request):
 			return render(request, 'blog/thanks.html')
 	return render(request, 'blog/contact.html', {'form': form_class,})
 	'''
+'''
+def mplimage(request):
+    fig = Figure()
+    canvas = FigureCanvas(fig)
+    ax = fig.add_subplot(111)
+    x = np.arange(-2,1.5,.01)
+    y = np.sin(np.exp(2*x))
+    ax.plot(x, y)
+    response=django.http.HttpResponse(content_type='image/png')
+    canvas.print_png(response)
+    return response
+'''
+
+class IndexView(TemplateView):
+	template_name = 'blog/table_history_image.html'
+
+	def get_context_data(self, **kwargs):
+		context = super(IndexView, self).get_context_data(**kwargs)
+
+		# Instantiate our chart. We'll keep the size/style/etc.
+		# config here in the view instead of `charts.py`.
+
+		FundGraph_out = FundGraph(
+			#height=600,
+			#width=800,
+			#explicit_size=True
+		)
+
+		#Call the `.generate()` method on our chart object and pass it to template context.
+		context['chart_data'] = FundGraph_out.generate()
+		return context
+
+'''
+class IndexView(generic.ListView):
+	template_name = 'blog/table_history_image.html'
+	context_object_name = 'posts'
+
+	def get_queryset(self):
+		return all_ks.objects.filter(Symbol__iexact='AAPL').order_by('Day')
+'''

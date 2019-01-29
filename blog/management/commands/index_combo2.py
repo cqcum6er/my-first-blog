@@ -171,8 +171,8 @@ class Command(BaseCommand):
 											longNameToEnd += ch
 										longNameSplit = longNameToEnd.split(',\"')  #Terminate character retrieval for company name before the next field variable.
 										#print longNameSplit[0], longNameSplit[0].count('"')
-										if longNameSplit[0].count('"') >= 2:  #If longName is contained within '"' mark...
-											longNameInQuote = longNameSplit[0].replace('amp;','').replace('&apos;',"'")  #Replace html escape character for "&" and "'".
+										if longNameSplit[0].count('"') >= 2:  #Check if longName is contained within double quotes.
+											longNameInQuote = longNameSplit[0].replace('amp;','').replace('&apos;',"'")  #Replace html escape character for "&" and "'" for user display.
 											Name = longNameInQuote.encode('utf-8')  #... convert to byte string from unicode.
 										else:  #...return "N/A" if longName is null.
 											Name = "N/A"
@@ -182,11 +182,18 @@ class Command(BaseCommand):
 									Name = "N/A"
 								response = requests.get('https://query1.finance.yahoo.com/v10/finance/quoteSummary/'+row[1]+'?formatted=true&crumb=fHNmbuf4JOf&lang=en-US&region=US&modules=summaryProfile%2CfinancialData%2CrecommendationTrend%2CupgradeDowngradeHistory%2Cearnings%2CdefaultKeyStatistics%2CcalendarEvents%2CesgScores%2Cdetails&corsDomain=finance.yahoo.com')
 								html = response.text  #Convert requests object to string.
+								html = html.encode('ascii', 'xmlcharrefreplace')  #Resolves "UnicodeEncodeError" when printing.
 								#print html
-								if html:
-									Sector = self.StrFet('"sector":', 1, ",")
+								Sector = ""
+								if html and ('"sector":' in html):
+									for ch in html.split('"sector":')[1]:  #Cannot use StrFet for string enclosed by '"'.
+										if ch != ",":
+											Sector += ch
+										else:
+											break
 								else:
 									Sector = "N/A"
+								print row[1], Sector
 								#print row[0], row[1], LP, _52WkChg, _52WkHi, _52WkLo, Div, tPE, fPE, PEG, PpS, PpB, MktCap, FCF, MpC, EpE, Name, Sector
 								csv_row_list = [row[0], row[1], LP, _52WkChg, _52WkHi, _52WkLo, Div, tPE, fPE, PEG, PpS, PpB, MktCap, FCF, MpC, EpE, Name, Sector]
 								output.writerow(csv_row_list)

@@ -184,7 +184,7 @@
 			color:white;
 		}
 
-		#aside { //Left vertical navigation bar format; define a different style for a different element identified by id="aside".
+		.aside { //Left vertical navigation bar format; define a different style for a different element identified by id="aside".
 			width:150px;
 			float:left;
 			margin-bottom:-2000px;  /*Clear space to the right for table.*/
@@ -192,30 +192,30 @@
 			padding-bottom:2000px;
 			background-color: #ffcc66;
 		}
-		#aside ul {
+		.aside ul {
 			background-color:#ffcc66;
 			width:155px;
 			margin:0; /*Set both margin and padding to 0 to remove indentation from un-styled list items.*/
 			padding:0;
 			clear:left;
 		}
-		#aside li {
+		.aside li {
 			list-style:none;  /*Remove list indicator (bullet)*/
 			border-bottom:1px solid #fff;
 			text-align:center;
 		}
-		#aside a {	/*Format hyperlink in all stats(i.e.link, visited, etc.)*/
+		.aside a {	/*Format hyperlink in all stats(i.e.link, visited, etc.)*/
 			text-decoration:none;
 			display:block;  /*Expand clickable boundary to the entire cell.*/
 			padding:4px;
 			color:black;
 		}
 		
-		#aside a.aside_act {
+		.aside a.aside_act {
 			background-color:orange;
 		}
 		
-		#aside a:hover, a:active {	//Change link color when cursor hovers over and when clicked.
+		.aside a:hover, a:active {	//Change link color when cursor hovers over and when clicked.
 			display:block;
 			background-color:#66991c;
 			color:white;
@@ -389,7 +389,7 @@
 				{% url 'blog:ResCenter_link' as rc %}
 				{% url 'blog:ResCenter_Links_link' as rc_l %}
 				{% url 'blog:ResCenter_Plugs_link' as rc_p %}
-				{% url 'blog:results' as res %}
+				{% url 'blog:results' as results %}
 				{% load make_list dict_vari_key_lookup static %}  <!--Load the custom template tags to prepare shortcut for an url list (usage: collect 'html' as 'shortcut').-->
 				{% collect DJLD DJLW DJLM DJL6M DJLQ DJLY as all_DJ_link %}
 				{% url 'blog:SP_LastDay' as SPLD %}
@@ -410,7 +410,7 @@
 				<!--<li>{{request.path}}</li>  Check for active path; must be activated with Django simple tag.-->
 				<li><a {% if request.path in all_ind_link %}class="actlink"{% endif %} href="{% url 'blog:home_link' %}">Home</a></li>
 				<li><a {% if request.path in all_ResCent_link %}class="actlink"{% endif %} href="{% url 'blog:ResCenter_link' %}">Resources</a></li>
-				<li><a {% if request.path in all_DJ_link or request.path in all_SP_link or request.path == res %}class="actlink"{% endif %} href="{% url 'blog:DJ_LastDay' %}">Database</a></li>  <!--'Database' nav link must be highlighted when any period in an index is selected or when a search result is found.-->
+				<li><a {% if request.path in all_DJ_link or request.path in all_SP_link or request.path == results %}class="actlink"{% endif %} href="{% url 'blog:DJ_LastDay' %}">Database</a></li>  <!--'Database' nav link must be highlighted when any period in an index is selected or when a search result is found.-->
 				<li><a {% if request.path == About %}class="actlink"{% endif %} href="{% url 'blog:AboutMe_link' %}">About</a></li>
 				<li><a {% if request.path == cont %}class="actlink"{% endif %} href="{% url 'blog:contact_link' %}">Contact</a></li>
 				<li id="date_time" style="background:#EADCAE; padding:10px 0 15px;"></li>
@@ -420,7 +420,7 @@
 		<!--</div>  top nav bar ends-->
 		<div class="main">
 		{% block content %}
-			<div id="aside">  <!--Margin added to keep element to the right of aside bar-->
+			<div class="aside">  <!--Margin added to keep element to the right of aside bar-->
 			<form method="GET" action="">  <!--Bind multiple forms to one submit button to keep current user GET state-->
 			<p><b>Index Sum</b></p>
 			Sum of index<br>
@@ -471,10 +471,15 @@
 				<figure>
 					<figcaption>Dow Jones Index</figcaption>
 					<!--<img width="423" height="201.75" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=WN6SR"/>-->
+					<!--<embed type="image/svg+xml" src={{ chart_data|safe }} style='width:400px'></embed>-->
+					<!--<embed src={{ chart_data|safe }}/>-->
+					<!--<embed src="data:image/svg+xml;charset=utf-8;base64,{{ chart_data|safe }}"/>-->
+					<!--{{ chart_data|safe }}-->
 				</figure>
 				<figure>
 					<figcaption>S&P 500 Index</figcaption>
 					<!--<img width="423" height="201.75" src="https://research.scottrade.com/qnr/Public/Api/Chrt?u=L5M39"/>-->
+					<!--<embed type="image/svg+xml" src={{ chart_data|safe }} style='width:400px'></embed>-->
 				</figure>
 				<br>  <!--Break for 2nd row of figures.-->
 				<!--<figure>
@@ -487,6 +492,7 @@
 				</figure>-->
 			</div>
 			{% endblock %}
+			<!--{{df}}-->
 		<div id="mover_cont">
 			<h2>Top/Bottom performers in <span class="highlight">{{Performer_Index}}</span> compared to <span class="highlight">{{Performer_Period}}</span> ago</h2>
 			<div class="mover">

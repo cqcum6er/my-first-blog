@@ -27,7 +27,7 @@ class Command(BaseCommand):
 			User_Date = {'Price_1': 1, 'Price_7': 7, 'Price_30': 30}
 			for key, value in User_Date.iteritems():  #User_Date.items():
 				Day_Delta = p.Day - datetime.timedelta(days=value)  #Get datetime for user specified range.
-				print Day_Delta
+				#print Day_Delta
 				#print key, type(key), value, type(value)
 				try:
 					ypost = all_ks.objects.filter(Day=Day_Delta, Symbol=post.Symbol)[0]  #Use .first() or '[0]' with filter to ensure only the first AND only entry in queryset is retrieved for the past date.
@@ -36,14 +36,14 @@ class Command(BaseCommand):
 				#print post.Symbol, post.LastPrice, type(post.LastPrice), ypost.LastPrice, type(ypost.LastPrice),
 				#if not ypost:  #Skip % diff calculation if a date doesn't exist. Note: "if not ypost.LastPrice:" OR "if type(ypost.LastPrice) is None:" doesn't work since ypost.LastPrice is an unicode object.
 					#continue #Skip input for User_date if none exists.
-				
 				if (post is None) or (post.LastPrice == "N/A") or (ypost is None) or (ypost.LastPrice == "N/A"):  #Return "N/A" if no price is reported (or invalid) for today or user-specified date.
+					print row, key, None
 					setattr(row, key, None)  #row.key (object instance.field) syntax may not function in a for-loop; use None as null value for DecimalFields.
 				else:
-				
 					PercDayMov = ((float(post.LastPrice) - float(ypost.LastPrice))/float(ypost.LastPrice))*100
 					#print PercDayMov, type(PercDayMov)
 					#row.key = str(PercDayMov)  #Convert to str format before saving to field of the model instance
+					print row, key, str(PercDayMov)
 					setattr(row, key, str(PercDayMov))
 					#row.key = 'test'
 					#print row.key, type(row.key)

@@ -40,22 +40,22 @@
 			<th title="Trailing Annual Dividend Yield">Div Yild</th>
 			<th title="Trailing Price-To-Earnings">Trail P/E</th>
 			<th title="Forward Price-To-Earnings">For P/E</th>
-			<th title="Price/Earnings-To-Growth">PEG Ratio</th>
+			<th title="Price/Earnings-To-Growth Ratio">PEG Ratio</th>
 			<th title="Price-To-Sales Ratio">P/S</th>
 			<th title="Price-To-Book Ratio">P/B</th>
-			<th title="Market Capitalization">Market Cap</th>
+			<th title="Market Capitalization">Mkt Cap</th>
 			<th title="Operating Cash Flow">OCF</th>
-			<th title="Price-To-Cash-Flow Ratio">Market/OCF</th>
+			<th title="Price-To-Cash-Flow Ratio">Mkt/OCF</th>
 			<th title="Enterprise Value/EBITDA">EV/EBITDA</th>
 			<th title="Company Name">Name</th>
-			<th title="Company Service Sector">Sector</th>
+			<th title="Company Service Type">Sector</th>
 		</tr>
 		</thead>
 	<!--</div>-->
 	<tbody>
 	{% for post in posts %}
 	<tr align="center">
-		<td id="table-link"><a href="/results/?q={{ post.Symbol }}">{{ post.Symbol }}</a></td>
+		<td id="table-link"><a href="/results/?q={{ post.Symbol }}" title="{{ post.Name }}">{{ post.Symbol }}</a></td>
 		<td>{% firstof post.LastPrice "N/A" %}</td>  <!--Print out value OR "N/A" in case value doesn't exist.-->
 		{% load math_op %}
 		{% if post.FiftyTwoWkChg|floatformat %}  <!--Check if conversion to float type is possible.-->

@@ -45,7 +45,7 @@ class sp500_post_sorted_Admin(admin.ModelAdmin):
 admin.site.register(sp500_post_sorted, sp500_post_sorted_Admin)
 
 class all_ks_Admin(admin.ModelAdmin):
-	list_display = ['Day', 'Symbol', 'LastPrice', 'FiftyTwoWkChg', 'DivYild', 'PEG_Ratio', 'PpS', 'PpB', 'Market_Cap', 'Free_Cash_Flow', 'Market_per_CashFlow', 'Enterprise_per_EBITDA']
+	list_display = ['Day', 'Symbol', 'LastPrice', 'FiftyTwoWkChg', 'DivYild', 'PEG_Ratio', 'PpS', 'PpB', 'Market_Cap', 'Free_Cash_Flow', 'Market_per_CashFlow', 'Enterprise_per_EBITDA', 'Sector']
 	list_display_links = ['Symbol']
 	list_filter = ['Day', 'Symbol']
 	search_fields = ['Symbol', 'Name']
