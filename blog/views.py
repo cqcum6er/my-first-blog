@@ -4,7 +4,7 @@ from django.shortcuts import render  #, render_to_response, redirect #get_object
 from django.core.exceptions import ObjectDoesNotExist  #Display in-app message when an instance isn't found.
 #from django.http import HttpResponse
 #from django.template import RequestContext
-from difflib import get_close_matches  #Allow 'approximate' search.
+from difflib import get_close_matches  #Allow 'approximate' search from user query.
 '''
 from django.db.models import Q  #Allow simultaneous search in different fields.
 #For email.
@@ -18,8 +18,8 @@ from .forms import ContactForm, MoverForm, IndexForm
 from datetime import timedelta
 import datetime  #Not the same as "from datetime import datetime"
 import time
-from django.db import connection  #Check sqlite connection speed with "connection.queries".
-import csv
+#from django.db import connection  #Check sqlite connection speed with "connection.queries".
+#import csv
 #import itertools
 import pygal
 import pandas as pd
@@ -31,10 +31,13 @@ import matplotlib.pyplot as plt
 import base64
 from io import BytesIO
 '''
-from django.views.generic import TemplateView
+#from django.views.generic import TemplateView
 #from django.views import generic
 #from pygal.style import DarkStyle
-from .charts import FundGraph
+#from .charts import FundGraph
+#from django.db.models.expressions import RawSQL
+from django.db.models import FloatField, Max, Min, Q
+from django.db.models.functions import Cast  #Not supported on Django 1.8 or before.
 
 '''
 #To update database with the current date, save scheduled csv record from Pythonanywhere (Export "all_ks" table as csv file [i.e.'all_ks_export.csv'] and save to the same directory as views.py), then run local server ONCE to populate local database before commenting out this block (may need to remove duplicate rows with sqlite command afterward); comment out this block before uploading views.py to Pythonanywhere to use scheduled csv instead...
@@ -99,11 +102,11 @@ def Movers(Ind, User_Date, Dis_num):  #Sorts index components into top/bottom pe
 	#key = next(User_filter, None)[0]
 	#key = User_filter.next()[0]  #Get key from generator dict.
 	#print key
-	rev_key = '-' + key
+	rev_key = '-' + key  #Cannot use .order_by(-rev_key) for object filter.
 	#val = User_filter.next()[1]  #Get val from generator dict.
 	variable_column = key
 	search_type = 'isnull'
-	filter = variable_column + '__' + search_type  #Use kwarg 'filter' for variable column name for .exclude() (removing instance where the value is null for user-specified period).
+	filter = variable_column + '__' + search_type  #Reserve kwarg 'filter' for variable column name for .exclude() (removing instance where the value is null for user-specified period).
 	Top_disp = all_ks_DatePriceDiff.objects.filter(Symbol__in=list(Latest_Ind)).order_by(rev_key).values('Name', 'Symbol', key).exclude(**{ filter: True })[:Dis_num]  #Use .only() to select fields to display (for faster access, use .values() to return a list of dict instead of queryset object); .exclude() excludes instance where price for a date doesn't exist from the orderd list.
 	#Top_disp = all_ks_DatePriceDiff.objects.filter(Symbol__in=list(Latest_Ind), key__icontains='').order_by(key)#[:Dis_num]
 	#Top_disp = all_ks_DatePriceDiff.objects.extra(select={key: 'CAST(all_ks_DatePriceDiff.key AS INTEGER)'}, order_by=[key])
@@ -434,12 +437,13 @@ def home(request):
 			print Ind_Date_label, type(Ind_Date_label)  #Show label from user submission dict.
 			Index_Sum = Ind_Date_label
 	'''
+	Movers_return = Movers(Ind, Period_Mov_val, Dis_num)
 	return render(request, 'blog/home.html', {
 	'ind_form': ind_form,
 	'move_form': move_form,
-	'TopMovers': Movers(Ind, Period_Mov_val, Dis_num)[0],  #Collect 1st part of tuple as top movers.
-	'BottomMovers': Movers(Ind, Period_Mov_val, Dis_num)[1],  #Collect 2nd part of tuple as bottom movers.
-	'key': Movers(Ind, Period_Mov_val, Dis_num)[2],  #Collect 3rd part of tuple for custom dict filter.
+	'TopMovers': Movers_return[0],  #Collect 1st part of tuple as top movers.
+	'BottomMovers': Movers_return[1],  #Collect 2nd part of tuple as bottom movers.
+	'key': Movers_return[2],  #Collect 3rd part of tuple for custom dict filter.
 	'Performer_Index': Ind_Mov_label,  #Flavor text for title.
 	'Performer_Period': Period_Mov_label,  #Flavor text for title.
 	'Index_Sum': Ind_Date_label,
@@ -451,23 +455,28 @@ def home(request):
 
 def Ind_LastWk(request):
 	form = MoverForm()
-	return render(request, 'blog/Indices_LastWeek.html', {'form': form, 'TopMovers': Movers(Index_DJ, 1, 5)[0], 'BottomMovers': Movers(Index_DJ, 1, 5)[1],'Performer_Index':'Dow Jones', 'Performer_Period':'one day'})
+	Movers_return = Movers(Index_DJ, 1, 5)
+	return render(request, 'blog/Indices_LastWeek.html', {'form': form, 'TopMovers': Movers_return[0], 'BottomMovers': Movers_return[1],'Performer_Index':'Dow Jones', 'Performer_Period':'one day'})
 
 def Ind_LastQtr(request):
 	form = MoverForm()
-	return render(request, 'blog/Indices_LastQuarter.html', {'form': form, 'TopMovers': Movers(Index_DJ, 1, 5)[0], 'BottomMovers': Movers(Index_DJ, 1, 5)[1],'Performer_Index':'Dow Jones', 'Performer_Period':'one day'})
+	Movers_return = Movers(Index_DJ, 1, 5)
+	return render(request, 'blog/Indices_LastQuarter.html', {'form': form, 'TopMovers': Movers_return[0], 'BottomMovers': Movers_return[1],'Performer_Index':'Dow Jones', 'Performer_Period':'one day'})
 
 def Ind_Last6Mnth(request):
 	form = MoverForm()
-	return render(request, 'blog/Indices_Last6Months.html', {'form': form, 'TopMovers': Movers(Index_DJ, 1, 5)[0], 'BottomMovers': Movers(Index_DJ, 1, 5)[1],'Performer_Index':'Dow Jones', 'Performer_Period':'one day'})
+	Movers_return = Movers(Index_DJ, 1, 5)
+	return render(request, 'blog/Indices_Last6Months.html', {'form': form, 'TopMovers': Movers_return[0], 'BottomMovers': Movers_return[1],'Performer_Index':'Dow Jones', 'Performer_Period':'one day'})
 
 def Ind_LastYr(request):
 	form = MoverForm()
-	return render(request, 'blog/Indices_LastYear.html', {'form': form, 'TopMovers': Movers(Index_DJ, 1, 5)[0], 'BottomMovers': Movers(Index_DJ, 1, 5)[1],'Performer_Index':'Dow Jones', 'Performer_Period':'one day'})
+	Movers_return = Movers(Index_DJ, 1, 5)
+	return render(request, 'blog/Indices_LastYear.html', {'form': form, 'TopMovers': Movers_return[0], 'BottomMovers': Movers_return[1],'Performer_Index':'Dow Jones', 'Performer_Period':'one day'})
 
 def Ind_Last5Yr(request):
 	form = MoverForm()
-	return render(request, 'blog/Indices_Last5Years.html', {'form': form, 'TopMovers': Movers(Index_DJ, 1, 5)[0], 'BottomMovers': Movers(Index_DJ, 1, 5)[1],'Performer_Index':'Dow Jones', 'Performer_Period':'one day'})
+	Movers_return = Movers(Index_DJ, 1, 5)
+	return render(request, 'blog/Indices_Last5Years.html', {'form': form, 'TopMovers': Movers_return[0], 'BottomMovers': Movers_return[1],'Performer_Index':'Dow Jones', 'Performer_Period':'one day'})
 
 def ResCenter_Def(request):
 	return render(request, 'blog/ResCenter_Def.html')
@@ -739,18 +748,40 @@ def SP_LastYr(request):
 def thanks(request):
 	return render(request, 'blog/thanks.html')
 
+def get_field_bound(sym, field):  #Get upper and lower boundary for model field from historic records.
+	#cleaned_field = all_ks.objects.filter(Symbol__iexact=sym).exclude(**{field: 'N/A'}).extra(select={'TrailPE': 'CAST(TrailPE AS REAL)'}).extra(where=['field = %s'], params=[field])  #MySQL statement CAST converts given field type (CharFfield) to DecimalField. '%s' is the standard Python database string placeholder to indicate parameters the database engine should automatically quote. Get the database to cast field type as an integer via the extra method; queryset must be ordered via order_by() before applying last().
+	#cleaned_field = all_ks.objects.filter(Symbol__iexact=sym).exclude(**{field: 'N/A'}).raw('SELECT CAST(field AS REAL) FROM blog_all_ks WHERE field = %s', [field])  #Returns RawQuerySet type (not compatible with Django query filter).
+	#cleaned_field = all_ks.objects.filter(Symbol__iexact=sym).exclude(**{field: 'N/A'}).filter(id__in=RawSQL('SELECT CAST(field AS REAL) FROM blog_all_ks WHERE field = %s', [field]))
+	#cleaned_field = all_ks.objects.filter(Symbol__iexact=sym).exclude(TrailPE='N/A').extra(select={'TrailPE': 'CAST(TrailPE AS REAL)'})
+	#cleaned_field = all_ks.objects.filter(Symbol__iexact=sym).exclude(TrailPE='N/A').extra(select={'TrailPE': 'CAST(TrailPE AS REAL)'})#.extra(where=['f = %s'], params=['TrailPE'])
+	#cleaned_field = all_ks.objects.filter(Symbol__iexact=sym).exclude(TrailPE='N/A').extra(select={'TrailPE': 'CAST(f AS REAL)'}, where=['f = "TrailPE"'])#, params=['TrailPE'])
+
+	#cleaned_field = all_ks.objects.filter(Q(Symbol__iexact=sym) & Q(**{field: r'[-+]?\d*\.\d+|\d+'})).annotate(as_float=Cast(field, FloatField())).order_by(field)
+	
+	var_col = field
+	search_type = 'isnull'
+	compound_filter = var_col + '__' + search_type
+	'''
+	cleaned_field = all_ks.objects.filter(Symbol__iexact=sym).exclude(**{field: 'N/A'}).exclude(**{compound_filter: True}).annotate(as_float=Cast(field, FloatField())).order_by(field)
+	'''
+	#null_field = all_ks.objects.filter(Symbol__iexact=sym).filter(**{compound_filter: True})
+	regex_filter = field + '__iregex'
+	cleaned_field = all_ks.objects.filter(Symbol__iexact=sym).filter(**{regex_filter: r'[-+]?\d*\.\d+|\d+'}).exclude(Q(**{field: 'N/A'})|Q(**{compound_filter: True})).annotate(as_float=Cast(field, FloatField())).order_by(field)  #Use **kwargs notation (**{field: 'N/A'}) to apply variable column within Django ORM filter; 'annotate' requires an alias (such as 'as_float') for manipulation of queryset (i.e. converting CharField to FloatField) on database end instead of python end for efficient query. r'[-+]?\d*\.\d+|\d+' will retrieve numbers with(out) -/+, leading zero or decimal such as -0.12, .32 or 67. Use Q()|Q() to combine conditions as OR or Q()&Q() as AND.
+	#print cleaned_field, cleaned_field.count()
+	#print cleaned_field.as_float, type(cleaned_field.as_float)
+	print sym, field #, cleaned_field.as_float
+	max_field = cleaned_field.last()
+	#print max_field, type(max_field)
+	max_field_float = float(getattr(max_field, field))  #Get the field value for a model.
+	print "max =", max_field_float, type(max_field_float)
+	#min_field = all_ks.objects.filter(Symbol__iexact=sym).exclude(**{field: 'N/A'}).order_by(field).first()
+	min_field = cleaned_field.first()
+	min_field_float = float(getattr(min_field, field))
+	print "min =", min_field_float, type(min_field_float)
+	field_rng = max_field_float - min_field_float
+	return (min_field_float, field_rng)
+
 def get_query(request):  #Implement logic for query search.
-	'''
-	#Pygal display test:
-	chart = pygal.Bar()
-	chart.title = 'Fundamental History'
-	chart.add('IE', 19.5)
-	chart.add('Firefox', 36.6)
-	chart.add('Chrome', 36.3)
-	chart.add('Safari', 4.5)
-	chart.add('Opera', 2.3)
-	chart_data = chart.render_data_uri()  #Allows direct embedding of SVG image into html instead of from an external image file.
-	'''
 	master_list = all_ks.objects.all()  #master_list should be accessible at all lower nested levels to refine filter.
 	q = request.GET.get('q')  #Get raw query object "q" (NAME of input text) from html.
 	if not q:  #Check if user has entered a search term.
@@ -775,31 +806,121 @@ def get_query(request):  #Implement logic for query search.
 			last_element = queryset_list.last()  #Get the last entry in the queryset to display latest company name as table caption in html.
 			chart = pygal.Line(x_label_rotation=20, show_minor_x_labels=False, x_labels_major_every=28) 
 			chart.title = last_element.Name + ' (' + last_element.Symbol + ') Fundamental History'
-			df = pd.DataFrame(list(all_ks.objects.filter(Symbol__iexact=last_element).values()))  #Convert queryset object to Pandas dataframe.
-			df.set_index('Day', inplace=True)
+			df = pd.DataFrame(list(all_ks.objects.filter(Symbol__iexact=last_element.Symbol).values()))  #Convert queryset object (as a list) to Pandas dataframe.
+			df.set_index('Day', inplace=True)  #inplace set to True modifies df object in place instead of creating new df object.
+			#print list(df), type(list(df))
+			#firstDayStr = str(df.index[0]).replace('-', '')
+			#lastDayStr = str(df.index[-1]).replace('-', '')
+			#print df.index[0:-1], df.Symbol[0:-1], df.LastPrice[0:-1]
+			#print df[['Symbol', 'LastPrice']]  #Index ('Day') is retrieved along with specified columns.
+			#print firstDayStr, lastDayStr, type(str(lastDayStr))
+			
+			#sym_all_ks = all_ks.objects.filter(Symbol__iexact=last_element.Symbol)
 			'''
-			firstDayStr = str(df.index[0]).replace('-', '')
-			lastDayStr = str(df.index[-1]).replace('-', '')
-			print list(df.index[0:-1])
-			print firstDayStr, lastDayStr, type(str(lastDayStr))
+			#max_LastPrice = all_ks.objects.filter(Symbol__iexact=last_element).order_by('LastPrice').values().last()
+			#queryset_list = all_ks.objects.filter(Symbol__iexact=last_element)
+			#max_LastPrice = queryset_list.values_list('LastPrice', flat=True).order_by('LastPrice').last()
+			ordered_LastPrice = sym_all_ks.exclude(LastPrice='N/A').extra(select={'LastPrice': 'CAST(LastPrice AS REAL)'}).order_by('LastPrice')  #Exclude all rows with LastPrice='N/A' before converting the rest of the rows to real (float) type using Sqlite syntax (CAST ... AS REAL).
+			max_LastPrice = ordered_LastPrice.last()
+			#print max_LastPrice, type(max_LastPrice)
+			#max_LastPrice_float = float(max_LastPrice.get('LastPrice').encode('utf-8'))
+			#max_LastPrice_float = float(max_LastPrice.encode('utf-8'))
+			max_LastPrice_float = float(max_LastPrice.LastPrice)
+			#print "max =", max_LastPrice_float, type(max_LastPrice_float)
+			min_LastPrice = ordered_LastPrice.first()
+			#print min_LastPrice, type(min_LastPrice)
+			min_LastPrice_float = float(min_LastPrice.LastPrice)
+			#print "min =", min_LastPrice_float, type(min_LastPrice_float)
+			LastPrice_rng = max_LastPrice_float - min_LastPrice_float
 			'''
-			total_row = []
-			for row in df.itertuples(): #Prepare an iterable for df (more efficient than iterrows() or iteritems()).
+			#LastPrice_bound_return = get_field_bound(last_element.Symbol, 'LastPrice')
+			row_LastPrice = []
+			'''
+			ordered_DivYild = sym_all_ks.exclude(DivYild='N/A').extra(select={'DivYild': 'CAST(DivYild AS REAL)'}).order_by('DivYild')
+			max_DivYild = ordered_DivYild.last()
+			#print max_DivYild, type(max_DivYild)
+			max_DivYild_float = float(max_DivYild.DivYild)
+			#print "max =", max_DivYild_float, type(max_DivYild_float)
+			min_DivYild = ordered_DivYild.first()
+			min_DivYild_float = float(min_DivYild.DivYild)
+			#print "min =", min_DivYild_float, type(min_DivYild_float)
+			DivYild_rng = max_DivYild_float - min_DivYild_float
+			
+			DivYild_bound_return = get_field_bound(last_element.Symbol, 'DivYild')
+			row_DivYild = []
+			'''
+			'''
+			ordered_TrailPE = sym_all_ks.exclude(TrailPE='N/A').extra(select={'TrailPE': 'CAST(TrailPE AS REAL)'}).order_by('TrailPE')
+			max_TrailPE = ordered_TrailPE.last()
+			#print max_TrailPE, type(max_TrailPE)
+			max_TrailPE_float = float(max_TrailPE.TrailPE)
+			#print "max =", max_TrailPE_float, type(max_TrailPE_float)
+			min_TrailPE = ordered_TrailPE.first()
+			min_TrailPE_float = float(min_TrailPE.TrailPE)
+			#print "min =", min_TrailPE_float, type(min_TrailPE_float)
+			TrailPE_rng = max_TrailPE_float - min_TrailPE_float
+			'''
+			'''
+			#last_element_TrailPE = [f.TrailPE for f in last_element._meta.get_fields()]
+			#filter_col = [col for col in df if col.startswith('TrailPE')]
+			#print last_element.Symbol, filter_col[0]
+			#print last_element.Symbol, last_element._meta.get_all_field_names()
+			#print last_element.Symbol, getattr(last_element, last_element.TrailPE)
+			#print last_element.TrailPE, type(last_element.TrailPE)
+			#TrailPE_bound_return = get_field_bound(last_element.Symbol, last_element.TrailPE)
+			TrailPE_bound_return = get_field_bound(last_element.Symbol, 'TrailPE')
+			#TrailPE_bound_return = get_field_bound(last_element.Symbol)
+			row_TrailPE = []
+			'''
+			for row in df.itertuples(): #Prepare an iterable for df (more efficient than iterrows() or iteritems()) from historic records for a symbol.
+				#print row, type(row), list(row), type(list(row)), type(df)
 				try:
-					#print row.DivYild
-					if float(row.DivYild.encode('utf-8')):
-						total_row.append(float(row.DivYild.encode('utf-8')))  #Add y values for each x ('Day').
-					else:
-						total_row.append(0)
+					#print row.LastPrice
+					if float(row.LastPrice.encode('utf-8')):
+						#row_LastPrice.append((float(row.LastPrice) - LastPrice_bound_return[0])/LastPrice_bound_return[1])  #Add y values for each x ('Day'); normalize to between 0 and 1.
+						row_LastPrice.append(float(row.LastPrice.encode('utf-8')))  #Add y values for each x ('Day').
+					else:  #Skip an empty daily entry if LastPrice for the date doesn't exist or can't be converted to float type.
+						row_LastPrice.append(None)
 				except ValueError, e:  #Output error message when the field cannot be converted to float format.
-					print "error", e, "on line", row
-			'''
-			for row in range(355):  #y val test datapoint
-				total_row.append(row)
-			'''
+					pass
+					#print "error", e, "on line", row
+				'''
+				try:
+					if float(row.DivYild):
+						row_DivYild.append((float(row.DivYild) - DivYild_bound_return[0])/DivYild_bound_return[1])
+					else:
+						row_DivYild.append(None)
+				except ValueError, e:
+					pass
+				
+				try:
+					if float(row.TrailPE):
+						
+						#row_TrailPE.append((float(row.TrailPE) - #min_TrailPE_float)/TrailPE_rng)
+						
+						
+						#print row.Symbol, type(row), list(row), type(list(row))
+						#filter_col = [col for col in df if col.startswith('TrailPE')]
+						#col_name = filter_col[0]  #Get the 1st list element (column name) as a string.
+						#print col_name, type(col_name)
+						#field_bound_return = get_field_bound(row.Symbol, col_name)
+						
+						row_TrailPE.append((float(row.TrailPE) - TrailPE_bound_return[0])/TrailPE_bound_return[1])
+						
+					else:
+						row_TrailPE.append(None)
+				except ValueError, e:
+					pass
+				'''
+			#for row in range(355):  #y val test datapoint
+				#total_row.append(row)
 			#print total_row, len(total_row)
 			#coords = [(xval, yval) for xval, yval in zip(list(df.index[0:-1]), total_row)]
-			chart.add('DivYild', total_row, dots_size=0)
+			chart.add('Last Price', row_LastPrice, dots_size=0)
+			
+			#chart.add('Dividend Yield', row_DivYild, dots_size=0)
+			#chart.add('Trail P/E', row_TrailPE, dots_size=0)
+			
 			#chart.add('', coords)
 			#print df
 			#chart.x_labels = map(str, range(int(firstDayStr), int(lastDayStr)))
@@ -809,6 +930,21 @@ def get_query(request):  #Implement logic for query search.
 			#date_list = [n for n in range(min(df.index), max(df.index))]
 			#print date_list
 			chart.x_labels = date_list
+			'''
+			chart.y_labels = [
+				{'label': '0%', 'value': 0},
+				{'label': '10%', 'value': .1},
+				{'label': '20%', 'value': .2},
+				{'label': '30%', 'value': .3},
+				{'label': '40%', 'value': .4},
+				{'label': '50%', 'value': .5},
+				{'label': '60%', 'value': .6},
+				{'label': '70%', 'value': .7},
+				{'label': '80%', 'value': .8},
+				{'label': '90%', 'value': .9},
+				{'label': '100%', 'value': 1}
+				]
+			'''
 			chart_data = chart.render_data_uri()  #Allows direct embedding of SVG image into html instead of from an external image file.
 			#return render_template("home.html", chart_data = chart_data)
 			return render(request, 'blog/table_history.html', {'posts': queryset_list, 'last_element': last_element, 'chart_data': chart_data})
@@ -917,7 +1053,7 @@ def mplimage(request):
     canvas.print_png(response)
     return response
 '''
-
+'''
 class IndexView(TemplateView):
 	template_name = 'blog/table_history_image.html'
 
@@ -936,7 +1072,7 @@ class IndexView(TemplateView):
 		#Call the `.generate()` method on our chart object and pass it to template context.
 		context['chart_data'] = FundGraph_out.generate()
 		return context
-
+'''
 '''
 class IndexView(generic.ListView):
 	template_name = 'blog/table_history_image.html'

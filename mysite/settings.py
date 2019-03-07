@@ -81,6 +81,31 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),  #Can also use '/home/<my name>/<my_test_project>/db.sqlite3' when moving project to pythonanywhere
     }
 }
+'''
+#Connect Mysql db to Pythonanywhere server.
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'cqcum6er$db',
+		'USER': 'cqcum6er',
+		'PASSWORD': '6poolrush',
+		'HOST': 'cqcum6er.mysql.pythonanywhere-services.com',
+    }
+}
+'''
+'''
+#Connect Mysql db to local machine.
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'testdb', #'localhost'
+		'USER': 'root',
+		'PASSWORD': '6poolrush',
+		'HOST': 'localhost', #'127.0.0.1'
+		'PORT': '3306',
+    }
+}
+'''
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -100,7 +125,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/' #Specify URL to the static folder when deploying on server.
 
-#STATIC_ROOT = os.path.join(BASE_DIR, 'static')  #Define path after using "manage.py collectstatic" for collection into one folder.
+#STATIC_ROOT = os.path.join(BASE_DIR, 'static')  #For use with PythonAnywhere. Defines path after using "manage.py collectstatic" for collection into one folder.
 
 STATICFILES_DIRS = [
 	os.path.join(BASE_DIR, 'static')  #Needed during development to specify paths of static folder(s).

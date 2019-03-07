@@ -1,8 +1,8 @@
 <!--Use for database left-side column.-->
-<div id="aside">
+<div class="aside">
 	<ul>
 		<li><a {% if request.path == rc %}class="aside_act"{% endif %} href="{% url 'blog:ResCenter_link' %}">Definitions</a></li>  <!--Implement "aside_act" to customize active link.-->
 		<li><a {% if request.path == rc_l %}class="aside_act"{% endif %} href="{% url 'blog:ResCenter_Links_link' %}">Links</a></li>
-		<li><a {% if request.path == rc_p %}class="aside_act"{% endif %} href="{% url 'blog:ResCenter_Plugs_link' %}">Plugs</a></li>
+		<li><a {% if request.path == rc_p %}class="aside_act"{% endif %} href="{% url 'blog:ResCenter_Plugs_link' %}">Others</a></li>
 	</ul>
 </div>

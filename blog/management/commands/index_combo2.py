@@ -213,6 +213,10 @@ class Command(BaseCommand):
 			p = all_ks.objects.latest('Day')  #Check what's the lastest day in existing db before appending to db.
 			with open('index_LastComboSet_ks.csv', 'rb') as file:  # Need to use absolute path when on Pythonanywhere server (i.e. use '/home/cqcum6er/my-first-blog/DJ_list.csv' as file path.)
 				infile = csv.reader(file, delimiter=",", quotechar='"')  #Specify csv item boundary.
+				'''
+				cutoff_day = next(infile)[0] - datetime.timedelta(days=365)  #Retrieve cutoff date based on 1st row of the csv file.
+				all_ks_q.filter(Day__lte=cutoff_day).delete()  #Remove all entry earlier than the cutoff date.
+				'''
 				for row in infile:
 					row_datetime = datetime.datetime.strptime(row[0],'%Y-%m-%d')  #row[0] is converted from str to datetime format.
 					#print row_datetime.date(), type(row_datetime.date())
