@@ -37,7 +37,7 @@ from io import BytesIO
 #from .charts import FundGraph
 #from django.db.models.expressions import RawSQL
 from django.db.models import FloatField, Max, Min, Q
-from django.db.models.functions import Cast  #Not supported on Django 1.8 or before.
+#from django.db.models.functions import Cast  #Not supported on Django 1.8 or before.
 
 '''
 #To update database with the current date, save scheduled csv record from Pythonanywhere (Export "all_ks" table as csv file [i.e.'all_ks_export.csv'] and save to the same directory as views.py), then run local server ONCE to populate local database before commenting out this block (may need to remove duplicate rows with sqlite command afterward); comment out this block before uploading views.py to Pythonanywhere to use scheduled csv instead...
@@ -876,9 +876,9 @@ def get_query(request):  #Implement logic for query search.
 				#print row, type(row), list(row), type(list(row)), type(df)
 				try:
 					#print row.LastPrice
-					if float(row.LastPrice.encode('utf-8')):
+					if float(row.LastPrice):  #float(row.LastPrice.encode('utf-8'))
 						#row_LastPrice.append((float(row.LastPrice) - LastPrice_bound_return[0])/LastPrice_bound_return[1])  #Add y values for each x ('Day'); normalize to between 0 and 1.
-						row_LastPrice.append(float(row.LastPrice.encode('utf-8')))  #Add y values for each x ('Day').
+						row_LastPrice.append(float(row.LastPrice))  #Add y values for each x ('Day')..encode('utf-8')
 					else:  #Skip an empty daily entry if LastPrice for the date doesn't exist or can't be converted to float type.
 						row_LastPrice.append(None)
 				except ValueError, e:  #Output error message when the field cannot be converted to float format.

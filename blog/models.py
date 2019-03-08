@@ -111,8 +111,8 @@ class sp500_post_sorted(models.Model):
 class all_ks(models.Model):
 	Day = models.DateField(db_index=True, blank=False, default=datetime.date.today().strftime('%Y-%m-%d'))
 	Symbol = models.CharField(db_index=True, max_length=20, default='N/A')
-	LastPrice = models.CharField(db_index=True, max_length=30, default='N/A')
-	LastPrice_v1 = models.DecimalField(blank=True, null=True, decimal_places=2, max_digits=10)
+	#LastPrice_v0 = models.CharField(db_index=True, max_length=30, default='N/A')
+	LastPrice = models.DecimalField(blank=True, null=True, decimal_places=2, max_digits=10)
 	FiftyTwoWkChg = models.CharField(db_index=True, max_length=30, default='N/A')
 	FiftyTwoWkHi = models.CharField(db_index=True, max_length=30, default='N/A')
 	FiftyTwoWkLo = models.CharField(db_index=True, max_length=30, default='N/A')
