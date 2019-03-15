@@ -874,13 +874,14 @@ def get_query(request):  #Implement logic for query search.
 			'''
 			for row in df.itertuples(): #Prepare an iterable for df (more efficient than iterrows() or iteritems()) from historic records for a symbol.
 				#print row, type(row), list(row), type(list(row)), type(df)
+				#str_LastPrice = str(row.LastPrice)
 				try:
-					#print row.LastPrice
-					if float(row.LastPrice):  #float(row.LastPrice.encode('utf-8'))
+					#print row.LastPrice, type(row.LastPrice)
+					#if float(str_LastPrice):  #Cannot convert None value in the decimal.Decimal type straight to float, need to convert to str 1st.
 						#row_LastPrice.append((float(row.LastPrice) - LastPrice_bound_return[0])/LastPrice_bound_return[1])  #Add y values for each x ('Day'); normalize to between 0 and 1.
-						row_LastPrice.append(float(row.LastPrice))  #Add y values for each x ('Day')..encode('utf-8')
-					else:  #Skip an empty daily entry if LastPrice for the date doesn't exist or can't be converted to float type.
-						row_LastPrice.append(None)
+					row_LastPrice.append(row.LastPrice)  #Add y values for each x ('Day')..encode('utf-8')
+					#else:  #Skip an empty daily entry if LastPrice for the date doesn't exist or can't be converted to float type.
+						#row_LastPrice.append(None)
 				except ValueError, e:  #Output error message when the field cannot be converted to float format.
 					pass
 					#print "error", e, "on line", row
