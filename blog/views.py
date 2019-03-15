@@ -748,28 +748,33 @@ def SP_LastYr(request):
 def thanks(request):
 	return render(request, 'blog/thanks.html')
 
-def get_field_bound(sym, field):  #Get upper and lower boundary for model field from historic records.
+def get_field_bound(sym, field):  #Get upper and lower boundary for model field from historic records. Field must be of DecimalField.
 	#cleaned_field = all_ks.objects.filter(Symbol__iexact=sym).exclude(**{field: 'N/A'}).extra(select={'TrailPE': 'CAST(TrailPE AS REAL)'}).extra(where=['field = %s'], params=[field])  #MySQL statement CAST converts given field type (CharFfield) to DecimalField. '%s' is the standard Python database string placeholder to indicate parameters the database engine should automatically quote. Get the database to cast field type as an integer via the extra method; queryset must be ordered via order_by() before applying last().
 	#cleaned_field = all_ks.objects.filter(Symbol__iexact=sym).exclude(**{field: 'N/A'}).raw('SELECT CAST(field AS REAL) FROM blog_all_ks WHERE field = %s', [field])  #Returns RawQuerySet type (not compatible with Django query filter).
 	#cleaned_field = all_ks.objects.filter(Symbol__iexact=sym).exclude(**{field: 'N/A'}).filter(id__in=RawSQL('SELECT CAST(field AS REAL) FROM blog_all_ks WHERE field = %s', [field]))
 	#cleaned_field = all_ks.objects.filter(Symbol__iexact=sym).exclude(TrailPE='N/A').extra(select={'TrailPE': 'CAST(TrailPE AS REAL)'})
 	#cleaned_field = all_ks.objects.filter(Symbol__iexact=sym).exclude(TrailPE='N/A').extra(select={'TrailPE': 'CAST(TrailPE AS REAL)'})#.extra(where=['f = %s'], params=['TrailPE'])
 	#cleaned_field = all_ks.objects.filter(Symbol__iexact=sym).exclude(TrailPE='N/A').extra(select={'TrailPE': 'CAST(f AS REAL)'}, where=['f = "TrailPE"'])#, params=['TrailPE'])
-
 	#cleaned_field = all_ks.objects.filter(Q(Symbol__iexact=sym) & Q(**{field: r'[-+]?\d*\.\d+|\d+'})).annotate(as_float=Cast(field, FloatField())).order_by(field)
-	
+	'''
 	var_col = field
 	search_type = 'isnull'
 	compound_filter = var_col + '__' + search_type
-	'''
+	
 	cleaned_field = all_ks.objects.filter(Symbol__iexact=sym).exclude(**{field: 'N/A'}).exclude(**{compound_filter: True}).annotate(as_float=Cast(field, FloatField())).order_by(field)
-	'''
+	
 	#null_field = all_ks.objects.filter(Symbol__iexact=sym).filter(**{compound_filter: True})
 	regex_filter = field + '__iregex'
 	cleaned_field = all_ks.objects.filter(Symbol__iexact=sym).filter(**{regex_filter: r'[-+]?\d*\.\d+|\d+'}).exclude(Q(**{field: 'N/A'})|Q(**{compound_filter: True})).annotate(as_float=Cast(field, FloatField())).order_by(field)  #Use **kwargs notation (**{field: 'N/A'}) to apply variable column within Django ORM filter; 'annotate' requires an alias (such as 'as_float') for manipulation of queryset (i.e. converting CharField to FloatField) on database end instead of python end for efficient query. r'[-+]?\d*\.\d+|\d+' will retrieve numbers with(out) -/+, leading zero or decimal such as -0.12, .32 or 67. Use Q()|Q() to combine conditions as OR or Q()&Q() as AND.
-	#print cleaned_field, cleaned_field.count()
+	
 	#print cleaned_field.as_float, type(cleaned_field.as_float)
-	print sym, field #, cleaned_field.as_float
+	'''
+	var_col = field
+	search_type = 'isnull'
+	compound_filter = var_col + '__' + search_type
+	cleaned_field = all_ks.objects.filter(Symbol__iexact=sym).exclude(**{compound_filter: True}).order_by(field)
+	print sym, cleaned_field, cleaned_field.count()
+	#print sym, field #, cleaned_field.as_float
 	max_field = cleaned_field.last()
 	#print max_field, type(max_field)
 	max_field_float = float(getattr(max_field, field))  #Get the field value for a model.
@@ -833,8 +838,11 @@ def get_query(request):  #Implement logic for query search.
 			#print "min =", min_LastPrice_float, type(min_LastPrice_float)
 			LastPrice_rng = max_LastPrice_float - min_LastPrice_float
 			'''
-			#LastPrice_bound_return = get_field_bound(last_element.Symbol, 'LastPrice')
+			LastPrice_bound_return = get_field_bound(last_element.Symbol, 'LastPrice')
 			row_LastPrice = []
+			
+			FiftyTwoWkChg_bound_return = get_field_bound(last_element.Symbol, 'FiftyTwoWkChg')
+			row_FiftyTwoWkChg = []
 			'''
 			ordered_DivYild = sym_all_ks.exclude(DivYild='N/A').extra(select={'DivYild': 'CAST(DivYild AS REAL)'}).order_by('DivYild')
 			max_DivYild = ordered_DivYild.last()
@@ -878,13 +886,23 @@ def get_query(request):  #Implement logic for query search.
 				try:
 					#print row.LastPrice, type(row.LastPrice)
 					#if float(str_LastPrice):  #Cannot convert None value in the decimal.Decimal type straight to float, need to convert to str 1st.
-						#row_LastPrice.append((float(row.LastPrice) - LastPrice_bound_return[0])/LastPrice_bound_return[1])  #Add y values for each x ('Day'); normalize to between 0 and 1.
-					row_LastPrice.append(row.LastPrice)  #Add y values for each x ('Day')..encode('utf-8')
-					#else:  #Skip an empty daily entry if LastPrice for the date doesn't exist or can't be converted to float type.
-						#row_LastPrice.append(None)
-				except ValueError, e:  #Output error message when the field cannot be converted to float format.
+					if row.LastPrice:
+						row_LastPrice.append((float(row.LastPrice) - LastPrice_bound_return[0])/LastPrice_bound_return[1])  #Add y values for each x ('Day'); normalize to between 0 and 1.
+					#row_LastPrice.append(row.LastPrice)  #Add y values for each x ('Day')..encode('utf-8')
+					else:  #Skip an empty daily entry if LastPrice for the date doesn't exist or can't be converted to float type.
+						row_LastPrice.append(None)
+				except ValueError:  #Output error message when the field cannot be converted to float format.
 					pass
 					#print "error", e, "on line", row
+				
+				try:
+					if row.FiftyTwoWkChg:
+						row_FiftyTwoWkChg.append((float(row.FiftyTwoWkChg) - FiftyTwoWkChg_bound_return[0])/FiftyTwoWkChg_bound_return[1])
+					else:
+						row_FiftyTwoWkChg.append(None)
+				except ValueError:
+					pass
+				
 				'''
 				try:
 					if float(row.DivYild):
@@ -918,7 +936,7 @@ def get_query(request):  #Implement logic for query search.
 			#print total_row, len(total_row)
 			#coords = [(xval, yval) for xval, yval in zip(list(df.index[0:-1]), total_row)]
 			chart.add('Last Price', row_LastPrice, dots_size=0)
-			
+			chart.add('52-Wk Change', row_FiftyTwoWkChg, dots_size=0)
 			#chart.add('Dividend Yield', row_DivYild, dots_size=0)
 			#chart.add('Trail P/E', row_TrailPE, dots_size=0)
 			
@@ -931,7 +949,7 @@ def get_query(request):  #Implement logic for query search.
 			#date_list = [n for n in range(min(df.index), max(df.index))]
 			#print date_list
 			chart.x_labels = date_list
-			'''
+			
 			chart.y_labels = [
 				{'label': '0%', 'value': 0},
 				{'label': '10%', 'value': .1},
@@ -945,7 +963,7 @@ def get_query(request):  #Implement logic for query search.
 				{'label': '90%', 'value': .9},
 				{'label': '100%', 'value': 1}
 				]
-			'''
+			
 			chart_data = chart.render_data_uri()  #Allows direct embedding of SVG image into html instead of from an external image file.
 			#return render_template("home.html", chart_data = chart_data)
 			return render(request, 'blog/table_history.html', {'posts': queryset_list, 'last_element': last_element, 'chart_data': chart_data})
