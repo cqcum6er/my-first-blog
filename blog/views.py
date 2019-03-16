@@ -843,43 +843,13 @@ def get_query(request):  #Implement logic for query search.
 			
 			FiftyTwoWkChg_bound_return = get_field_bound(last_element.Symbol, 'FiftyTwoWkChg')
 			row_FiftyTwoWkChg = []
-			'''
-			ordered_DivYild = sym_all_ks.exclude(DivYild='N/A').extra(select={'DivYild': 'CAST(DivYild AS REAL)'}).order_by('DivYild')
-			max_DivYild = ordered_DivYild.last()
-			#print max_DivYild, type(max_DivYild)
-			max_DivYild_float = float(max_DivYild.DivYild)
-			#print "max =", max_DivYild_float, type(max_DivYild_float)
-			min_DivYild = ordered_DivYild.first()
-			min_DivYild_float = float(min_DivYild.DivYild)
-			#print "min =", min_DivYild_float, type(min_DivYild_float)
-			DivYild_rng = max_DivYild_float - min_DivYild_float
-			
+
 			DivYild_bound_return = get_field_bound(last_element.Symbol, 'DivYild')
 			row_DivYild = []
-			'''
-			'''
-			ordered_TrailPE = sym_all_ks.exclude(TrailPE='N/A').extra(select={'TrailPE': 'CAST(TrailPE AS REAL)'}).order_by('TrailPE')
-			max_TrailPE = ordered_TrailPE.last()
-			#print max_TrailPE, type(max_TrailPE)
-			max_TrailPE_float = float(max_TrailPE.TrailPE)
-			#print "max =", max_TrailPE_float, type(max_TrailPE_float)
-			min_TrailPE = ordered_TrailPE.first()
-			min_TrailPE_float = float(min_TrailPE.TrailPE)
-			#print "min =", min_TrailPE_float, type(min_TrailPE_float)
-			TrailPE_rng = max_TrailPE_float - min_TrailPE_float
-			'''
-			'''
-			#last_element_TrailPE = [f.TrailPE for f in last_element._meta.get_fields()]
-			#filter_col = [col for col in df if col.startswith('TrailPE')]
-			#print last_element.Symbol, filter_col[0]
-			#print last_element.Symbol, last_element._meta.get_all_field_names()
-			#print last_element.Symbol, getattr(last_element, last_element.TrailPE)
-			#print last_element.TrailPE, type(last_element.TrailPE)
-			#TrailPE_bound_return = get_field_bound(last_element.Symbol, last_element.TrailPE)
+
 			TrailPE_bound_return = get_field_bound(last_element.Symbol, 'TrailPE')
-			#TrailPE_bound_return = get_field_bound(last_element.Symbol)
 			row_TrailPE = []
-			'''
+
 			for row in df.itertuples(): #Prepare an iterable for df (more efficient than iterrows() or iteritems()) from historic records for a symbol.
 				#print row, type(row), list(row), type(list(row)), type(df)
 				#str_LastPrice = str(row.LastPrice)
@@ -902,43 +872,33 @@ def get_query(request):  #Implement logic for query search.
 						row_FiftyTwoWkChg.append(None)
 				except ValueError:
 					pass
-				
-				'''
+
 				try:
-					if float(row.DivYild):
+					if row.DivYild:
 						row_DivYild.append((float(row.DivYild) - DivYild_bound_return[0])/DivYild_bound_return[1])
 					else:
 						row_DivYild.append(None)
-				except ValueError, e:
+				except ValueError:
 					pass
-				
+
 				try:
-					if float(row.TrailPE):
-						
-						#row_TrailPE.append((float(row.TrailPE) - #min_TrailPE_float)/TrailPE_rng)
-						
-						
-						#print row.Symbol, type(row), list(row), type(list(row))
+					if row.TrailPE:
 						#filter_col = [col for col in df if col.startswith('TrailPE')]
 						#col_name = filter_col[0]  #Get the 1st list element (column name) as a string.
-						#print col_name, type(col_name)
-						#field_bound_return = get_field_bound(row.Symbol, col_name)
-						
 						row_TrailPE.append((float(row.TrailPE) - TrailPE_bound_return[0])/TrailPE_bound_return[1])
-						
 					else:
 						row_TrailPE.append(None)
-				except ValueError, e:
+				except ValueError:
 					pass
-				'''
+
 			#for row in range(355):  #y val test datapoint
 				#total_row.append(row)
 			#print total_row, len(total_row)
 			#coords = [(xval, yval) for xval, yval in zip(list(df.index[0:-1]), total_row)]
 			chart.add('Last Price', row_LastPrice, dots_size=0)
 			chart.add('52-Wk Change', row_FiftyTwoWkChg, dots_size=0)
-			#chart.add('Dividend Yield', row_DivYild, dots_size=0)
-			#chart.add('Trail P/E', row_TrailPE, dots_size=0)
+			chart.add('Dividend Yield', row_DivYild, dots_size=0)
+			chart.add('Trail P/E', row_TrailPE, dots_size=0)
 			
 			#chart.add('', coords)
 			#print df
